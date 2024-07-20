@@ -1,0 +1,10 @@
+.MuiDataGrid-columnHeaders {
+    background: rgb(57, 49, 132);
+    color:white;
+    font-size:14px;
+    font-weight:600;
+}
+
+.MuiDataGrid-column .HeadersMuiButtonBase-root{
+    color:white !important;
+}

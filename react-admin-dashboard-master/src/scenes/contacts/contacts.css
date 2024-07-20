@@ -1,0 +1,22 @@
+table {
+    width: 100%;
+    /* border-collapse: collapse; */
+    /* background-color: var(--blueAccent-500); */
+    text-align: center;
+  }
+  th, td {
+    border: 1px solid black;
+    /* padding: 8px; */
+    width:50%;
+    /* text-align: left; */
+  }
+  .tableHeader{
+    background-color: var(--blueAccent-500);
+  }
+  th {
+    
+  }
+
+  .bgChange{
+    background-color: #f2f2f2;
+  }
