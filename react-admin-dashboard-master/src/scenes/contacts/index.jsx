@@ -1,168 +1,197 @@
-import { Box } from "@mui/material";
-import { DataGrid, GridToolbar } from "@mui/x-data-grid";
-import { tokens } from "../../theme";
-import { mockDataContacts } from "../../data/mockData";
-import Header from "../../components/Header";
-import { useTheme } from "@mui/material";
-import "./contacts.css";
+import React, { useState } from 'react';
+import { Box, Button, Typography, Paper, Grid } from '@mui/material';
+import Header from '../../components/Header';
+import ClaimForm from '../../../src/files/Claim form.pdf';
+import CheckList from '../../../src/files/Check List.doc';
+import './contacts.css';
+
 const Contacts = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
+  const [insurance, setInsurance] = useState("XYZ Ltd");
+  const [TPA, setTPA] = useState("XZY Ltd");
+  const [SI, setSI] = useState("500000");
+  const [period, setPeriod] = useState("1st Apr 2024 To 31st March 2025");
 
+  // Define custom colors
+  const primaryColor = '#1E88E5';
+  const secondaryColor = '#FFC107';
+  const darkColor = '#333';
+  const lightColor = '#FFF';
+  const borderColor = '#E0E0E0';
   
-
   return (
     <Box m="20px">
-      <Header
-        title="Policy Coverage"
-        // subtitle="List of Contacts for Future Reference"
-      />
+      <Header title="Policy Coverage" />
 
-      <div>
-        <table border="1px">
-          
-            <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-              <th colSpan={2}>Coverage</th>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: '20px',
+          mb: 3,
+          p: 2,
+          border: `1px solid ${borderColor}`,
+          borderRadius: 2,
+          backgroundColor: lightColor,
+        }}
+      >
+        <Typography variant="body1" sx={{ fontWeight: 600 , fontSize:'16px' }}>Insurance:</Typography>
+        <Typography variant="body1" sx={{ fontSize:'16px'}}>{insurance}</Typography>
+
+        <Typography variant="body1" sx={{ fontWeight: 600 , fontSize:'16px'}}>TPA:</Typography>
+        <Typography variant="body1" sx={{ fontSize:'16px'}}>{TPA}</Typography>
+
+        <Typography variant="body1" sx={{ fontWeight: 600 , fontSize:'16px'}}>SI:</Typography>
+        <Typography variant="body1" sx={{ fontSize:'16px'}}>{SI}</Typography>
+
+        <Typography variant="body1" sx={{ fontWeight: 600 , fontSize:'16px'}}>Period:</Typography>
+        <Typography variant="body1" sx={{ fontSize:'16px'}}>{period}</Typography>
+      </Box>
+
+      <Box className="userbutton" mb={3}>
+        <Grid container spacing={2}>
+          <Grid item>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: primaryColor  , fontSize:'15px'}}
+              href="https://www.mediassist.in/network-hospital-search/"
+              target="_blank"
+            >
+              Network Hospital
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: secondaryColor , fontSize:'15px'}}
+              href={ClaimForm}
+              target="_blank"
+            >
+              Claim Form A & B
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: '#343a40', color: '#FFF' , fontSize:'15px'}}
+            >
+              Exclusion List
+            </Button>
+          </Grid>
+          <Grid item>
+            <Button
+              variant="contained"
+              style={{ backgroundColor: '#28a745', color: '#FFF' , fontSize:'15px'}}
+              href={CheckList}
+              target="_blank"
+            >
+              Check List
+            </Button>
+          </Grid>
+        </Grid>
+      </Box>
+
+      <Paper elevation={3} sx={{ p: 2 }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Coverage</th>
             </tr>
-
+          </thead>
+          <tbody>
             <tr>
-              <th className="tableHeader">Sum Assured</th>
-              <th>3 Lacs INR</th>
-            </tr>
-
-            <tr>
-              <th>Policy Type</th>
-              <th>Group Mediclaim Policy</th>
-            </tr>
-
-            <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-              <th colSpan={2} >Family Definition</th>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Sum Assured</th>
+              <td style={{ padding: '10px' }}>3 Lacs INR</td>
             </tr>
             <tr>
-              <th>Family Definition</th>
-              <th>Self + Spouse + 5 dependent Kids + 2 Dep. Parents/ Parents In Laws</th>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Policy Type</th>
+              <td style={{ padding: '10px' }}>Group Mediclaim Policy</td>
             </tr>
-
-            <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-              <th colSpan={2}>Room Rent Limits</th>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Family Definition</th>
             </tr>
-
             <tr>
-              <th>Normal room rent capping</th>
-              <th>2% for Normal</th>
-              </tr>
-
-              <tr>
-              <th>ICU room rent capping</th>
-              <th>4% for ICU</th>
-              </tr>
-
-              <tr>
-              <th>Pre-existing diseases</th>
-              <th>Covered from Day 1</th>
-              </tr>
-
-              <tr>
-                <th>30 days waiting period</th>
-                <th>Waived off</th>
-              </tr>
-
-              <tr>
-                <th>1st / 2nd / 3rd / 4th Year Waiting Period</th>
-                <th>Waived off</th>
-              </tr>
-
-
-              <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-                <th colSpan={2}>Maternity</th>
-              </tr>
-
-              <tr>
-                <th>9 months Waiting Period</th>
-                <th>Waived off</th>
-              </tr>
-
-              <tr>
-                <th>Maternity Limit</th>
-                <th>Rs 60,000 for Both Normal & Caesearean</th>
-              </tr>
-
-              <tr>
-                <th>New Born Cover </th>
-                <th>Covered from Day 1</th>
-              </tr>
-
-              <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-                <th colSpan={2}>Pre & Post Hospitalization</th>
-              </tr>
-
-              <tr>
-                <th>Pre-hospitalization costs </th>
-                <th>30 days </th>
-              </tr>
-
-              <tr>
-                <th>Post Hospitalization costs</th>
-                <th>60 days</th>
-              </tr>
-
-              <tr style={{backgroundColor:colors.blueAccent[500] , color:'white'}}>
-                <th colSpan={2}>Other Conditions</th>
-              </tr>
-
-              <tr>
-                <th>Oral Chemotherapy</th>
-                <th>Covered upto Family SI</th>
-              </tr>
-
-              <tr>
-                <th>Ambulance Charges</th>
-                <th>Rs 2,000 per Incident</th>
-              </tr>
-
-              <tr>
-                <th>Organ Donor</th>
-                <th>Covered upto Family SI</th>
-              </tr>
-
-              <tr>
-                <th>Disease-wise capping</th>
-                <th>No Capping on Diseases</th>
-              </tr>
-
-              <tr>
-                <th>Addition / Deletion of Lives</th>
-                <th>Pro-rata</th>
-              </tr>
-
-              <tr>
-                <th>Day Care Procedures</th>
-                <th>Covered from day 1 </th>
-              </tr>
-
-              <tr>
-                <th>Co-pay</th>
-                <th>5% Copay on All Claims</th>
-           </tr>
-
-              <tr>
-                <th>Corporate Buffer</th>
-                <th>Covered upto Rs 10 Lakhs applicable for all diseases</th>
-              </tr>
-
-              <tr>
-                <th>Parental Sum Insured Restriction</th>
-                <th>Parents Sum Insured Restriction for Claim up to 50% of sum insured</th>
-              </tr>
-
-              <tr>
-                <th>Disease-wise capping for Parents Only</th>
-                <th>Cataract limited to Rs.25,000/-per eye only.</th>
-              </tr>
-
+              <th style={{ padding: '10px', textAlign: 'left' }}>Family Definition</th>
+              <td style={{ padding: '10px' }}>Self + Spouse + 5 dependent Kids + 2 Dep. Parents/ Parents In Laws</td>
+            </tr>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Room Rent Limits</th>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Normal room rent capping</th>
+              <td style={{ padding: '10px' }}>2% for Normal</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>ICU room rent capping</th>
+              <td style={{ padding: '10px' }}>4% for ICU</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Pre-existing diseases</th>
+              <td style={{ padding: '10px' }}>Covered from Day 1</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>30 days waiting period</th>
+              <td style={{ padding: '10px' }}>Waived off</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>1st / 2nd / 3rd / 4th Year Waiting Period</th>
+              <td style={{ padding: '10px' }}>Waived off</td>
+            </tr>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Maternity</th>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>9 months Waiting Period</th>
+              <td style={{ padding: '10px' }}>Waived off</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Maternity Limit</th>
+              <td style={{ padding: '10px' }}>Rs 60,000 for Both Normal & Caesarean</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>New Born Cover</th>
+              <td style={{ padding: '10px' }}>Covered from Day 1</td>
+            </tr>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Pre & Post Hospitalization</th>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Pre-hospitalization costs</th>
+              <td style={{ padding: '10px' }}>30 days</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Post Hospitalization costs</th>
+              <td style={{ padding: '10px' }}>60 days</td>
+            </tr>
+            <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
+              <th colSpan={2} style={{ padding: '10px', textAlign: 'center' }}>Other Conditions</th>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Oral Chemotherapy</th>
+              <td style={{ padding: '10px' }}>Covered upto Family SI</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Ambulance Charges</th>
+              <td style={{ padding: '10px' }}>Rs 2,000 per Incident</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Organ Donor</th>
+              <td style={{ padding: '10px' }}>Covered upto Family SI</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Disease-wise capping</th>
+              <td style={{ padding: '10px' }}>No Capping on Diseases</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Addition / Deletion of Lives</th>
+              <td style={{ padding: '10px' }}>Pro-rata</td>
+            </tr>
+            <tr>
+              <th style={{ padding: '10px', textAlign: 'left' }}>Policy Cancellation</th>
+              <td style={{ padding: '10px' }}>Refund of Pro-rata Premium</td>
+            </tr>
+          </tbody>
         </table>
-      </div>
-      
+      </Paper>
     </Box>
   );
 };

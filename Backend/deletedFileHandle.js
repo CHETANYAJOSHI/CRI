@@ -16,7 +16,15 @@ const storage = multer.diskStorage({
   }
 });
 
-const selfupload = multer({ storage: storage });
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
+      file.mimetype !== 'application/vnd.ms-excel') {
+      return cb(new Error('Only Excel files are allowed'), false);
+  }
+  cb(null, true);
+};
+
+const selfupload = multer({ storage: storage,fileFilter:fileFilter });
 
 const selfUpload = (req, res) => {
   try {

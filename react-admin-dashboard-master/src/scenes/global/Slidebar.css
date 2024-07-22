@@ -1,3 +1,31 @@
-.pro-menu-item{
-    color:black !important;
-}
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px; /* Adjust the width as needed */
+    background-color: rgb(57, 49, 132) !important;
+    color: white !important;
+    overflow: hidden;
+  }
+
+.pro-menu {
+    background-color: rgb(57, 49, 132) !important;
+  }
+  
+  .pro-menu-item {
+    color: white !important;
+  }
+  
+  .pro-menu-item:hover {
+    color: #868dfb !important;
+  }
+  
+  .pro-menu-item.active {
+    color: #6870fa !important;
+  }
+  
+  .pro-icon-wrapper {
+    color: white !important;
+  }
+  

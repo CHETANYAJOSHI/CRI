@@ -6,7 +6,7 @@ const path = require('path');
 const moment = require('moment');
 const fs = require('fs');
 const multer = require('multer');
-
+const { embedPdfInExcel } = require('./processexcel');
 const app = express();
 const PORT = 5000;
 const FILE_PATH = path.join(__dirname, 'uploads', 'data.xlsx');
@@ -14,12 +14,25 @@ const { getDeletedDataHandler, updateRowHandler, deleteRowHandler , selfDownload
 const { getfloatDeletedDataHandler, floatupdateRowHandler, floatdeleteRowHandler ,floaterDownload, floaterUpload ,floaterupload } = require('./floaterDeleted');
 const {claimdumpdatahandler, updateclaimdump, claimdumpdownload, claimdumpupload, claimdump}= require("./claimdump");
 const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
-
+const pdfRouter = require('./pdfHandler');
+app.get('/process-excel', (req, res) => {
+    const excelFilePath = path.join(__dirname, 'file', 'data.xlsx'); // Update this path
+    const pdfFolderPath1 = path.join(__dirname, 'Employee, Family & Parents'); // Update this path
+    const outputFilePath = path.join(__dirname, 'updatefile', 'data.xlsx'); // Update this path
+    const pdfFolderPath2 = path.join(__dirname, 'Employee and Parents')
+    try {
+        processExcel(excelFilePath, pdfFolderPath1,pdfFolderPath2, outputFilePath);
+        res.send('Excel file processed and updated with PDF links.');
+    } catch (error) {
+        console.error('Error processing Excel file:', error);
+        res.status(500).send('Error processing Excel file.');
+    }
+});
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
-
+app.use('/pdf', pdfRouter);
 app.get('/api/deleted-data', getDeletedDataHandler);
 app.put('/api/update-row/:rowIndex', updateRowHandler);
 app.delete('/api/delete-row/:rowIndex', deleteRowHandler);
@@ -68,7 +81,7 @@ const fileFilter = (req, file, cb) => {
     cb(null, true);
 };
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage: storage , fileFilter:fileFilter });
 
 // Endpoint to download the Excel file
 app.get('/download-file', (req, res) => {

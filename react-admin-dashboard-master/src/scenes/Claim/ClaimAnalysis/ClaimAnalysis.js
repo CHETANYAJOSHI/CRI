@@ -1,83 +1,63 @@
-import { Box, Typography, useTheme } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
-import { tokens } from "../../../theme";
-import { mockDataInvoices } from "../../../data/mockData";
-import Header from "../../../components/Header";
+// src/components/PdfViewer.js
+import React, { useState, useEffect } from 'react';
 
-const ClaimAnalysis = () => {
-  const theme = useTheme();
-  const colors = tokens(theme.palette.mode);
-  const columns = [
-    { field: "id", headerName: "ID" },
-    {
-      field: "name",
-      headerName: "Name",
-      flex: 1,
-      cellClassName: "name-column--cell",
-    },
-    {
-      field: "phone",
-      headerName: "Phone Number",
-      flex: 1,
-    },
-    {
-      field: "email",
-      headerName: "Email",
-      flex: 1,
-    },
-    {
-      field: "cost",
-      headerName: "Cost",
-      flex: 1,
-      renderCell: (params) => (
-        <Typography color={colors.greenAccent[500]}>
-          ${params.row.cost}
-        </Typography>
-      ),
-    },
-    {
-      field: "date",
-      headerName: "Date",
-      flex: 1,
-    },
-  ];
+const CalimAnalysis = () => {
+    const [file, setFile] = useState(null);
+    const [message, setMessage] = useState('');
 
-  return (
-    <Box m="20px">
-      <Header title="Enrollment/Claim Analysis" />
-      <Box
-        m="40px 0 0 0"
-        height="75vh"
-        sx={{
-          "& .MuiDataGrid-root": {
-            border: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            borderBottom: "none",
-          },
-          "& .name-column--cell": {
-            color: colors.greenAccent[300],
-          },
-          "& .MuiDataGrid-columnHeaders": {
-            backgroundColor: colors.blueAccent[700],
-            borderBottom: "none",
-          },
-          "& .MuiDataGrid-virtualScroller": {
-            backgroundColor: colors.primary[400],
-          },
-          "& .MuiDataGrid-footerContainer": {
-            borderTop: "none",
-            backgroundColor: colors.blueAccent[700],
-          },
-          "& .MuiCheckbox-root": {
-            color: `${colors.greenAccent[200]} !important`,
-          },
-        }}
-      >
-        <DataGrid checkboxSelection rows={mockDataInvoices} columns={columns} />
-      </Box>
-    </Box>
-  );
+    // Handle file input change
+    const handleFileChange = (e) => {
+        setFile(e.target.files[0]);
+    };
+
+    // Upload new PDF file
+    const handleUpload = async (e) => {
+        e.preventDefault();
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await fetch('http://localhost:5000/pdf/upload', {
+                method: 'POST',
+                body: formData,
+            });
+            const result = await response.text();
+            setMessage(result);
+            loadPdfViewer(); // Refresh the PDF viewer to show the updated file
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setMessage('Failed to upload file');
+        }
+    };
+
+    // Load PDF viewer with the current file
+    const loadPdfViewer = () => {
+        document.getElementById('pdfViewer').src = 'http://localhost:5000/pdf/file';
+    };
+
+    // Load PDF viewer initially
+    useEffect(() => {
+        loadPdfViewer();
+    }, []);
+
+    return (
+        <div>
+            <h1>Upload and View PDF</h1>
+            <form onSubmit={handleUpload}>
+                <input type="file" accept="application/pdf" onChange={handleFileChange} />
+                <button type="submit">Upload PDF</button>
+            </form>
+            {message && <p>{message}</p>}
+            <a href="http://localhost:5000/pdf/download" download>Download PDF</a>
+            <iframe
+                id="pdfViewer"
+                style={{ width: '100%', height: '600px', border: '1px solid #ccc' }}
+                title="PDF Viewer"
+            ></iframe>
+        </div>
+    );
 };
 
-export default ClaimAnalysis;
+export default CalimAnalysis;

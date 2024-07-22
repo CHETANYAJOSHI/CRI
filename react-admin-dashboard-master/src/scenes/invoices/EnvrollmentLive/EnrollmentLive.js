@@ -93,7 +93,7 @@ const Invoices = () => {
             alert('File uploaded successfully!');
         } catch (error) {
             console.error('Error uploading file:', error);
-            alert('Error uploading file. Please try again.');
+            alert('Only Excel File Allowed.');
         } finally {
             setFile(null); // Reset file state
             setFileSelected(false); // Reset fileSelected state
@@ -279,11 +279,12 @@ const Invoices = () => {
                 height: '100vh',
                 overflowX: 'auto',
                 overflowY: 'auto',
-                padding: '20px'
+                padding: '20px',
+                margin:'auto'
             }}
         >
 
-<Box style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
+            <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
                         <input type="file" onChange={handleFileChange} />
                         <Button
                             onClick={handleFileUpload}
@@ -324,10 +325,10 @@ const Invoices = () => {
                         <Table>
                             <TableHead>
                             <TableRow>
-                                        <StyledTableCell>Actions</StyledTableCell>
+                                        <StyledTableCell style={{color:'#4cceac'}}>Actions</StyledTableCell>
                                         
                                         {headers.map((header) => (
-                                            <StyledTableCell key={header}>
+                                            <StyledTableCell key={header} style={{color:'#4cceac'}}>
                                                 {header}
                                             </StyledTableCell>
                                         ))}

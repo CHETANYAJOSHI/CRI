@@ -223,6 +223,7 @@ const handleFileUpload = async () => {
         overflowX: 'auto',
         overflowY: 'auto',
         padding: '20px',
+        margin:'auto'
       }}
     >
 

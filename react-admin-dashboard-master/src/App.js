@@ -26,7 +26,7 @@ import Downloads from "./components/Downloads/Downloads";
 import Wellness from "./components/Wellness/Wellness";
 import FloaterDeleted from "./scenes/invoices/DeletedData/FloaterDeleted";
 import RackRates from "./scenes/Rackrates/RackRates";
-
+import CreateAccount from "./components/CreateAccount/CreateAccount";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -44,6 +44,7 @@ function App() {
           <main className="content">
             {!noSidebarPaths.includes(location.pathname) && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
+              <Route path="/createaccount" element={<CreateAccount />} />
             <Route path="/claim/claimanalysis" element={<ClaimAnalysis />} />
             <Route path="/claim/claimdumb" element={<ClaimDumb />} />
             <Route path="/downloads" element={<Downloads/>} />

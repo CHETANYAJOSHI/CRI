@@ -37,7 +37,8 @@ import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SpaIcon from '@mui/icons-material/Spa';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-
+import profile from "../../images/profile.avif"
+import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import './Slidebar.css';
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
@@ -92,7 +93,7 @@ const Sidebar = () => {
         },
       }}
     >
-      <ProSidebar collapsed={isCollapsed}>
+      <ProSidebar collapsed={isCollapsed} style={{width:'100px'}}>
         <Menu iconShape="square">
           {/* LOGO AND MENU ICON */}
           <MenuItem
@@ -100,7 +101,7 @@ const Sidebar = () => {
             icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
             style={{
               margin: "10px 0 20px 0",
-              color: colors.grey[100],
+              color: "white",
             }}
           >
             {!isCollapsed && (
@@ -110,10 +111,10 @@ const Sidebar = () => {
                 alignItems="center"
                 ml="15px"
               >
-                <Typography variant="h3" color={colors.grey[100]}>
-                  ADMINIS
+                <Typography variant="h3" style={{color:'white' , fontWeight:'600'}}>
+                  ADMIN
                 </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)}>
+                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{color:"white"}}>
                   <MenuOutlinedIcon />
                 </IconButton>
               </Box>
@@ -127,14 +128,14 @@ const Sidebar = () => {
                   alt="profile-user"
                   width="100px"
                   height="100px"
-                  src={`../../assets/user.png`}
+                  src={profile}
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
               <Box textAlign="center">
                 <Typography
                   variant="h2"
-                  color={colors.grey[100]}
+                  style={{color:"white"}}
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
@@ -156,9 +157,17 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
+            <Item
+              title="Create Account"
+              to="/createaccount"
+              icon={<FolderSharedIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+
             <Typography
               variant="h6"
-              color={colors.grey[300]}
+              style={{color:"white" , fontSize:'17px', fontWeight:600}}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Data
@@ -276,7 +285,7 @@ const Sidebar = () => {
               icon={<SimCardDownloadIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> 
 
             <Item
               title="Wellness"
@@ -317,7 +326,7 @@ const Sidebar = () => {
 
             <Typography
               variant="h6"
-              color={colors.grey[300]}
+              style={{color:"white" , fontSize:'17px', fontWeight:600}}
               sx={{ m: "15px 0 5px 20px" }}
             >
               Charts

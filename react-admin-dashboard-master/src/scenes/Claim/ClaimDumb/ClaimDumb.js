@@ -68,7 +68,7 @@ const handleFileUpload = async () => {
         alert('File uploaded successfully!');
     } catch (error) {
         console.error('Error uploading file:', error);
-        alert('Error uploading file. Please try again.');
+        alert('Only Excel file Is Allowed');
     } finally {
         setFile(null); // Reset file state
         setFileSelected(false); // Reset fileSelected state
@@ -222,6 +222,7 @@ const handleFileUpload = async () => {
         overflowX: 'auto',
         overflowY: 'auto',
         padding: '20px',
+        margin:'auto'
       }}
     >
        <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>

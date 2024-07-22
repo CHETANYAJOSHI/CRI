@@ -20,3 +20,35 @@ table {
   .bgChange{
     background-color: #f2f2f2;
   }
+
+  .usertable {
+    border:none;
+    width:100%;
+    font-size:17px;
+    text-align:left
+  }
+
+
+
+  .user{
+    justify-content: space-around;
+  }
+
+  .userbutton{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content: space-evenly;
+  }
+
+  .userdetails{
+    justify-content: space-between;
+  }
+
+  .detail1{
+    
+    justify-content: space-around;
+  }
+
+   .detail1 p{
+    font-size:16px;
+   }
