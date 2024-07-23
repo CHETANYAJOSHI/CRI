@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import axios from 'axios'
 import { Box, Button, Typography, Paper, Grid } from '@mui/material';
 import Header from '../../components/Header';
 import ClaimForm from '../../../src/files/Claim form.pdf';
 import CheckList from '../../../src/files/Check List.doc';
+import { useLocation } from 'react-router-dom';
 import './contacts.css';
 
 const Contacts = () => {
@@ -11,16 +13,52 @@ const Contacts = () => {
   const [SI, setSI] = useState("500000");
   const [period, setPeriod] = useState("1st Apr 2024 To 31st March 2025");
 
+
+  const [accountData, setAccountData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const location = useLocation();
+
   // Define custom colors
   const primaryColor = '#1E88E5';
   const secondaryColor = '#FFC107';
   const darkColor = '#333';
   const lightColor = '#FFF';
   const borderColor = '#E0E0E0';
+
+
+
+  useEffect(() => {
+    const fetchAccountData = async () => {
+      const query = new URLSearchParams(location.search);
+      const accountId = query.get('accountId');
+
+      if (accountId) {
+        try {
+          const res = await axios.get(`http://localhost:5000/api/accounts/${accountId}`);
+          setAccountData(res.data);
+        } catch (err) {
+          setError('Failed to fetch account data');
+          console.error('Error fetching account data:', err);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setError('No account ID provided');
+        setLoading(false);
+      }
+    };
+
+    fetchAccountData();
+  }, [location.search]);
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   
   return (
     <Box m="20px">
-      <Header title="Policy Coverage" />
+      <Header title={`Policy Coverage : ${accountData.accountName}`} />
 
       <Box
         sx={{
@@ -53,7 +91,7 @@ const Contacts = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: primaryColor  , fontSize:'15px'}}
-              href="https://www.mediassist.in/network-hospital-search/"
+              href={accountData.networkHospitalLink}
               target="_blank"
             >
               Network Hospital

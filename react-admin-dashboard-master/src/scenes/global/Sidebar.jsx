@@ -179,9 +179,12 @@ const Sidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
+
+
+
             <Item
               title="Policy Coverage"
-              to="/policycoverage"
+              to="/selectAccount"
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}

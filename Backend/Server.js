@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const userRoutes = require('./routes/userRoutes');
+const accountRouters = require('./routes/accountRoutes');
 const xlsx = require('xlsx');
 const path = require('path');
 const moment = require('moment');
@@ -15,6 +17,21 @@ const { getfloatDeletedDataHandler, floatupdateRowHandler, floatdeleteRowHandler
 const {claimdumpdatahandler, updateclaimdump, claimdumpdownload, claimdumpupload, claimdump}= require("./claimdump");
 const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
 const pdfRouter = require('./pdfHandler');
+const fileUpload = require('express-fileupload');
+
+const connectDB = require('./config');
+require('dotenv').config();
+
+app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(fileUpload());
+connectDB();
+app.use('/api' , accountRouters)
+
+app.use('/api', userRoutes);
+
+
+
 app.get('/process-excel', (req, res) => {
     const excelFilePath = path.join(__dirname, 'file', 'data.xlsx'); // Update this path
     const pdfFolderPath1 = path.join(__dirname, 'Employee, Family & Parents'); // Update this path
@@ -30,8 +47,9 @@ app.get('/process-excel', (req, res) => {
 });
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+
+
+
 app.use('/pdf', pdfRouter);
 app.get('/api/deleted-data', getDeletedDataHandler);
 app.put('/api/update-row/:rowIndex', updateRowHandler);

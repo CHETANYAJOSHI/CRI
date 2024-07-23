@@ -27,6 +27,8 @@ import Wellness from "./components/Wellness/Wellness";
 import FloaterDeleted from "./scenes/invoices/DeletedData/FloaterDeleted";
 import RackRates from "./scenes/Rackrates/RackRates";
 import CreateAccount from "./components/CreateAccount/CreateAccount";
+import SelectAccount from "./components/SelectAccount/SelectAccount";
+
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -45,9 +47,10 @@ function App() {
             {!noSidebarPaths.includes(location.pathname) && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
               <Route path="/createaccount" element={<CreateAccount />} />
-            <Route path="/claim/claimanalysis" element={<ClaimAnalysis />} />
-            <Route path="/claim/claimdumb" element={<ClaimDumb />} />
-            <Route path="/downloads" element={<Downloads/>} />
+              <Route path="/selectAccount" element={<SelectAccount />} />
+              <Route path="/claim/claimanalysis" element={<ClaimAnalysis />} />
+              <Route path="/claim/claimdumb" element={<ClaimDumb />} />
+              <Route path="/downloads" element={<Downloads/>} />
               <Route path="/enrollment/live" element={<EnrollmentLive />} />
               <Route path="/enrollement/rack-rates" element={<RackRates />} />
               <Route path="/enrollment/premium" element={<Premium />} />
