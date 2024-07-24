@@ -3,8 +3,10 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const accountRouters = require('./routes/accountRoutes');
+const Account=require('./routes/download');
 const xlsx = require('xlsx');
 const path = require('path');
+// const fileUpload = require('express-fileupload');
 const moment = require('moment');
 const fs = require('fs');
 const multer = require('multer');
@@ -17,15 +19,19 @@ const { getfloatDeletedDataHandler, floatupdateRowHandler, floatdeleteRowHandler
 const {claimdumpdatahandler, updateclaimdump, claimdumpdownload, claimdumpupload, claimdump}= require("./claimdump");
 const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
 const pdfRouter = require('./pdfHandler');
-const fileUpload = require('express-fileupload');
 
-const connectDB = require('./config');
 require('dotenv').config();
 
-app.use(cors());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(fileUpload());
+const connectDB = require('./config');
+
+// app.use(fileUpload());
 connectDB();
+app.use(cors());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.use('/api/files' , Account)
 app.use('/api' , accountRouters)
 
 app.use('/api', userRoutes);

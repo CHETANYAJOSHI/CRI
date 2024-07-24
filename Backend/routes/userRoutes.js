@@ -1,11 +1,13 @@
 // backend/routes/userRoutes.js
 const express = require('express');
-const { createUser } = require('../controllers/userControllers');
+const router = express.Router();
 const fileUpload = require('express-fileupload');
+const { createUser } = require('../controllers/userControllers');
+
 
 // Middleware for file uploads
 
-const router = express.Router();
+
 router.use(fileUpload());
 router.post('/createaccount', createUser);
 

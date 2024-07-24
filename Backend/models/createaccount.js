@@ -5,7 +5,6 @@ const UserSchema = new mongoose.Schema({
   accountName: {
     type: String,
     required: true,
-   
   },
   networkHospitalLink: {
     type: String,

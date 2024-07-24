@@ -26,7 +26,8 @@ const Contacts = () => {
   const lightColor = '#FFF';
   const borderColor = '#E0E0E0';
 
-
+  const query = new URLSearchParams(location.search);
+  const accountId = query.get('accountId');
 
   useEffect(() => {
     const fetchAccountData = async () => {
@@ -59,7 +60,7 @@ const Contacts = () => {
   return (
     <Box m="20px">
       <Header title={`Policy Coverage : ${accountData.accountName}`} />
-
+      
       <Box
         sx={{
           display: 'flex',
@@ -93,6 +94,7 @@ const Contacts = () => {
               style={{ backgroundColor: primaryColor  , fontSize:'15px'}}
               href={accountData.networkHospitalLink}
               target="_blank"
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/networkHospitalFile`, '_blank')}
             >
               Network Hospital
             </Button>
