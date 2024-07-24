@@ -94,7 +94,7 @@ const Contacts = () => {
               style={{ backgroundColor: primaryColor  , fontSize:'15px'}}
               href={accountData.networkHospitalLink}
               target="_blank"
-              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/networkHospitalFile`, '_blank')}
+
             >
               Network Hospital
             </Button>
@@ -105,6 +105,7 @@ const Contacts = () => {
               style={{ backgroundColor: secondaryColor , fontSize:'15px'}}
               href={ClaimForm}
               target="_blank"
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/claimsFile`, '_blank')}
             >
               Claim Form A & B
             </Button>

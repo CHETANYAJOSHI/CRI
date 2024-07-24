@@ -11,13 +11,13 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: 'No files were uploaded.' });
     }
 
-    const networkHospitalFile = req.files.networkHospitalFile;
+    // const networkHospitalFile = req.files.networkHospitalFile;
     const claimsFile = req.files.claimsFile;
     const exclusionFile = req.files.exclusionFile;
     const checklistFile = req.files.checklistFile;
 
     // Ensure that files are present
-    if (!networkHospitalFile || !claimsFile || !exclusionFile || !checklistFile) {
+    if (!claimsFile || !exclusionFile || !checklistFile) {
       return res.status(400).json({ message: 'Some files are missing.' });
     }
 
@@ -29,15 +29,15 @@ const createUser = async (req, res) => {
     }
 
     // Define file paths
-    const networkHospitalFilePath = path.join(accountFolderPath, networkHospitalFile.name);
+    // const networkHospitalFilePath = path.join(accountFolderPath, networkHospitalFile.name);
     const claimsFilePath = path.join(accountFolderPath, claimsFile.name);
     const exclusionFilePath = path.join(accountFolderPath, exclusionFile.name);
     const checklistFilePath = path.join(accountFolderPath, checklistFile.name);
 
     // Move files to the account-specific directory
-    networkHospitalFile.mv(networkHospitalFilePath, err => {
-      if (err) return res.status(500).json({ message: 'Failed to upload network hospital file' });
-    });
+    // networkHospitalFile.mv(networkHospitalFilePath, err => {
+    //   if (err) return res.status(500).json({ message: 'Failed to upload network hospital file' });
+    // });
     claimsFile.mv(claimsFilePath, err => {
       if (err) return res.status(500).json({ message: 'Failed to upload claims file' });
     });
@@ -52,7 +52,7 @@ const createUser = async (req, res) => {
     const user = new User({
       accountName,
       networkHospitalLink,
-      networkHospitalFile: path.join(accountName, networkHospitalFile.name),  // Store relative path
+      // networkHospitalFile: path.join(accountName, networkHospitalFile.name),  // Store relative path
       claimsFile: path.join(accountName, claimsFile.name),  // Store relative path
       exclusionFile: path.join(accountName, exclusionFile.name),  // Store relative path
       checklistFile: path.join(accountName, checklistFile.name),  // Store relative path

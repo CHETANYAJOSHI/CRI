@@ -10,10 +10,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  networkHospitalFile: {
-    type: String,
-    required: false,
-  },
+  
   claimsFile: {
     type: String,
     required: false,
