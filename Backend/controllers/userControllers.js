@@ -15,9 +15,10 @@ const createUser = async (req, res) => {
     const claimsFile = req.files.claimsFile;
     const exclusionFile = req.files.exclusionFile;
     const checklistFile = req.files.checklistFile;
+    const liveDataFile = req.files.liveDataFile;
 
     // Ensure that files are present
-    if (!claimsFile || !exclusionFile || !checklistFile) {
+    if (!claimsFile || !exclusionFile || !checklistFile || !liveDataFile) {
       return res.status(400).json({ message: 'Some files are missing.' });
     }
 
@@ -33,7 +34,7 @@ const createUser = async (req, res) => {
     const claimsFilePath = path.join(accountFolderPath, claimsFile.name);
     const exclusionFilePath = path.join(accountFolderPath, exclusionFile.name);
     const checklistFilePath = path.join(accountFolderPath, checklistFile.name);
-
+    const liveDataFilePath = path.join(accountFolderPath, liveDataFile.name);
     // Move files to the account-specific directory
     // networkHospitalFile.mv(networkHospitalFilePath, err => {
     //   if (err) return res.status(500).json({ message: 'Failed to upload network hospital file' });
@@ -47,6 +48,9 @@ const createUser = async (req, res) => {
     checklistFile.mv(checklistFilePath, err => {
       if (err) return res.status(500).json({ message: 'Failed to upload checklist file' });
     });
+    liveDataFile.mv(liveDataFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload LiveData file' });
+    });
 
     // Create a new user with relative file paths
     const user = new User({
@@ -56,6 +60,7 @@ const createUser = async (req, res) => {
       claimsFile: path.join(accountName, claimsFile.name),  // Store relative path
       exclusionFile: path.join(accountName, exclusionFile.name),  // Store relative path
       checklistFile: path.join(accountName, checklistFile.name),  // Store relative path
+      liveDataFile: path.join(accountName, liveDataFile.name),  // Store relative path
     });
 
     await user.save();

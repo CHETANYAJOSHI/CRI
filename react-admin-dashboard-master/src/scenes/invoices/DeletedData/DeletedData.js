@@ -144,6 +144,7 @@ const handleFileUpload = async () => {
       );
       setDialogOpen(false);
       setSelectedRow(null);
+      console.log(selectedRow)
     } catch (error) {
       setError(error.message);
     }

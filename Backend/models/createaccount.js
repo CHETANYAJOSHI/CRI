@@ -23,6 +23,10 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
+  liveDataFile: {
+    type: String,
+    required: false,
+  }
 });
 
 module.exports = mongoose.model('Accounts', UserSchema);

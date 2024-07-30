@@ -94,7 +94,7 @@ const Contacts = () => {
               style={{ backgroundColor: primaryColor  , fontSize:'15px'}}
               href={accountData.networkHospitalLink}
               target="_blank"
-
+            
             >
               Network Hospital
             </Button>
@@ -114,6 +114,7 @@ const Contacts = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: '#343a40', color: '#FFF' , fontSize:'15px'}}
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/exclusionFile`, '_blank')}
             >
               Exclusion List
             </Button>
@@ -124,6 +125,7 @@ const Contacts = () => {
               style={{ backgroundColor: '#28a745', color: '#FFF' , fontSize:'15px'}}
               href={CheckList}
               target="_blank"
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/checklistFile`, '_blank')}
             >
               Check List
             </Button>

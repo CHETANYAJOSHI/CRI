@@ -40,11 +40,7 @@ const updateAccount = async (req, res) => {
     }
 
     // Replace files
-    if (files.networkHospitalFile) {
-      const filePath = path.join(__dirname, '../NewAccounts', files.networkHospitalFile.name);
-      files.networkHospitalFile.mv(filePath);
-      account.networkHospitalFile = filePath;
-    }
+   
     if (files.claimsFile) {
       const filePath = path.join(__dirname, '../NewAccounts', files.claimsFile.name);
       files.claimsFile.mv(filePath);
@@ -60,10 +56,15 @@ const updateAccount = async (req, res) => {
       files.checklistFile.mv(filePath);
       account.checklistFile = filePath;
     }
+    if (files.liveDataFile) {
+      const filePath = path.join(__dirname, '../NewAccounts', files.liveDataFile.name);
+      files.liveDataFile.mv(filePath);
+      account.liveDataFile = filePath;
+    }
 
     account.accountName = accountName || account.accountName;
     account.networkHospitalLink = networkHospitalLink || account.networkHospitalLink;
-
+    
     await account.save();
     res.json({ message: 'Account updated successfully', account });
   } catch (err) {
@@ -72,4 +73,38 @@ const updateAccount = async (req, res) => {
   }
 };
 
-module.exports = { getAllAccounts, getAccountData, updateAccount };
+
+const getLiveDataFilePath = async (accountId) => {
+  const account = await Account.findById(accountId);
+  if (!account || !account.liveDataFile) {
+    throw new Error('Account or liveDataFile not found');
+  }
+  return path.join(__dirname, '..', 'NewAccounts', account.accountName, account.liveDataFile);
+};
+
+// Function to read Excel data from the first sheet
+const claimdumexcel = async (accountId) => {
+  const filePath = await getLiveDataFilePath(accountId);
+  const workbook = xlsx.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const xlData = xlsx.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
+  return xlData;
+};
+
+// Handler to fetch data from Excel file
+const claimdumpdatahandler = async (req, res) => {
+  try {
+    const accountId = req.params.accountId;
+    const xlData = await claimdumexcel(accountId);
+    const headers = xlData[0];
+    const data = xlData.slice(1);
+    res.json({ headers, data });
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    res.status(500).json({ error: 'Failed to fetch data' });
+  }
+};
+
+
+module.exports = { getAllAccounts, getAccountData, updateAccount,claimdumpdatahandler };

@@ -117,6 +117,7 @@ const CreateAccount = () => {
   const [claimsFile, setClaimsFile] = useState(null);
   const [exclusionFile, setExclusionFile] = useState(null);
   const [checklistFile, setChecklistFile] = useState(null);
+  const [liveDataFile, setLiveDataFile] = useState(null);
   const [message, setMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [accountDetails, setAccountDetails] = useState({});
@@ -131,6 +132,8 @@ const CreateAccount = () => {
       setExclusionFile(files[0]);
     } else if (name === 'checklistFile') {
       setChecklistFile(files[0]);
+    }else if (name === 'liveDataFile') {
+      setLiveDataFile(files[0]);
     }
   };
 
@@ -143,7 +146,7 @@ const CreateAccount = () => {
     formData.append('claimsFile', claimsFile);
     formData.append('exclusionFile', exclusionFile);
     formData.append('checklistFile', checklistFile);
-
+    formData.append('liveDataFile', liveDataFile);
     try {
       const res = await axios.post('http://localhost:5000/api/createaccount', formData, {
         headers: {
@@ -210,6 +213,10 @@ const CreateAccount = () => {
             <Label htmlFor="checklistFile">Upload Checklist File</Label>
             <Input type="file" id="checklistFile" name="checklistFile" onChange={onFileChange} />
           </FormGroup>
+          <FormGroup>
+            <Label htmlFor="liveDataFile">Upload Live Data File</Label>
+            <Input type="file" id="liveDataFile" name="liveDataFile" onChange={onFileChange} />
+          </FormGroup>
           <Button type="submit">Upload</Button>
         </Form>
         {message && <Message>{message}</Message>}
@@ -227,6 +234,7 @@ const CreateAccount = () => {
             <p><strong>Claims File:</strong> {accountDetails.claimsFile}</p>
             <p><strong>Exclusion File:</strong> {accountDetails.exclusionFile}</p>
             <p><strong>Checklist File:</strong> {accountDetails.checklistFile}</p>
+            <p><strong>LiveData File:</strong> {accountDetails.liveDataFile}</p>
           </ModalContent>
         </Modal>
       )}
