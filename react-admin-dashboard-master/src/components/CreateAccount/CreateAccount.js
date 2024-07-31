@@ -124,16 +124,26 @@ const CreateAccount = () => {
 
   const onFileChange = (e) => {
     const { name, files } = e.target;
-    if (name === 'networkHospitalFile') {
-      setNetworkHospitalFile(files[0]);
-    } else if (name === 'claimsFile') {
-      setClaimsFile(files[0]);
-    } else if (name === 'exclusionFile') {
-      setExclusionFile(files[0]);
-    } else if (name === 'checklistFile') {
-      setChecklistFile(files[0]);
-    }else if (name === 'liveDataFile') {
-      setLiveDataFile(files[0]);
+    if (files.length > 0) {
+      switch (name) {
+        case 'networkHospitalFile':
+          setNetworkHospitalFile(files[0]);
+          break;
+        case 'claimsFile':
+          setClaimsFile(files[0]);
+          break;
+        case 'exclusionFile':
+          setExclusionFile(files[0]);
+          break;
+        case 'checklistFile':
+          setChecklistFile(files[0]);
+          break;
+        case 'liveDataFile':
+          setLiveDataFile(files[0]);
+          break;
+        default:
+          break;
+      }
     }
   };
 
@@ -147,6 +157,7 @@ const CreateAccount = () => {
     formData.append('exclusionFile', exclusionFile);
     formData.append('checklistFile', checklistFile);
     formData.append('liveDataFile', liveDataFile);
+
     try {
       const res = await axios.post('http://localhost:5000/api/createaccount', formData, {
         headers: {

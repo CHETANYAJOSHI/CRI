@@ -15,6 +15,8 @@ import {
 } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -59,6 +61,7 @@ const Invoices = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editRow, setEditRow] = useState(null);
   const [editData, setEditData] = useState({});
+  const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -86,14 +89,9 @@ const Invoices = () => {
   const fetchLiveDataFile = async (accountId) => {
     setLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/account/${accountId}/live-data-file`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch live data file');
-      }
-      const jsonData = await response.json();
-      setHeaders(jsonData.headers);
-      setData(jsonData.data);
-      // console.log(data);
+      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/live-data-file`);
+      setHeaders(response.data.headers);
+      setData(response.data.data);
     } catch (error) {
       console.error('Error fetching live data file:', error);
     } finally {
@@ -129,20 +127,64 @@ const Invoices = () => {
 
   const handleEditSave = async () => {
     try {
-      // Perform PUT request to update the row
       await axios.put(`http://localhost:5000/api/account/${selectedAccount}/update-row`, {
-        rowId: editRow.id, // Send the row ID to the server
+        rowId: editRow.id,
         updatedData: editData,
       });
-      
-  
-      // Refresh the data after saving
       fetchLiveDataFile(selectedAccount);
     } catch (error) {
       console.error('Error updating row:', error);
-      console.log(editData)
     } finally {
       setEditRow(null);
+    }
+  };
+
+  const handleDownloadClick = async () => {
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:5000/api/account/${selectedAccount}/download-file`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'data.xlsx');
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    setFile(event.target.files[0]);
+  };
+
+  const handleUploadClick = async () => {
+    if (!file || !selectedAccount) {
+      alert('Please select a file and an account first.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/upload-file`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      alert('File uploaded successfully');
+      fetchLiveDataFile(selectedAccount); // Refresh data
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      console.log(file);
+      console.log(formData.append('file', file))
     }
   };
 
@@ -208,6 +250,40 @@ const Invoices = () => {
         </Select>
       </DropdownWrapper>
 
+      <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleDownloadClick}
+          startIcon={<DownloadIcon />}
+        >
+          Download
+        </Button>
+        <input
+          type="file"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          id="file-input"
+        />
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => document.getElementById('file-input').click()}
+          startIcon={<UploadIcon />}
+          style={{ marginLeft: '10px' }}
+        >
+          Upload
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleUploadClick}
+          style={{ marginLeft: '10px' }}
+        >
+          Upload File
+        </Button>
+      </Box>
+
       {loading ? (
         <Box
           style={{
@@ -225,27 +301,34 @@ const Invoices = () => {
             <DataGrid
               rows={rows}
               columns={columns}
-              pageSize={10}
               pagination
-              autoHeight
+              style={{
+                backgroundColor: 'white',
+                color: 'black',
+                height: '80vh',
+                width: '80vw',
+                borderRadius: '10px',
+                overflowX: 'auto',
+                overflowY: 'auto',
+                display: 'flex',
+              }}
             />
           ) : (
             <Box
               style={{
-                marginTop: '20px',
-                textAlign: 'center',
-                padding: '20px',
-                border: '1px solid #ccc',
-                borderRadius: '5px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
               }}
             >
-              No data available
+              <CircularProgress />
             </Box>
           )}
         </>
       )}
 
-      <Dialog open={editRow !== null} onClose={() => setEditRow(null)}>
+      <Dialog open={Boolean(editRow)} onClose={() => setEditRow(null)}>
         <DialogTitle>Edit Row</DialogTitle>
         <DialogContent>
           {headers.map((header, index) => (
