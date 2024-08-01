@@ -29,6 +29,7 @@ require('dotenv').config();
 const connectDB = require('./config');
 
 // app.use(fileUpload());
+
 connectDB();
 app.use(cors());
 
@@ -37,8 +38,8 @@ app.use(bodyParser.json());
 
 app.use('/api/files' , Account)
 app.use('/api' , accountRouters)
+// app.use('/api', userRoutes)
 
-// app.use('/api', userRoutes);
 
 
 

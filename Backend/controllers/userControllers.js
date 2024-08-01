@@ -16,9 +16,14 @@ const createUser = async (req, res) => {
     const exclusionFile = req.files.exclusionFile;
     const checklistFile = req.files.checklistFile;
     const liveDataFile = req.files.liveDataFile;
+    const cdStatementFile = req.files.cdStatementFile;
+    const claimFormFile = req.files.claimFormFile;
+    const claimAnalysisFile = req.files.claimAnalysisFile;
+    const claimDumpFile = req.files.claimDumpFile;
+    const EndorsementFile = req.files.EndorsementFile;
 
     // Ensure that files are present
-    if (!claimsFile || !exclusionFile || !checklistFile || !liveDataFile) {
+    if (!claimsFile || !exclusionFile || !checklistFile || !liveDataFile || !cdStatementFile || !claimFormFile || !claimAnalysisFile || !claimDumpFile || !EndorsementFile) {
       return res.status(400).json({ message: 'Some files are missing.' });
     }
 
@@ -35,6 +40,11 @@ const createUser = async (req, res) => {
     const exclusionFilePath = path.join(accountFolderPath, exclusionFile.name);
     const checklistFilePath = path.join(accountFolderPath, checklistFile.name);
     const liveDataFilePath = path.join(accountFolderPath, liveDataFile.name);
+    const cdStatementFilePath = path.join(accountFolderPath, cdStatementFile.name);
+    const claimFormFilePath = path.join(accountFolderPath, claimFormFile.name);
+    const claimAnalysisFilePath = path.join(accountFolderPath, claimAnalysisFile.name);
+    const claimDumpFilePath = path.join(accountFolderPath, claimDumpFile.name);
+    const EndorsementFilePath = path.join(accountFolderPath, EndorsementFile.name);
     // Move files to the account-specific directory
     // networkHospitalFile.mv(networkHospitalFilePath, err => {
     //   if (err) return res.status(500).json({ message: 'Failed to upload network hospital file' });
@@ -51,6 +61,21 @@ const createUser = async (req, res) => {
     liveDataFile.mv(liveDataFilePath, err => {
       if (err) return res.status(500).json({ message: 'Failed to upload LiveData file' });
     });
+    cdStatementFile.mv(cdStatementFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload cd Statement file' });
+    });
+    claimFormFile.mv(claimFormFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload ClaimForm file' });
+    });
+    claimAnalysisFile.mv(claimAnalysisFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload CalimAnalyis file' });
+    });
+    claimDumpFile.mv(claimDumpFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload ClaimDump file' });
+    });
+    EndorsementFile.mv(EndorsementFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload Endorsement file' });
+    });
 
     // Create a new user with relative file paths
     const user = new User({
@@ -61,6 +86,11 @@ const createUser = async (req, res) => {
       exclusionFile: path.join(accountName, exclusionFile.name),  // Store relative path
       checklistFile: path.join(accountName, checklistFile.name),  // Store relative path
       liveDataFile: path.join(accountName, liveDataFile.name),  // Store relative path
+      cdStatementFile: path.join(accountName, cdStatementFile.name),  // Store relative path
+      claimFormFile: path.join(accountName, claimFormFile.name),  // Store relative path
+      claimAnalysisFile: path.join(accountName, claimAnalysisFile.name),  // Store relative path
+      claimDumpFile: path.join(accountName, claimDumpFile.name),  // Store relative path
+      EndorsementFile: path.join(accountName, EndorsementFile.name),  // Store relative path
     });
 
     await user.save();

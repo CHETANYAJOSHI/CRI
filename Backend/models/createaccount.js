@@ -26,7 +26,28 @@ const UserSchema = new mongoose.Schema({
   liveDataFile: {
     type: String,
     required: false,
+  },
+  cdStatementFile:{ 
+    type:String,
+    required:false
+  },
+  claimFormFile:{ 
+    type:String,
+    required:false
+  },
+  claimAnalysisFile:{ 
+    type:String,
+    required:false
+  },
+  claimDumpFile:{ 
+    type:String,
+    required:false
+  },
+  EndorsementFile:{ 
+    type:String,
+    required:false
   }
+
 });
 
 module.exports = mongoose.model('Accounts', UserSchema);

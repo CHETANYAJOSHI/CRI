@@ -118,6 +118,11 @@ const CreateAccount = () => {
   const [exclusionFile, setExclusionFile] = useState(null);
   const [checklistFile, setChecklistFile] = useState(null);
   const [liveDataFile, setLiveDataFile] = useState(null);
+  const [cdStatementFile, setCdStatementFile] = useState(null);
+  const [claimFormFile, setClaimFormFile] = useState(null);
+  const [claimAnalysisFile, setClaimAnalysisFile] = useState(null);
+  const [claimDumpFile, setClaimDumpFile] = useState(null);
+  const [EndorsementFile, setEndorsementFile] = useState(null);
   const [message, setMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [accountDetails, setAccountDetails] = useState({});
@@ -141,6 +146,21 @@ const CreateAccount = () => {
         case 'liveDataFile':
           setLiveDataFile(files[0]);
           break;
+          case 'cdStatementFile':
+            setCdStatementFile(files[0]);
+          break;
+          case 'claimFormFile':
+            setClaimFormFile(files[0]);
+          break;
+          case 'claimAnalysisFile':
+            setClaimAnalysisFile(files[0]);
+          break;
+          case 'claimDumpFile':
+            setClaimDumpFile(files[0]);
+          break;
+          case 'EndorsementFile':
+            setEndorsementFile(files[0]);
+          break;
         default:
           break;
       }
@@ -157,6 +177,11 @@ const CreateAccount = () => {
     formData.append('exclusionFile', exclusionFile);
     formData.append('checklistFile', checklistFile);
     formData.append('liveDataFile', liveDataFile);
+    formData.append('cdStatementFile', cdStatementFile);
+    formData.append('claimFormFile', claimFormFile);
+    formData.append('claimAnalysisFile', claimAnalysisFile);
+    formData.append('claimDumpFile', claimDumpFile);
+    formData.append('EndorsementFile', EndorsementFile);
 
     try {
       const res = await axios.post('http://localhost:5000/api/createaccount', formData, {
@@ -228,6 +253,26 @@ const CreateAccount = () => {
             <Label htmlFor="liveDataFile">Upload Live Data File</Label>
             <Input type="file" id="liveDataFile" name="liveDataFile" onChange={onFileChange} />
           </FormGroup>
+          <FormGroup>
+            <Label htmlFor="cdStatementFile">Upload cdStatementFile File</Label>
+            <Input type="file" id="cdStatementFile" name="cdStatementFile" onChange={onFileChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="claimFormFile">Upload claimFormFile File</Label>
+            <Input type="file" id="claimFormFile" name="claimFormFile" onChange={onFileChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="claimAnalysisFile">Upload claimAnalysisFile File</Label>
+            <Input type="file" id="claimAnalysisFile" name="claimAnalysisFile" onChange={onFileChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="claimDumpFile">Upload claimDumpFile File</Label>
+            <Input type="file" id="claimDumpFile" name="claimDumpFile" onChange={onFileChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="EndorsementFile">Upload EndorsementFile File</Label>
+            <Input type="file" id="EndorsementFile" name="EndorsementFile" onChange={onFileChange} />
+          </FormGroup>
           <Button type="submit">Upload</Button>
         </Form>
         {message && <Message>{message}</Message>}
@@ -246,6 +291,11 @@ const CreateAccount = () => {
             <p><strong>Exclusion File:</strong> {accountDetails.exclusionFile}</p>
             <p><strong>Checklist File:</strong> {accountDetails.checklistFile}</p>
             <p><strong>LiveData File:</strong> {accountDetails.liveDataFile}</p>
+            <p><strong>cdStatementFile File:</strong> {accountDetails.cdStatementFile}</p>
+            <p><strong>claimFormFile File:</strong> {accountDetails.claimFormFile}</p>
+            <p><strong>claimAnalysisFile File:</strong> {accountDetails.claimAnalysisFile}</p>
+            <p><strong>claimDumpFile File:</strong> {accountDetails.claimDumpFile}</p>
+            <p><strong>EndorsementFile File:</strong> {accountDetails.EndorsementFile}</p>
           </ModalContent>
         </Modal>
       )}
