@@ -10,7 +10,6 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  
   claimsFile: {
     type: String,
     required: false,
@@ -46,8 +45,19 @@ const UserSchema = new mongoose.Schema({
   EndorsementFile:{ 
     type:String,
     required:false
+  },
+  selfParentFile:{ 
+    type:String,
+    required:false
+  },
+  floaterParentFile:{ 
+    type:String,
+    required:false
   }
 
 });
+
+
+
 
 module.exports = mongoose.model('Accounts', UserSchema);

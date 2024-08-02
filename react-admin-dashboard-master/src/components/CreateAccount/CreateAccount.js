@@ -123,6 +123,8 @@ const CreateAccount = () => {
   const [claimAnalysisFile, setClaimAnalysisFile] = useState(null);
   const [claimDumpFile, setClaimDumpFile] = useState(null);
   const [EndorsementFile, setEndorsementFile] = useState(null);
+  const [selfParentFile, setselfParentFile] = useState(null);
+  const [floaterParentFile, setfloaterParentFile] = useState(null);
   const [message, setMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [accountDetails, setAccountDetails] = useState({});
@@ -161,6 +163,12 @@ const CreateAccount = () => {
           case 'EndorsementFile':
             setEndorsementFile(files[0]);
           break;
+          case 'selfParentFile':
+            setselfParentFile(files[0]);
+          break;
+          case 'floaterParentFile':
+            setfloaterParentFile(files[0]);
+          break;
         default:
           break;
       }
@@ -182,6 +190,8 @@ const CreateAccount = () => {
     formData.append('claimAnalysisFile', claimAnalysisFile);
     formData.append('claimDumpFile', claimDumpFile);
     formData.append('EndorsementFile', EndorsementFile);
+    formData.append('selfParentFile', selfParentFile);
+    formData.append('floaterParentFile', floaterParentFile);
 
     try {
       const res = await axios.post('http://localhost:5000/api/createaccount', formData, {
@@ -273,6 +283,14 @@ const CreateAccount = () => {
             <Label htmlFor="EndorsementFile">Upload EndorsementFile File</Label>
             <Input type="file" id="EndorsementFile" name="EndorsementFile" onChange={onFileChange} />
           </FormGroup>
+          <FormGroup>
+            <Label htmlFor="selfParentFile">Upload selfParentFile File</Label>
+            <Input type="file" id="selfParentFile" name="selfParentFile" onChange={onFileChange} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="floaterParentFile">Upload floaterParentFile File</Label>
+            <Input type="file" id="floaterParentFile" name="floaterParentFile" onChange={onFileChange} />
+          </FormGroup>
           <Button type="submit">Upload</Button>
         </Form>
         {message && <Message>{message}</Message>}
@@ -296,6 +314,8 @@ const CreateAccount = () => {
             <p><strong>claimAnalysisFile File:</strong> {accountDetails.claimAnalysisFile}</p>
             <p><strong>claimDumpFile File:</strong> {accountDetails.claimDumpFile}</p>
             <p><strong>EndorsementFile File:</strong> {accountDetails.EndorsementFile}</p>
+            <p><strong>selfParentFile File:</strong> {accountDetails.selfParentFile}</p>
+            <p><strong>floaterParentFile File:</strong> {accountDetails.floaterParentFile}</p>
           </ModalContent>
         </Modal>
       )}

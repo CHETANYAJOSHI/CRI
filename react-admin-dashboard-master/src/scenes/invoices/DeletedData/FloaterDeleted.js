@@ -1,186 +1,226 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import styled from 'styled-components';
+import {
+  Box,
+  TextField,
+  IconButton,
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
+import EditIcon from '@mui/icons-material/Edit';
+import DownloadIcon from '@mui/icons-material/Download';
+import UploadIcon from '@mui/icons-material/Upload';
+import AddIcon from '@mui/icons-material/Add';
 
-const FloaterDeleted = () => {
-  const [headers, setHeaders] = useState([]);
+const DropdownWrapper = styled.div`
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #fff;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
+const Option = styled.option``;
+
+const DeletedData = () => {
   const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
-  const [formData, setFormData] = useState({});
+  const [headers, setHeaders] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [selectedAccount, setSelectedAccount] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editRow, setEditRow] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
+  const [newUserData, setNewUserData] = useState({});
   const [file, setFile] = useState(null);
-  const [fileSelected, setFileSelected] = useState(false); // Track if a file is selected
-  const [uploading, setUploading] = useState(false);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const accountId = searchParams.get('accountId');
+    if (accountId) {
+      setSelectedAccount(accountId);
+      fetchLiveDataFile(accountId);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/floatdeleted-data');
-        if (!response.ok) {
-          throw new Error('Failed to fetch data');
-        }
-        const jsonData = await response.json();
-        setHeaders(jsonData.headers || []);
-        setData(jsonData.data || []);
-        console.log(data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
+        const res = await axios.get('http://localhost:5000/api/accounts');
+        setAccounts(res.data);
+      } catch (err) {
+        console.error('Error fetching accounts:', err);
       }
     };
 
-    fetchData();
+    fetchAccounts();
   }, []);
 
+  const fetchLiveDataFile = async (accountId) => {
+    setLoading(true);
+    try {
+      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/floater-parent-file`);
+      setHeaders(response.data.headers);
+      setData(response.data.data);
+      
+
+    } catch (error) {
+      console.error('Error fetching live data file:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSelectChange = (e) => {
+    const accountId = e.target.value;
+    setSelectedAccount(accountId);
+    if (accountId) {
+      navigate(`/enrollment/deleted/floater?accountId=${accountId}`);
+      fetchLiveDataFile(accountId);
+    }
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
+  const handleEditClick = (row) => {
+    setEditRow(row);
+    setEditData(headers.reduce((obj, header, index) => {
+      obj[header] = row[`column_${index}`];
+      return obj;
+    }, {}));
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleEditSave = async () => {
+    try {
+      await axios.put(`http://localhost:5000/api/account/${selectedAccount}/update-floater-parent-row`, {
+        rowId: editRow.id,
+        updatedData: editData,
+      });
+      fetchLiveDataFile(selectedAccount);
+    } catch (error) {
+      console.error('Error updating row:', error);
+    } finally {
+      setEditRow(null);
+    }
+  };
+
+  const handleDownloadClick = async () => {
+    if (!selectedAccount) {
+      alert('Please select an account first.');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`http://localhost:5000/api/account/${selectedAccount}/download-floater-parent-file`, {
+        responseType: 'blob',
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'Floater.xlsx');
+      document.body.appendChild(link);
+      link.click();
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  };
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
-    setFileSelected(true); // Set fileSelected to true when a file is selected
-};
-
-const handleFileUpload = async () => {
-    if (!file) {
-        alert('Please select a file.');
-        return;
-    }
-
-    try {
-        setUploading(true); // Set uploading to true when upload begins
-
-        const formData = new FormData();
-        formData.append('file', file);
-
-        // Replace with your backend API endpoint
-        const response = await fetch('http://localhost:5000/api/floaterupload-file', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const responseData = await response.json();
-        console.log('File upload response:', responseData);
-        alert('File uploaded successfully!');
-    } catch (error) {
-        console.error('Error uploading file:', error);
-        alert('Error uploading file. Please try again.');
-    } finally {
-        setFile(null); // Reset file state
-        setFileSelected(false); // Reset fileSelected state
-        setUploading(false); // Reset uploading state
-    }
-};
-
-
-  const handleUpdateClick = (row) => {
-    setSelectedRow(row);
-    const rowData = {};
-    headers.forEach((header, index) => {
-      rowData[`column_${index}`] = row[`column_${index}`];
-    });
-    setFormData(rowData);
-    setDialogOpen(true);
   };
 
-  const handleFileDownload = async () => {
-    try {
-        const response = await fetch('http://localhost:5000/api/floaterdownload-file');
-        if (response.ok) {
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'floated.xlsx';
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } else {
-            throw new Error('Failed to download file');
-        }
-    } catch (error) {
-        console.error('Error downloading file:', error);
+  const handleUploadClick = async () => {
+    if (!file || !selectedAccount) {
+      alert('Please select a file and an account first.');
+      return;
     }
-};
 
-  const handleDeleteClick = async (rowIndex) => {
-    if (window.confirm('Are you sure you want to delete this row?')) {
-      try {
-        const response = await fetch(`http://localhost:5000/api/floatdelete-row/${rowIndex}`, {
-          method: 'DELETE',
-        });
-        if (!response.ok) {
-          throw new Error('Failed to delete row');
-        }
-        setData((prevData) => prevData.filter((_, index) => index !== rowIndex));
-      } catch (error) {
-        setError(error.message);
-      }
-    }
-  };
+    const formData = new FormData();
+    formData.append('file', file);
 
-  const handleDialogClose = () => {
-    setDialogOpen(false);
-    setSelectedRow(null);
-  };
-
-  const handleDialogSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/floatupdate-row/${selectedRow.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/upload-floater-parent-file`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      if (!response.ok) {
-        throw new Error('Failed to update row');
-      }
-      setData((prevData) =>
-        prevData.map((row, index) =>
-          index === selectedRow.id ? { ...row, ...formData } : row
-        )
-      );
-      setDialogOpen(false);
-      setSelectedRow(null);
+      alert('File uploaded successfully');
+      fetchLiveDataFile(selectedAccount); // Refresh data
     } catch (error) {
-      setError(error.message);
+      console.error('Error uploading file:', error);
+      console.log(file);
+      console.log(formData.append('file', file))
     }
   };
 
-  if (loading) {
-    return (
-      <Box
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <CircularProgress />
-      </Box>
-    );
-  }
+  const handleAddUserClick = () => {
+    setOpenAddUserDialog(true);
+  };
 
-  if (error) {
-    return (
-      <Box
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
-      </Box>
-    );
-  }
+  const handleAddUserChange = (e) => {
+    const { name, value } = e.target;
+    setNewUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleAddUserSave = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/add-floater-parent-row`, {
+        newRowData: newUserData,
+      });
+      fetchLiveDataFile(selectedAccount);
+    } catch (error) {
+      console.error('Error adding new row:', error);
+    } finally {
+      setOpenAddUserDialog(false);
+      setNewUserData({});
+    }
+  };
+
+  const filteredData = data.filter((row) =>
+    headers.some((header) =>
+      row[header]?.toString().toLowerCase().includes(searchQuery.toLowerCase())
+    )
+  );
 
   const columns = [
     {
@@ -188,17 +228,12 @@ const handleFileUpload = async () => {
       headerName: 'Actions',
       renderCell: (params) => (
         <Box>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => handleUpdateClick(params.row)}
-          >
-            Update
-          </Button>
-          
+          <IconButton onClick={() => handleEditClick(params.row)}>
+            <EditIcon color="info" />
+          </IconButton>
         </Box>
       ),
-      width: 150,
+      width: 100,
     },
     ...headers.map((header, index) => ({
       field: `column_${index}`,
@@ -207,10 +242,10 @@ const handleFileUpload = async () => {
     })),
   ];
 
-  const rows = data.map((row, index) => {
+  const rows = filteredData.map((row, index) => {
     const rowData = { id: index };
     headers.forEach((header, cellIndex) => {
-      rowData[`column_${cellIndex}`] = row[cellIndex];
+      rowData[`column_${cellIndex}`] = row[header];
     });
     return rowData;
   });
@@ -223,72 +258,169 @@ const handleFileUpload = async () => {
         overflowX: 'auto',
         overflowY: 'auto',
         padding: '20px',
-        margin:'auto'
+        margin: 'auto',
+        flexDirection: 'row',
       }}
     >
+      <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+        <Label htmlFor="account-select">Account</Label>
+        <Select
+          id="account-select"
+          value={selectedAccount}
+          onChange={handleSelectChange}
+        >
+          <Option value="">--Select an Account--</Option>
+          {accounts.map((account) => (
+            <Option key={account._id} value={account._id}>
+              {account.accountName}
+            </Option>
+          ))}
+        </Select>
+      </DropdownWrapper>
 
-<Box style={{ display: 'flex', justifyContent: 'center', margin: '20px 0' }}>
-                        <input type="file" onChange={handleFileChange} />
-                        <Button
-                            onClick={handleFileUpload}
-                            variant="contained"
-                            color="primary"
-                            disabled={!fileSelected || uploading}
-                            style={{ marginLeft: '10px' }}
-                        >
-                            {uploading ? 'Uploading...' : 'Upload'}
-                        </Button>
-                        <Button
-                            onClick={handleFileDownload}
-                            variant="contained"
-                            color="primary"
-                            style={{ marginLeft: '10px' }}
-                        >
-                            Download
-                        </Button>
-                    </Box>
+      <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleDownloadClick}
+          startIcon={<DownloadIcon />}
+          style={{  height:'50%'}}
+        >
+          Download
+        </Button>
+        <input
+          type="file"
+          onChange={handleFileChange}
+          style={{ display: 'none' }}
+          id="file-input"
+        />
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={() => document.getElementById('file-input').click()}
+          startIcon={<UploadIcon />}
+          style={{ marginLeft: '10px' , height:'50%' }}
+        >
+          Upload
+        </Button>
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={handleUploadClick}
+          style={{ marginLeft: '10px' , height:'50%' }}
+        >
+          Upload File
+        </Button>
 
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddUserClick}
+          startIcon={<AddIcon />}
+          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
+        >
+          Add User
+        </Button>
 
-      {rows.length > 0 ? (
-        <DataGrid rows={rows} columns={columns} pageSize={10} />
-      ) : (
+        <TextField
+          label="Search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          style={{ marginLeft: '10px'}}
+        />
+      </Box>
+
+      {loading ? (
         <Box
           style={{
-            marginTop: '20px',
-            textAlign: 'center',
-            padding: '20px',
-            border: '1px solid #ccc',
-            borderRadius: '5px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
           }}
         >
-          No data available
+          <CircularProgress />
         </Box>
+      ) : (
+        <>
+          {rows.length > 0 ? (
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pagination
+              style={{
+                backgroundColor: 'white',
+                color: 'black',
+                height: '80vh',
+                width: '80vw',
+                borderRadius: '10px',
+                overflowX: 'auto',
+                overflowY: 'auto',
+                display: 'flex',
+              }}
+            />
+          ) : (
+            <Box
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100vh',
+                fontSize:'25px'
+              }}
+            >
+              Select Your Account
+            </Box>
+          )}
+        </>
       )}
 
-      <Dialog open={dialogOpen} onClose={handleDialogClose}>
-        <DialogTitle>Update Row</DialogTitle>
+      <Dialog open={Boolean(editRow)} onClose={() => setEditRow(null)}>
+        <DialogTitle>Edit Row</DialogTitle>
+        <DialogContent>
+          {headers.map((header, index) => (
+            <TextField
+              key={index}
+              margin="dense"
+              label={header}
+              type="text"
+              fullWidth
+              name={header}
+              value={editData[header] || ''}
+              onChange={handleEditChange}
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setEditRow(null)}>Cancel</Button>
+          <Button onClick={handleEditSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openAddUserDialog}
+        onClose={() => setOpenAddUserDialog(false)}
+      >
+        <DialogTitle>Add User</DialogTitle>
         <DialogContent>
           {headers.map((header, index) => (
             <TextField
               key={index}
               label={header}
-              value={formData[`column_${index}`] || ''}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  [`column_${index}`]: e.target.value,
-                })
-              }
+              name={header}
+              value={newUserData[header] || ''}
+              onChange={handleAddUserChange}
               fullWidth
               margin="normal"
             />
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary">
+          <Button onClick={() => setOpenAddUserDialog(false)} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDialogSave} color="primary">
+          <Button onClick={handleAddUserSave} color="primary">
             Save
           </Button>
         </DialogActions>
@@ -297,4 +429,4 @@ const handleFileUpload = async () => {
   );
 };
 
-export default FloaterDeleted;
+export default DeletedData;

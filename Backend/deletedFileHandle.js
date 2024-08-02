@@ -1,142 +1,243 @@
-// deletedFileHandler.js
-const express = require('express');
 const path = require('path');
-const xlsx = require('xlsx');
+const fs = require('fs');
 const multer = require('multer');
+const xlsx = require('xlsx');
+const readxlsxFile = require('read-excel-file/node');
+const Accounts = require('./models/createaccount'); // Adjust the path according to your project structure
 
-const DELETED_FILE_PATH = path.join(__dirname, 'deleted', 'deleted_data.xlsx');
-
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, 'deleted/'); // Destination folder for uploaded files
-  },
-  filename: function (req, file, cb) {
-      cb(null, 'deleted_data.xlsx'); // Always save as data.xlsx
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
-      file.mimetype !== 'application/vnd.ms-excel') {
-      return cb(new Error('Only Excel files are allowed'), false);
-  }
-  cb(null, true);
-};
-
-const selfupload = multer({ storage: storage,fileFilter:fileFilter });
-
-const selfUpload = (req, res) => {
+// Function to fetch and read self-parent data file
+const getSelfParentDataFile = async (req, res) => {
   try {
-      if (!req.file) {
-          return res.status(400).send('No file uploaded.');
-      }
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
 
-      // Process the uploaded file
-      const fileInfo = {
-          filename: req.file.filename,
-          originalName: req.file.originalname,
-          size: req.file.size
-      };
-      res.json({ message: 'File uploaded and replaced successfully', fileInfo });
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { accountName, selfParentFile } = account;
+    if (!accountName || !selfParentFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const selfParentFilePath = path.join(__dirname, 'NewAccounts', selfParentFile);
+
+    // Read Excel file and send the data
+    readxlsxFile(selfParentFilePath).then((rows) => {
+      const headers = rows[0];
+      const data = rows.slice(1).map(row => {
+        let rowData = {};
+        row.forEach((cell, index) => {
+          rowData[headers[index]] = cell;
+        });
+        return rowData;
+      });
+
+      res.json({ headers, data });
+    }).catch(error => {
+      console.error('Error reading Excel file:', error);
+      res.status(500).json({ error: 'Failed to read Excel file' });
+    });
   } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).send('Error uploading file');
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Function to read Excel data from the first sheet
-const readDeletedExcelData = () => {
-  const workbook = xlsx.readFile(DELETED_FILE_PATH);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  const xlData = xlsx.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
-  return xlData;
-};
+// Function to download self-parent data file
+const downloadSelfParentDataFile = async (req, res) => {
+  const accountId = req.params.accountId;
+  const account = await Accounts.findById(accountId);
+  const { selfParentFile } = account;
+  if (!selfParentFile) {
+    return res.status(400).json({ error: 'Invalid account data' });
+  }
 
- const selfDownload = (req,res) => {
-  const filePath = DELETED_FILE_PATH;
-  res.download(filePath, 'deleted_data.xlsx', (err) => {
-      if (err) {
+  if (account) {
+    const filePath = path.join(__dirname, './NewAccounts', selfParentFile);
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, err => {
+        if (err) {
           console.error('Error downloading file:', err);
           res.status(500).send('Error downloading file');
+        }
+      });
+    } else {
+      res.status(404).send('File not found');
+    }
+  } else {
+    res.status(404).send('Account not found');
+  }
+};
+
+// Configure Multer for file upload
+const storage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const accountId = req.params.accountId;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return cb(new Error('Account not found'), false);
+    }
+
+    const accountFolder = path.join(__dirname, 'NewAccounts', account.accountName);
+
+    if (!fs.existsSync(accountFolder)) {
+      fs.mkdirSync(accountFolder, { recursive: true });
+    }
+
+    cb(null, accountFolder);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const selfupload = multer({ storage });
+
+// Function to upload self-parent data file
+const uploadSelfParentDataFile = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
+  }
+
+  try {
+    const accountId = req.params.accountId;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const newFilePath = path.join(account.accountName, req.file.originalname);
+    const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
+
+    // Delete the old selfParentFile if it exists
+    const oldSelfParentFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.selfParentFile);
+    if (fs.existsSync(oldSelfParentFilePath)) {
+      fs.unlinkSync(oldSelfParentFilePath);
+    }
+
+    // Update the account with the new selfParentFile path
+    account.selfParentFile = newFilePath;
+    await account.save();
+
+    res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
+  } catch (error) {
+    console.error('Error uploading file and updating database:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+// Function to update a row in the self-parent data file
+const updateSelfParentDataRow = async (req, res) => {
+  try {
+    const { accountId } = req.params;
+    const { rowId, updatedData } = req.body;
+
+    if (typeof updatedData !== 'object' || updatedData === null) {
+      return res.status(400).json({ error: 'Invalid updatedData format' });
+    }
+
+    const account = await Accounts.findById(accountId);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { selfParentFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', selfParentFile);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+
+    const workbook = xlsx.readFile(filePath);
+    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    // Read the existing data
+    const data = xlsx.utils.sheet_to_json(worksheet, { header: 1 });
+    const headers = data[0];
+    const rowIndex = parseInt(rowId) + 1; // Adjust for header row
+
+    if (rowIndex < 1 || rowIndex >= data.length) {
+      return res.status(400).json({ error: 'Invalid rowId' });
+    }
+
+    // Update the row with new data
+    headers.forEach((header, index) => {
+      if (updatedData.hasOwnProperty(header)) {
+        const cellAddress = xlsx.utils.encode_cell({ r: rowIndex, c: index });
+        worksheet[cellAddress] = { v: updatedData[header] || '' };
       }
+    });
+
+    // Write the updated workbook back to the file
+    xlsx.writeFile(workbook, filePath);
+
+    res.status(200).json({ message: 'Row updated successfully' });
+  } catch (error) {
+    console.error('Error updating row:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getFilePath = (accountName) => path.join(__dirname, 'NewAccounts', accountName, 'Self.xlsx');
+const getDataFromSheet = (sheet) => {
+  const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+  const headers = data[0];
+  const rows = data.slice(1).map((row) => {
+    const rowData = [];
+    headers.forEach((header, i) => {
+      rowData.push(row[i]);
+    });
+    return rowData;
   });
+  return { headers, rows };
 };
 
-// Function to write Excel data to the file
-const writeDeletedExcelData = (xlData) => {
-  const newWorkbook = xlsx.utils.book_new();
-  const newWorksheet = xlsx.utils.aoa_to_sheet(xlData);
-  xlsx.utils.book_append_sheet(newWorkbook, newWorksheet, 'Sheet1');
-  xlsx.writeFile(newWorkbook, DELETED_FILE_PATH);
-};
 
-// Handler to fetch data from Excel file
-const getDeletedDataHandler = (req, res) => {
+const AddSelfParentUser = async (req, res) => {
+  const { accountId } = req.params;
+  const { newRowData } = req.body;
+
   try {
-    const xlData = readDeletedExcelData();
-    const headers = xlData[0];
-    const data = xlData.slice(1);
-    res.json({ headers, data });
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
-  }
-};
+    const account = await Accounts.findById(accountId);
+    const { selfParentFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', selfParentFile);
 
-// Handler to update a specific row
-const updateRowHandler = (req, res) => {
-  try {
-    const { rowIndex } = req.params;
-    const updatedData = req.body;
-
-    let xlData = readDeletedExcelData();
-             
-    if (isNaN(rowIndex) || rowIndex < 0 || rowIndex >= xlData.length - 1) {
-      return res.status(400).json({ error: 'Invalid row index' });
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found' });
     }
 
-    const headers = xlData[0];
-    const updatedRow = headers.map((header, index) => updatedData[`column_${index}`] || '');
-    xlData[parseInt(rowIndex) + 1] = updatedRow;
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
 
-    writeDeletedExcelData(xlData);
+    const { headers, rows } = getDataFromSheet(worksheet);
 
-    res.json({ message: 'Data updated successfully' });
+    // Append the new row data
+    const newRow = headers.map((header) => newRowData[header] || '');
+    rows.push(newRow);
+
+    // Convert back to sheet and write to file
+    const newSheetData = [headers, ...rows];
+    const newWorksheet = xlsx.utils.aoa_to_sheet(newSheetData);
+    workbook.Sheets[sheetName] = newWorksheet;
+    xlsx.writeFile(workbook, filePath);
+
+    res.status(200).json({ message: 'Row added successfully' });
   } catch (error) {
-    console.error('Error updating data:', error);
-    res.status(500).json({ error: 'Failed to update data' });
+    console.error('Error adding new row:', error);
+    res.status(500).json({ message: 'Error adding new row' });
   }
 };
 
-// Handler to delete a specific row
-const deleteRowHandler = (req, res) => {
-  try {
-    const { rowIndex } = req.params;
-
-    let xlData = readDeletedExcelData();
-
-    if (isNaN(rowIndex) || rowIndex < 0 || rowIndex >= xlData.length - 1) {
-      return res.status(400).json({ error: 'Invalid row index' });
-    }
-
-    xlData = xlData.filter((_, index) => index !== parseInt(rowIndex) + 1);
-
-    writeDeletedExcelData(xlData);
-
-    res.json({ message: 'Data deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting data:', error);
-    res.status(500).json({ error: 'Failed to delete data' });
-  }
-};
 
 module.exports = {
-  getDeletedDataHandler,
-  updateRowHandler,
-  deleteRowHandler,
-  selfDownload,
-  selfUpload,
+  getSelfParentDataFile,
+  downloadSelfParentDataFile,
+  uploadSelfParentDataFile,
+  updateSelfParentDataRow,
+  AddSelfParentUser,
   selfupload
 };

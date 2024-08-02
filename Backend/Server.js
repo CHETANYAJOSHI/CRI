@@ -18,9 +18,9 @@ const { embedPdfInExcel } = require('./processexcel');
 const app = express();
 const PORT = 5000;
 const FILE_PATH = path.join(__dirname, 'uploads', 'data.xlsx');
-const { getDeletedDataHandler, updateRowHandler, deleteRowHandler , selfDownload, selfUpload ,selfupload} = require('./deletedFileHandle');
-const { getfloatDeletedDataHandler, floatupdateRowHandler, floatdeleteRowHandler ,floaterDownload, floaterUpload ,floaterupload } = require('./floaterDeleted');
-const {claimdumpdatahandler, updateclaimdump, claimdumpdownload, claimdumpupload, claimdump}= require("./claimdump");
+const { getSelfParentDataFile, downloadSelfParentDataFile, uploadSelfParentDataFile, updateSelfParentDataRow, AddSelfParentUser,selfupload } = require('./deletedFileHandle');
+const {   getFloaterParentDataFile,   downloadFloaterParentDataFile,   uploadFloaterParentDataFile,   updateFloaterParentDataRow, AddFloaterParentUser,   floaterUpload } = require('./floaterDeleted');
+const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow, claimupload } = require('./claimdump')
 const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
 const pdfRouter = require('./pdfHandler');
 
@@ -62,26 +62,40 @@ app.get('/process-excel', (req, res) => {
 
 
 app.use('/pdf', pdfRouter);
-app.get('/api/deleted-data', getDeletedDataHandler);
-app.put('/api/update-row/:rowIndex', updateRowHandler);
-app.delete('/api/delete-row/:rowIndex', deleteRowHandler);
-app.get('/api/selfdownload-file', selfDownload);
-app.post('/api/selfupload-file',selfupload.single('file'), selfUpload);
-
+app.get('/api/account/:id/self-parent-data-file', getSelfParentDataFile);
+app.get('/api/account/:accountId/download-self-parent-file', downloadSelfParentDataFile);
+app.post('/api/account/:accountId/upload-self-parent-file', selfupload.single('file'), uploadSelfParentDataFile);
+app.put('/api/account/:accountId/update-self-parent-row', updateSelfParentDataRow);
+app.post('/api/account/:accountId/add-self-parent-row' , AddSelfParentUser);
 // floated deleted
-app.get('/api/floatdeleted-data', getfloatDeletedDataHandler);
-app.put('/api/floatupdate-row/:rowIndex', floatupdateRowHandler);
-app.delete('/api/floatdelete-row/:rowIndex', floatdeleteRowHandler);
-app.get('/api/floaterdownload-file', floaterDownload);
-app.post('/api/floaterupload-file',floaterupload.single('file'), floaterUpload);
+app.get('/api/account/:id/floater-parent-file', getFloaterParentDataFile);
+app.get('/api/account/:accountId/download-floater-parent-file', downloadFloaterParentDataFile);
+app.post('/api/account/:accountId/upload-floater-parent-file', floaterUpload.single('file'), uploadFloaterParentDataFile);
+app.put('/api/account/:accountId/update-floater-parent-row', updateFloaterParentDataRow);
+app.post('/api/account/:accountId/add-floater-parent-row' , AddFloaterParentUser);
 
 
 //claimdump
-app.get('/api/claimdumpexcel', claimdumpdatahandler);
-app.put('/api/claimdumpupdate/:rowIndex', updateclaimdump);
-// app.delete('/api/floatdelete-row/:rowIndex', floatdeleteRowHandler);
-app.get('/api/claimdumpdownload-file', claimdumpdownload);
-app.post('/api/claimdumpupload-file',claimdump.single('file'), claimdumpupload);
+
+// Fetch and read claims data file
+app.get('/api/account/:id/claims-data-file', getClaimsDataFile);
+
+// Download claims data file
+app.get('/api/account/:accountId/download-claim-file', downloadClaimsDataFile);
+
+// Upload claims data file
+app.post('/api/account/:accountId/upload-claim-file', claimupload.single('file'), uploadClaimsDataFile);
+
+// Update a row in the claims data file
+app.put('/api/account/:accountId/update-claim-row', updateClaimsDataRow);
+
+
+
+// app.get('/api/claimdumpexcel', claimdumpdatahandler);
+// app.put('/api/claimdumpupdate/:rowIndex', updateclaimdump);
+// // app.delete('/api/floatdelete-row/:rowIndex', floatdeleteRowHandler);
+// app.get('/api/claimdumpdownload-file', claimdumpdownload);
+// app.post('/api/claimdumpupload-file',claimdump.single('file'), claimdumpupload);
 
 
 app.get('/api/rackexcel', rackdatahandler);
@@ -291,6 +305,57 @@ app.post('/api/account/:accountId/upload-file', upload.single('file'), async (re
       console.error('Error updating row:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  });
+
+
+  const getDataFromSheet = (sheet) => {
+    const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+    const headers = data[0];
+    const rows = data.slice(1).map((row) => {
+      const rowData = [];
+      headers.forEach((header, i) => {
+        rowData.push(row[i]);
+      });
+      return rowData;
+    });
+    return { headers, rows };
+  };
+
+
+  app.post('/api/account/:accountId/add-live-data-row', async (req, res) => {
+    const { accountId } = req.params;
+  const { newRowData } = req.body;
+
+  try {
+    const account = await Accounts.findById(accountId);
+    const { liveDataFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', liveDataFile);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const { headers, rows } = getDataFromSheet(worksheet);
+
+    // Append the new row data
+    const newRow = headers.map((header) => newRowData[header] || '');
+    rows.push(newRow);
+
+    // Convert back to sheet and write to file
+    const newSheetData = [headers, ...rows];
+    const newWorksheet = xlsx.utils.aoa_to_sheet(newSheetData);
+    workbook.Sheets[sheetName] = newWorksheet;
+    xlsx.writeFile(workbook, filePath);
+
+    res.status(200).json({ message: 'Row added successfully' });
+  } catch (error) {
+    console.error('Error adding new row:', error);
+    res.status(500).json({ message: 'Error adding new row' });
+  }
   });
   
   

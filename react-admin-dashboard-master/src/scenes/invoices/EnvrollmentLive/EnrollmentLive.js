@@ -17,6 +17,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
+import AddIcon from '@mui/icons-material/Add';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -61,6 +62,8 @@ const Invoices = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editRow, setEditRow] = useState(null);
   const [editData, setEditData] = useState({});
+  const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
+  const [newUserData, setNewUserData] = useState({});
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -187,6 +190,29 @@ const Invoices = () => {
       console.log(formData.append('file', file))
     }
   };
+  const handleAddUserClick = () => {
+    setOpenAddUserDialog(true);
+  };
+
+  const handleAddUserChange = (e) => {
+    const { name, value } = e.target;
+    setNewUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleAddUserSave = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/add-live-data-row`, {
+        newRowData: newUserData,
+      });
+      fetchLiveDataFile(selectedAccount);
+    } catch (error) {
+      console.error('Error adding new row:', error);
+    } finally {
+      setOpenAddUserDialog(false);
+      setNewUserData({});
+    }
+  };
+
 
   const filteredData = data.filter((row) =>
     headers.some((header) =>
@@ -256,6 +282,7 @@ const Invoices = () => {
           color="primary"
           onClick={handleDownloadClick}
           startIcon={<DownloadIcon />}
+          style={{height:'50%'}}
         >
           Download
         </Button>
@@ -270,7 +297,7 @@ const Invoices = () => {
           color="secondary"
           onClick={() => document.getElementById('file-input').click()}
           startIcon={<UploadIcon />}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: '10px' , height:'50%'}}
         >
           Upload
         </Button>
@@ -278,10 +305,26 @@ const Invoices = () => {
           variant="contained"
           color="secondary"
           onClick={handleUploadClick}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: '10px' , height:'50%'}}
         >
           Upload File
         </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddUserClick}
+          startIcon={<AddIcon />}
+          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
+        >
+          Add User
+        </Button>
+        <TextField
+          label="Search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          style={{ marginLeft: '10px'}}
+        />
       </Box>
 
       {loading ? (
@@ -293,7 +336,7 @@ const Invoices = () => {
             height: '100vh',
           }}
         >
-          <CircularProgress />
+       <CircularProgress />  
         </Box>
       ) : (
         <>
@@ -320,9 +363,10 @@ const Invoices = () => {
                 justifyContent: 'center',
                 alignItems: 'center',
                 height: '100vh',
+                fontSize:'25px'
               }}
             >
-              <CircularProgress />
+               Select Your Account
             </Box>
           )}
         </>
@@ -347,6 +391,34 @@ const Invoices = () => {
         <DialogActions>
           <Button onClick={() => setEditRow(null)}>Cancel</Button>
           <Button onClick={handleEditSave}>Save</Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={openAddUserDialog}
+        onClose={() => setOpenAddUserDialog(false)}
+      >
+        <DialogTitle>Add User</DialogTitle>
+        <DialogContent>
+          {headers.map((header, index) => (
+            <TextField
+              key={index}
+              label={header}
+              name={header}
+              value={newUserData[header] || ''}
+              onChange={handleAddUserChange}
+              fullWidth
+              margin="normal"
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddUserDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddUserSave} color="primary">
+            Save
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

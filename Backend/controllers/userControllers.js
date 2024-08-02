@@ -21,9 +21,11 @@ const createUser = async (req, res) => {
     const claimAnalysisFile = req.files.claimAnalysisFile;
     const claimDumpFile = req.files.claimDumpFile;
     const EndorsementFile = req.files.EndorsementFile;
+    const selfParentFile = req.files.selfParentFile;
+    const floaterParentFile = req.files.floaterParentFile;
 
     // Ensure that files are present
-    if (!claimsFile || !exclusionFile || !checklistFile || !liveDataFile || !cdStatementFile || !claimFormFile || !claimAnalysisFile || !claimDumpFile || !EndorsementFile) {
+    if (!claimsFile || !exclusionFile || !checklistFile || !liveDataFile || !cdStatementFile || !claimFormFile || !claimAnalysisFile || !claimDumpFile || !EndorsementFile || !selfParentFile || !floaterParentFile) {
       return res.status(400).json({ message: 'Some files are missing.' });
     }
 
@@ -45,6 +47,8 @@ const createUser = async (req, res) => {
     const claimAnalysisFilePath = path.join(accountFolderPath, claimAnalysisFile.name);
     const claimDumpFilePath = path.join(accountFolderPath, claimDumpFile.name);
     const EndorsementFilePath = path.join(accountFolderPath, EndorsementFile.name);
+    const selfParentFilePath = path.join(accountFolderPath, selfParentFile.name);
+    const floaterParentFilePath = path.join(accountFolderPath, floaterParentFile.name);
     // Move files to the account-specific directory
     // networkHospitalFile.mv(networkHospitalFilePath, err => {
     //   if (err) return res.status(500).json({ message: 'Failed to upload network hospital file' });
@@ -76,6 +80,12 @@ const createUser = async (req, res) => {
     EndorsementFile.mv(EndorsementFilePath, err => {
       if (err) return res.status(500).json({ message: 'Failed to upload Endorsement file' });
     });
+    selfParentFile.mv(selfParentFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload Endorsement file' });
+    });
+    floaterParentFile.mv(floaterParentFilePath, err => {
+      if (err) return res.status(500).json({ message: 'Failed to upload Endorsement file' });
+    });
 
     // Create a new user with relative file paths
     const user = new User({
@@ -91,6 +101,8 @@ const createUser = async (req, res) => {
       claimAnalysisFile: path.join(accountName, claimAnalysisFile.name),  // Store relative path
       claimDumpFile: path.join(accountName, claimDumpFile.name),  // Store relative path
       EndorsementFile: path.join(accountName, EndorsementFile.name),  // Store relative path
+      selfParentFile: path.join(accountName, selfParentFile.name),  // Store relative path
+      floaterParentFile: path.join(accountName, floaterParentFile.name),  // Store relative path
     });
 
     await user.save();
