@@ -4,7 +4,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 
 const bodyParser = require('body-parser');
-// const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoutes');
 const accountRouters = require('./routes/accountRoutes');
 const Accounts= require('./models/createaccount');
 const Account=require('./routes/download');
@@ -38,7 +38,7 @@ app.use(bodyParser.json());
 
 app.use('/api/files' , Account)
 app.use('/api' , accountRouters)
-// app.use('/api', userRoutes)
+app.use('/api', userRoutes)
 
 
 
@@ -106,6 +106,8 @@ app.post('/api/rackupload-file',rack.single('file'), rackupload);
 
 
 // try this
+
+
 
 app.get('/api/account/:id/live-data-file', async (req, res) => {
     try {

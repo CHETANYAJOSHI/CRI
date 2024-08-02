@@ -238,7 +238,7 @@ const CreateAccount = () => {
               onChange={(e) => setNetworkHospitalLink(e.target.value)}
             />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <Label htmlFor="networkHospitalFile">Upload Network Hospital File</Label>
             <Input
               type="file"
@@ -246,7 +246,7 @@ const CreateAccount = () => {
               name="networkHospitalFile"
               onChange={onFileChange}
             />
-          </FormGroup>
+          </FormGroup> */}
           <FormGroup>
             <Label htmlFor="claimsFile">Upload Claims File</Label>
             <Input type="file" id="claimsFile" name="claimsFile" onChange={onFileChange} />
@@ -298,7 +298,7 @@ const CreateAccount = () => {
 
       {/* Modal for displaying account details */}
       {modalVisible && (
-        <Modal>
+        <Modal style={{height:'100vh' , overflow:'auto'}}>
           <ModalContent>
             <CloseButton onClick={handleCloseModal}>Close</CloseButton>
             <Title>Account Created Successfully</Title>

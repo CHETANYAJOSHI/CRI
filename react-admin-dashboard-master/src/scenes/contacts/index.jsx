@@ -5,6 +5,7 @@ import Header from '../../components/Header';
 import ClaimForm from '../../../src/files/Claim form.pdf';
 import CheckList from '../../../src/files/Check List.doc';
 import { useLocation } from 'react-router-dom';
+
 import './contacts.css';
 
 const Contacts = () => {
@@ -12,8 +13,6 @@ const Contacts = () => {
   const [TPA, setTPA] = useState("XZY Ltd");
   const [SI, setSI] = useState("500000");
   const [period, setPeriod] = useState("1st Apr 2024 To 31st March 2025");
-
-
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

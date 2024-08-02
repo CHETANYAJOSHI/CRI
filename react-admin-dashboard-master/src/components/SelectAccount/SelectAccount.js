@@ -2,6 +2,7 @@ import React, { useState,useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
+// import { useAccount } from '../AccountContext/AccountContext';
 
 const Container = styled.div`
   display: flex;
@@ -47,6 +48,7 @@ const Option = styled.option``;
 const SelectAccount = () => {
     const [accounts, setAccounts] = useState([]);
     const [selectedAccount, setSelectedAccount] = useState('');
+    // const { selectedAccount, setSelectedAccount } = useAccount();
     const navigate = useNavigate();
 
     useEffect(() => {
