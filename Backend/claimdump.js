@@ -15,12 +15,12 @@ const getClaimsDataFile = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { accountName, claimDumpFile } = account;
-    if (!accountName || !claimDumpFile) {
+    const { accountName, claimDumpSelfFile } = account;
+    if (!accountName || !claimDumpSelfFile) {
       return res.status(400).json({ error: 'Invalid account data' });
     }
 
-    const claimsFilePath = path.join(__dirname, 'NewAccounts', claimDumpFile);
+    const claimsFilePath = path.join(__dirname, 'NewAccounts', claimDumpSelfFile);
 
     // Read Excel file and send the data
     readxlsxFile(claimsFilePath).then((rows) => {
@@ -48,13 +48,13 @@ const getClaimsDataFile = async (req, res) => {
 const downloadClaimsDataFile = async (req, res) => {
   const accountId = req.params.accountId;
   const account = await Accounts.findById(accountId);
-  const { claimDumpFile } = account;
-  if (!claimDumpFile) {
+  const { claimDumpSelfFile } = account;
+  if (!claimDumpSelfFile) {
     return res.status(400).json({ error: 'Invalid account data' });
   }
 
   if (account) {
-    const filePath = path.join(__dirname, './NewAccounts', claimDumpFile);
+    const filePath = path.join(__dirname, './NewAccounts', claimDumpSelfFile);
     if (fs.existsSync(filePath)) {
       res.download(filePath, err => {
         if (err) {
@@ -113,13 +113,13 @@ const uploadClaimsDataFile = async (req, res) => {
     const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
 
     // Delete the old claimsFile if it exists
-    const oldClaimsFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.claimDumpFile);
+    const oldClaimsFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.claimDumpSelfFile);
     if (fs.existsSync(oldClaimsFilePath)) {
       fs.unlinkSync(oldClaimsFilePath);
     }
 
     // Update the account with the new claimsFile path
-    account.claimDumpFile = newFilePath;
+    account.claimDumpSelfFile = newFilePath;
     await account.save();
 
     res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
@@ -150,8 +150,8 @@ const updateClaimsDataRow = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { claimDumpFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', claimDumpFile);
+    const { claimDumpSelfFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', claimDumpSelfFile);
 
     const workbook = xlsx.readFile(filePath);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -186,10 +186,63 @@ const updateClaimsDataRow = async (req, res) => {
   }
 };
 
+const getDataFromSheet = (sheet) => {
+  const data = xlsx.utils.sheet_to_json(sheet, { header: 1 });
+  const headers = data[0];
+  const rows = data.slice(1).map((row) => {
+    const rowData = [];
+    headers.forEach((header, i) => {
+      rowData.push(row[i]);
+    });
+    return rowData;
+  });
+  return { headers, rows };
+};
+
+
+
+const AddSelfClaim = async (req, res) => {
+  const { accountId } = req.params;
+  const { newRowData } = req.body;
+
+  try {
+    const account = await Accounts.findById(accountId);
+    const { claimDumpSelfFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', claimDumpSelfFile);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found' });
+    }
+
+    const workbook = xlsx.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    const { headers, rows } = getDataFromSheet(worksheet);
+
+    // Append the new row data
+    const newRow = headers.map((header) => newRowData[header] || '');
+    rows.push(newRow);
+
+    // Convert back to sheet and write to file
+    const newSheetData = [headers, ...rows];
+    const newWorksheet = xlsx.utils.aoa_to_sheet(newSheetData);
+    workbook.Sheets[sheetName] = newWorksheet;
+    xlsx.writeFile(workbook, filePath);
+
+    res.status(200).json({ message: 'Row added successfully' });
+  } catch (error) {
+    console.error('Error adding new row:', error);
+    res.status(500).json({ message: 'Error adding new row' });
+  }
+};
+
+
 module.exports = {
   getClaimsDataFile,
   downloadClaimsDataFile,
   uploadClaimsDataFile,
   updateClaimsDataRow,
+  AddSelfClaim,
   claimupload
 };

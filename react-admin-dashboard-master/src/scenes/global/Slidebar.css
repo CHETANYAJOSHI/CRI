@@ -9,23 +9,32 @@
     overflow: hidden;
   }
 
+  .inner-submenu-arrows{
+    height:200vh;
+  }
+
+
+.pro-sidebar-inner{
+  height:none !important;
+}
+
 .pro-menu {
     background-color: rgb(57, 49, 132) !important;
   }
   
-  .pro-menu-item {
+.pro-menu-item {
     color: white !important;
   }
   
-  .pro-menu-item:hover {
+.pro-menu-item:hover {
     color: #868dfb !important;
   }
   
-  .pro-menu-item.active {
+.pro-menu-item.active {
     color: #6870fa !important;
   }
   
-  .pro-icon-wrapper {
+.pro-icon-wrapper {
     color: white !important;
   }
   

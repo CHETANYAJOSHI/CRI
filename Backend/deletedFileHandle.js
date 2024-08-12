@@ -15,12 +15,12 @@ const getSelfParentDataFile = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { accountName, selfParentFile } = account;
-    if (!accountName || !selfParentFile) {
+    const { accountName, deletionDataSelfFile } = account;
+    if (!accountName || !deletionDataSelfFile) {
       return res.status(400).json({ error: 'Invalid account data' });
     }
 
-    const selfParentFilePath = path.join(__dirname, 'NewAccounts', selfParentFile);
+    const selfParentFilePath = path.join(__dirname, 'NewAccounts', deletionDataSelfFile);
 
     // Read Excel file and send the data
     readxlsxFile(selfParentFilePath).then((rows) => {
@@ -48,13 +48,13 @@ const getSelfParentDataFile = async (req, res) => {
 const downloadSelfParentDataFile = async (req, res) => {
   const accountId = req.params.accountId;
   const account = await Accounts.findById(accountId);
-  const { selfParentFile } = account;
-  if (!selfParentFile) {
+  const { deletionDataSelfFile } = account;
+  if (!deletionDataSelfFile) {
     return res.status(400).json({ error: 'Invalid account data' });
   }
 
   if (account) {
-    const filePath = path.join(__dirname, './NewAccounts', selfParentFile);
+    const filePath = path.join(__dirname, './NewAccounts', deletionDataSelfFile);
     if (fs.existsSync(filePath)) {
       res.download(filePath, err => {
         if (err) {
@@ -113,13 +113,13 @@ const uploadSelfParentDataFile = async (req, res) => {
     const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
 
     // Delete the old selfParentFile if it exists
-    const oldSelfParentFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.selfParentFile);
+    const oldSelfParentFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.deletionDataSelfFile);
     if (fs.existsSync(oldSelfParentFilePath)) {
       fs.unlinkSync(oldSelfParentFilePath);
     }
 
     // Update the account with the new selfParentFile path
-    account.selfParentFile = newFilePath;
+    account.deletionDataSelfFile = newFilePath;
     await account.save();
 
     res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
@@ -144,8 +144,8 @@ const updateSelfParentDataRow = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { selfParentFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', selfParentFile);
+    const { deletionDataSelfFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', deletionDataSelfFile);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ error: 'File not found' });
@@ -202,8 +202,8 @@ const AddSelfParentUser = async (req, res) => {
 
   try {
     const account = await Accounts.findById(accountId);
-    const { selfParentFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', selfParentFile);
+    const { deletionDataSelfFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', deletionDataSelfFile);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found' });

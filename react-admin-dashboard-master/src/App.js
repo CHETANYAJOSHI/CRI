@@ -28,6 +28,15 @@ import FloaterDeleted from "./scenes/invoices/DeletedData/FloaterDeleted";
 import RackRates from "./scenes/Rackrates/RackRates";
 import CreateAccount from "./components/CreateAccount/CreateAccount";
 import SelectAccount from "./components/SelectAccount/SelectAccount";
+import FloaterLive from "./scenes/invoices/FloaterLive/FloaterLive";
+import FloaterClaimDump from "./scenes/Claim/ClaimDumb/FloaterClaimDump";
+import FloaterClaimAnalysis from "./scenes/Claim/ClaimAnalysis/FloaterClaimAnalysis";
+import CDstatement from "./scenes/invoices/Endorsement/CDstatement";
+import SelfPolicy from "./scenes/contacts/SelfPolicy";
+import FolaterPolicy from "./scenes/contacts/FolaterPolicy";
+import Addition from "./scenes/Endorsement/Addition";
+import Deletion from "./scenes/Endorsement/Deletion";
+
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -47,17 +56,26 @@ function App() {
             {!noSidebarPaths.includes(location.pathname) && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
               <Route path="/createaccount" element={<CreateAccount />} />
+              
               <Route path="/selectAccount" element={<SelectAccount />} />
-              <Route path="/claim/claimanalysis" element={<ClaimAnalysis />} />
-              <Route path="/claim/claimdumb" element={<ClaimDumb />} />
+              <Route path="/policycoverage/selfPolicy" element={<SelfPolicy />} />
+              <Route path="/policycoverage/floaterPolicy" element={<FolaterPolicy />} />
+              <Route path="/claim/Selfclaimanalysis" element={<ClaimAnalysis />} />
+              <Route path="/claim/Floaterclaimanalysis" element={<FloaterClaimAnalysis />} />
+              <Route path="/claim/Selfclaimdumb" element={<ClaimDumb />} />
+              <Route path="/claim/Floaterclaimdumb" element={<FloaterClaimDump />} />
+              <Route path="/CDStatement" element={<CDstatement />} />
               <Route path="/downloads" element={<Downloads/>} />
-              <Route path="/enrollment/live" element={<EnrollmentLive />} />
+              <Route path="/enrollment/SelfLive" element={<EnrollmentLive />} />
+              <Route path="/enrollment/FloaterLive" element={<FloaterLive />} />
               <Route path="/enrollement/rack-rates" element={<RackRates />} />
               <Route path="/enrollment/premium" element={<Premium />} />
               <Route path="/enrollment/endorsement" element={<Endorsement />} />
               <Route path="/enrollment/deleted/self" element={<DeletedData />} />
               <Route path="/enrollment/deleted/floater" element={<FloaterDeleted />} />
               <Route path="/" element={<Login />} />
+              <Route path="/Addition" element={<Addition />} />
+              <Route path="/Deletion" element={<Deletion />} />
               <Route path="/wellness" element={<Wellness />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/profile" element={<Team />} />

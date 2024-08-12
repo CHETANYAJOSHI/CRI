@@ -20,8 +20,20 @@ const PORT = 5000;
 const FILE_PATH = path.join(__dirname, 'uploads', 'data.xlsx');
 const { getSelfParentDataFile, downloadSelfParentDataFile, uploadSelfParentDataFile, updateSelfParentDataRow, AddSelfParentUser,selfupload } = require('./deletedFileHandle');
 const {   getFloaterParentDataFile,   downloadFloaterParentDataFile,   uploadFloaterParentDataFile,   updateFloaterParentDataRow, AddFloaterParentUser,   floaterUpload } = require('./floaterDeleted');
-const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow, claimupload } = require('./claimdump')
+const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow,AddSelfClaim, claimupload } = require('./claimdump')
 const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
+const { getFloaterLive, downloadFloaterLive, uploadFloaterLive, updateFloaterLive, AddFloaterLive , floaterUploadLive , countBenefStatus} = require('./Livefloater');
+const { getClaimsfloaterFile, downloadClaimsfloaterFile, uploadClaimsfloaterFile, updateClaimsfloaterRow, AddfloaterClaim,claimFloaterupload } = require('./Floaterclaimdump')
+const { getClaimSelfAnalysis, downloadClaimSelfAnalysis, uploadClaimSelfAnalysis , claimSelfAnalysisUpload } = require('./ClaimAnalysis')
+const { getClaimFloaterAnalysis, downloadClaimFloaterAnalysis, uploadClaimFloaterAnalysis , claimFloaterAnalysisUpload } = require('./FloaterClaimAnalysis');
+const { getAdditionDataFile, downloadAdditionDataFile, uploadAdditionDataFile, updateAdditionDataRow, AddSelfAddition , Additionupload } = require('./Addition');
+const { getDeletionDataFile, downloadDeletionDataFile, uploadDeletionDataFile, updateDeletionDataRow, AddSelfDeletion , Deletionupload } = require('./Deletition');
+
+const { getCDfile, downloadCDfile, uploadCDfile , CDfileUpload } = require('./CDStatement');
+const { getSelfPolicyfile, downloadSelfPolicyfile, uploadSelfPolicy , SelfPolicyUpload } = require('./SelfPolicy');
+const { getFloaterPolicyfile, downloadFloaterPolicyfile, uploadFloaterPolicy , FloaterPolicyUpload } = require('./FloaterPolicy');
+
+
 const pdfRouter = require('./pdfHandler');
 
 require('dotenv').config();
@@ -59,6 +71,64 @@ app.get('/process-excel', (req, res) => {
 
 // Middleware
 
+//ClaimAnalysis Self
+
+app.get('/api/claim-self-analysis/:id', getClaimSelfAnalysis);
+app.get('/api/claim-self-analysis/download/:accountId', downloadClaimSelfAnalysis);
+app.post('/api/claim-self-analysis/upload/:accountId', claimSelfAnalysisUpload.single('file'), uploadClaimSelfAnalysis);
+
+
+
+//FloaterClaimAnalysis Self
+
+app.get('/api/claim-floater-analysis/:id', getClaimFloaterAnalysis);
+app.get('/api/claim-floater-analysis/download/:accountId', downloadClaimFloaterAnalysis);
+app.post('/api/claim-floater-analysis/upload/:accountId', claimFloaterAnalysisUpload.single('file'), uploadClaimFloaterAnalysis);
+
+
+// Self Policy Coverage
+
+app.get('/api/SelfPolicyCoverage/:id', getSelfPolicyfile);
+app.get('/api/SelfPolicyCoverage/download/:accountId', downloadSelfPolicyfile);
+app.post('/api/SelfPolicyCoverage/upload/:accountId', SelfPolicyUpload.single('file'), uploadSelfPolicy);
+
+
+
+// Floater Policy Coverage
+
+app.get('/api/FloaterPolicyCoverage/:id', getFloaterPolicyfile);
+app.get('/api/FloaterPolicyCoverage/download/:accountId', downloadFloaterPolicyfile);
+app.post('/api/FloaterPolicyCoverage/upload/:accountId', FloaterPolicyUpload.single('file'), uploadFloaterPolicy);
+
+
+
+
+// CDstatement
+app.get('/api/CDStatement/:id', getCDfile);
+app.get('/api/CDStatement/download/:accountId', downloadCDfile);
+app.post('/api/CDStatement/upload/:accountId', CDfileUpload.single('file'), uploadCDfile);
+
+
+
+
+
+
+//Floater Live Data
+
+
+
+app.get('/api/account/:id/livefloater-parent-data-file', getFloaterLive);
+app.get('/api/account/:accountId/download-livefloater-parent-file', downloadFloaterLive);
+app.post('/api/account/:accountId/upload-livefloater-parent-file', floaterUploadLive.single('file'), uploadFloaterLive);
+app.put('/api/account/:accountId/update-livefloater-parent-row', updateFloaterLive);
+app.post('/api/account/:accountId/add-livefloater-parent-row' , AddFloaterLive);
+app.get('/api/pdf/countBenefStatus/:id' , countBenefStatus);
+
+
+
+
+
+
 
 
 app.use('/pdf', pdfRouter);
@@ -67,6 +137,9 @@ app.get('/api/account/:accountId/download-self-parent-file', downloadSelfParentD
 app.post('/api/account/:accountId/upload-self-parent-file', selfupload.single('file'), uploadSelfParentDataFile);
 app.put('/api/account/:accountId/update-self-parent-row', updateSelfParentDataRow);
 app.post('/api/account/:accountId/add-self-parent-row' , AddSelfParentUser);
+
+
+
 // floated deleted
 app.get('/api/account/:id/floater-parent-file', getFloaterParentDataFile);
 app.get('/api/account/:accountId/download-floater-parent-file', downloadFloaterParentDataFile);
@@ -75,7 +148,7 @@ app.put('/api/account/:accountId/update-floater-parent-row', updateFloaterParent
 app.post('/api/account/:accountId/add-floater-parent-row' , AddFloaterParentUser);
 
 
-//claimdump
+//Selfclaimdump
 
 // Fetch and read claims data file
 app.get('/api/account/:id/claims-data-file', getClaimsDataFile);
@@ -88,6 +161,24 @@ app.post('/api/account/:accountId/upload-claim-file', claimupload.single('file')
 
 // Update a row in the claims data file
 app.put('/api/account/:accountId/update-claim-row', updateClaimsDataRow);
+app.post('/api/account/:accountId/add-claim-self-row' , AddSelfClaim);
+
+
+//FloaterClaimDump
+
+
+app.get('/api/account/:id/floaterclaims-data-file', getClaimsfloaterFile);
+
+// Download claims data file
+app.get('/api/account/:accountId/download-floaterclaim-file', downloadClaimsfloaterFile);
+
+// Upload claims data file
+app.post('/api/account/:accountId/upload-floaterclaim-file', claimFloaterupload.single('file'), uploadClaimsfloaterFile);
+
+// Update a row in the claims data file
+app.put('/api/account/:accountId/update-floaterclaim-row', updateClaimsfloaterRow);
+app.post('/api/account/:accountId/add-claim-floater-row' , AddfloaterClaim);
+
 
 
 
@@ -107,6 +198,23 @@ app.post('/api/rackupload-file',rack.single('file'), rackupload);
 
 // try this
 
+//Endorsement Addition Data
+
+app.get('/api/account/:id/Addition', getAdditionDataFile);
+app.get('/api/account/:accountId/download-Addition', downloadAdditionDataFile);
+app.post('/api/account/:accountId/upload-Addition', Additionupload.single('file'), uploadAdditionDataFile);
+app.put('/api/account/:accountId/update-Addition', updateAdditionDataRow);
+app.post('/api/account/:accountId/add-Addition' , AddSelfAddition);
+
+
+//Endorsement Deletion Data
+
+app.get('/api/account/:id/Deletion', getDeletionDataFile);
+app.get('/api/account/:accountId/download-Deletion', downloadDeletionDataFile);
+app.post('/api/account/:accountId/upload-Deletion', Deletionupload.single('file'), uploadDeletionDataFile);
+app.put('/api/account/:accountId/update-Deletion', updateDeletionDataRow);
+app.post('/api/account/:accountId/add-Deletion' , AddSelfDeletion);
+
 
 
 app.get('/api/account/:id/live-data-file', async (req, res) => {
@@ -118,12 +226,12 @@ app.get('/api/account/:id/live-data-file', async (req, res) => {
         return res.status(404).json({ error: 'Account not found' });
       }
   
-      const { accountName, liveDataFile } = account;
-      if (!accountName || !liveDataFile) {
+      const { accountName, liveDataSelfFile } = account;
+      if (!accountName || !liveDataSelfFile) {
         return res.status(400).json({ error: 'Invalid account data' });
       }
   
-      const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataFile);
+      const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
       
   
       // Read Excel file and send the data
@@ -155,13 +263,13 @@ app.get('/api/account/:accountId/download-file', async (req, res) => {
   const accountId = req.params.accountId;
   // Find account by ID
   const account = await Accounts.findById(accountId);
-  const {liveDataFile}= account;
-  if (!liveDataFile) {
+  const {liveDataSelfFile}= account;
+  if (!liveDataSelfFile) {
     return res.status(400).json({ error: 'Invalid account data' });
   }
 
   if (account) {
-    const filePath = path.join(__dirname, './NewAccounts', liveDataFile);
+    const filePath = path.join(__dirname, './NewAccounts', liveDataSelfFile);
     if (fs.existsSync(filePath)) {
       res.download(filePath, err => {
         if (err) {
@@ -225,13 +333,13 @@ app.post('/api/account/:accountId/upload-file', upload.single('file'), async (re
       const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
 
       // Delete the old liveDataFile if it exists
-      const oldLiveDataFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.liveDataFile);
+      const oldLiveDataFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.liveDataSelfFile);
       if (fs.existsSync(oldLiveDataFilePath)) {
           fs.unlinkSync(oldLiveDataFilePath);
       }
 
       // Update the account with the new liveDataFile path
-      account.liveDataFile = newFilePath;
+      account.liveDataSelfFile = newFilePath;
       await account.save();
 
       res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
@@ -273,8 +381,8 @@ app.post('/api/account/:accountId/upload-file', upload.single('file'), async (re
         return res.status(404).json({ error: 'Account not found' });
       }
   
-      const { liveDataFile } = account;
-      const filePath = path.join(__dirname, 'NewAccounts', liveDataFile);
+      const { liveDataSelfFile } = account;
+      const filePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
   
       const workbook = xlsx.readFile(filePath);
       const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -330,8 +438,8 @@ app.post('/api/account/:accountId/upload-file', upload.single('file'), async (re
 
   try {
     const account = await Accounts.findById(accountId);
-    const { liveDataFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', liveDataFile);
+    const { liveDataSelfFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found' });

@@ -15,12 +15,12 @@ const getFloaterParentDataFile = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { accountName, floaterParentFile } = account;
-    if (!accountName || !floaterParentFile) {
+    const { accountName, deletionDataFloaterFile } = account;
+    if (!accountName || !deletionDataFloaterFile) {
       return res.status(400).json({ error: 'Invalid account data' });
     }
 
-    const floaterParentFilePath = path.join(__dirname, 'NewAccounts', floaterParentFile);
+    const floaterParentFilePath = path.join(__dirname, 'NewAccounts', deletionDataFloaterFile);
 
     // Read Excel file and send the data
     readxlsxFile(floaterParentFilePath).then((rows) => {
@@ -48,13 +48,13 @@ const getFloaterParentDataFile = async (req, res) => {
 const downloadFloaterParentDataFile = async (req, res) => {
   const accountId = req.params.accountId;
   const account = await Accounts.findById(accountId);
-  const { floaterParentFile } = account;
-  if (!floaterParentFile) {
+  const { deletionDataFloaterFile } = account;
+  if (!deletionDataFloaterFile) {
     return res.status(400).json({ error: 'Invalid account data' });
   }
 
   if (account) {
-    const filePath = path.join(__dirname, './NewAccounts', floaterParentFile);
+    const filePath = path.join(__dirname, './NewAccounts', deletionDataFloaterFile);
     if (fs.existsSync(filePath)) {
       res.download(filePath, err => {
         if (err) {
@@ -113,13 +113,13 @@ const uploadFloaterParentDataFile = async (req, res) => {
     const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
 
     // Delete the old floaterParentFile if it exists
-    const oldFloaterParentFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.floaterParentFile);
+    const oldFloaterParentFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.deletionDataFloaterFile);
     if (fs.existsSync(oldFloaterParentFilePath)) {
       fs.unlinkSync(oldFloaterParentFilePath);
     }
 
     // Update the account with the new floaterParentFile path
-    account.floaterParentFile = newFilePath;
+    account.deletionDataFloaterFile = newFilePath;
     await account.save();
 
     res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
@@ -150,8 +150,8 @@ const updateFloaterParentDataRow = async (req, res) => {
       return res.status(404).json({ error: 'Account not found' });
     }
 
-    const { floaterParentFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', floaterParentFile);
+    const { deletionDataFloaterFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', deletionDataFloaterFile);
 
     const workbook = xlsx.readFile(filePath);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -206,8 +206,8 @@ const AddFloaterParentUser = async (req, res) => {
 
   try {
     const account = await Accounts.findById(accountId);
-    const { floaterParentFile } = account;
-    const filePath = path.join(__dirname, 'NewAccounts', floaterParentFile);
+    const { deletionDataFloaterFile } = account;
+    const filePath = path.join(__dirname, 'NewAccounts', deletionDataFloaterFile);
 
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'File not found' });

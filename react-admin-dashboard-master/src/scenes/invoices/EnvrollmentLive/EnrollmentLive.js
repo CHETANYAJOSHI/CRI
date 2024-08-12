@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Header from '../../../components/Header';
 import styled from 'styled-components';
 import {
   Box,
@@ -18,6 +19,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import AddIcon from '@mui/icons-material/Add';
+import './Envrollment.css';
+import { textAlign } from '@mui/system';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -67,6 +70,7 @@ const Invoices = () => {
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  
 
   useEffect(() => {
     const accountId = searchParams.get('accountId');
@@ -89,6 +93,9 @@ const Invoices = () => {
     fetchAccounts();
   }, []);
 
+
+  
+
   const fetchLiveDataFile = async (accountId) => {
     setLoading(true);
     try {
@@ -102,14 +109,14 @@ const Invoices = () => {
     }
   };
 
-  const handleSelectChange = (e) => {
-    const accountId = e.target.value;
-    setSelectedAccount(accountId);
-    if (accountId) {
-      navigate(`/enrollment/live?accountId=${accountId}`);
-      fetchLiveDataFile(accountId);
-    }
-  };
+  // const handleSelectChange = (e) => {
+  //   const accountId = e.target.value;
+  //   setSelectedAccount(accountId);
+  //   if (accountId) {
+  //     navigate(`/enrollment/SelfLive?accountId=${accountId}`);
+  //     fetchLiveDataFile(accountId); 
+  //   }
+  // };
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -248,7 +255,16 @@ const Invoices = () => {
     return rowData;
   });
 
+    const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
+
+
   return (
+
+    <Box mt="20px" style={{textAlign:'center'}}>
+      <Header title={` ${selectedAccountName}`}/>
+
+
+
     <Box
       style={{
         width: '80vw',
@@ -260,7 +276,30 @@ const Invoices = () => {
         flexDirection: 'row',
       }}
     >
-      <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+
+
+      <div className="Detailsm">
+
+          <div className="totalPremium">
+            <p>Total Premium</p>
+            <p>Rs. 150000</p>
+          </div>
+
+          <div className="totalPremium">
+            <p>Total Life</p>
+            <p>50000</p>
+          </div>
+
+          <div className="totalPremium">
+            <p>CD Balance</p>
+            <p>50000</p>
+          </div>
+
+     
+
+
+
+      {/* <DropdownWrapper style={{ width: '100%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
         <Label htmlFor="account-select">Account</Label>
         <Select
           id="account-select"
@@ -274,7 +313,9 @@ const Invoices = () => {
             </Option>
           ))}
         </Select>
-      </DropdownWrapper>
+      </DropdownWrapper> */}
+
+      </div>
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <Button
@@ -306,10 +347,11 @@ const Invoices = () => {
           color="secondary"
           onClick={handleUploadClick}
           style={{ marginLeft: '10px' , height:'50%'}}
+          startIcon={<UploadIcon />}
         >
-          Upload File
+          Submit File
         </Button>
-        <Button
+        {/* <Button
           variant="contained"
           color="primary"
           onClick={handleAddUserClick}
@@ -317,7 +359,7 @@ const Invoices = () => {
           style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
         >
           Add User
-        </Button>
+        </Button> */}
         <TextField
           label="Search"
           value={searchQuery}
@@ -421,6 +463,8 @@ const Invoices = () => {
           </Button>
         </DialogActions>
       </Dialog>
+    </Box>
+
     </Box>
   );
 };

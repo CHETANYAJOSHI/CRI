@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
+import axios from "axios";
+import { Navigate, useNavigate } from "react-router-dom";
 import {
   ProSidebar,
   Menu,
@@ -9,7 +11,8 @@ import {
   Box,
   IconButton,
   Typography,
-  useTheme
+  useTheme,
+  Button
 } from "@mui/material";
 import { Link } from "react-router-dom";
 import "react-pro-sidebar/dist/css/styles.css";
@@ -39,7 +42,44 @@ import SpaIcon from '@mui/icons-material/Spa';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import profile from "../../images/profile.avif"
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
+import styled from 'styled-components';
 import './Slidebar.css';
+
+
+const DropdownWrapper = styled.div`
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+  color: #333;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  background-color: #fff;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+`;
+
+const Option = styled.option``;
+
 const Item = ({ title, to, icon, selected, setSelected }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
@@ -69,9 +109,57 @@ const DropdownItem = ({ title, to, icon, selected, setSelected }) => {
 
 const Sidebar = () => {
   const theme = useTheme();
+  const Navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const [selectedAccount, setSelectedAccount] = useState(() => {
+    // Retrieve from localStorage if available
+    return localStorage.getItem('selectedAccount') || ''});
+    
+    const [accounts, setAccounts] = useState([]);
+
+const Nav = ()=>{
+  Navigate("/createaccount")
+}
+
+
+
+useEffect(() => {
+  const fetchAccounts = async () => {
+    try {
+      const res = await axios.get('http://localhost:5000/api/accounts');
+      setAccounts(res.data);
+    } catch (err) {
+      console.error('Error fetching accounts:', err);
+    }
+  };
+
+  fetchAccounts();
+}, []);
+
+
+
+useEffect(() => {
+  // Store the selectedAccount in localStorage whenever it changes
+  localStorage.setItem('selectedAccount', selectedAccount);
+}, [selectedAccount]);
+
+const handleSelectChange = (e) => {
+  const accountId = e.target.value;
+  setSelectedAccount(accountId);
+ 
+  Navigate("/dashboard")
+};
+
+
+
+
+
+
+
+
+
 
   return (
     <Box
@@ -113,6 +201,7 @@ const Sidebar = () => {
               >
                 <Typography variant="h3" style={{color:'white' , fontWeight:'600'}}>
                   ADMIN
+                  
                 </Typography>
                 <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{color:"white"}}>
                   <MenuOutlinedIcon />
@@ -139,14 +228,36 @@ const Sidebar = () => {
                   fontWeight="bold"
                   sx={{ m: "10px 0 0 0" }}
                 >
-                  Ed Roh
-                </Typography>
-                <Typography variant="h5" color={colors.greenAccent[500]}>
-                  VP Fancy Admin
+                  
+                 Mr. Vinod Rai
+                 
                 </Typography>
               </Box>
+              <Button style={{backgroundColor:'red' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button>
+              <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">
+        
+        <Select
+          id="account-select"
+          value={selectedAccount}
+          onChange={handleSelectChange}
+        >
+          <Option value="">--Select an Account--</Option>
+          {accounts.map((account) => (
+            <Option key={account._id} value={account._id}>
+              {account.accountName}
+            </Option>
+          ))}
+        </Select>
+      </DropdownWrapper>
+
+
+
+
             </Box>
+
           )}
+
+         
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
             <Item
@@ -157,21 +268,15 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
 
-            <Item
+            {/* <Item
               title="Create Account"
               to="/createaccount"
               icon={<FolderSharedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
-            <Typography
-              variant="h6"
-              style={{color:"white" , fontSize:'17px', fontWeight:600}}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Data
-            </Typography>
+            
             <Item
               title="Profile"
               to="/profile"
@@ -184,7 +289,7 @@ const Sidebar = () => {
 
             <Item
               title="Policy Coverage"
-              to="/selectAccount"
+              to={`/policycoverage?accountId=${selectedAccount}`}
               icon={<ContactsOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
@@ -195,14 +300,32 @@ const Sidebar = () => {
               title="Enrollments"
               icon={<InsertPageBreakIcon />}
             >
+
+          <SubMenu
+                title="Live Data"
+                to={`/enrollment/live`}
+                icon={<ImportContactsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              >
               
               <Item
-                title="Live Data"
-                to="/enrollment/live"
+                title="Self With Parents"
+                to={`/enrollment/SelfLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
+
+            <Item
+                title="Floater With Parents"
+                to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
+                icon={<ImportContactsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              </SubMenu>
               
               <SubMenu
                 title="Deleted Data"
@@ -213,26 +336,20 @@ const Sidebar = () => {
               >
 
                 <Item title="Self With Parents"
-                to="enrollment/deleted/self"
+                to={`enrollment/deleted/self?accountId=${selectedAccount}`}
                 icon={< ControlPointIcon />}
                 selected={selected}
                 setSelected={setSelected}
                 />
                 <Item title="Floater With Parents"
-                to="enrollment/deleted/floater"
+                to={`enrollment/deleted/floater?accountId=${selectedAccount}`}
                 icon={< ControlPointIcon />}
                 selected={selected}
                 setSelected={setSelected}
                 />
 
                 </SubMenu>
-              <Item
-                title="Endorsement"
-                to="/enrollment/endorsement"
-                icon={<BeenhereIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+              
               <Item
                 title="Calculated Premium"
                 to="/enrollment/premium"
@@ -240,13 +357,7 @@ const Sidebar = () => {
                 selected={selected}
                 setSelected={setSelected}
               />
-              <Item
-                title="Rack-Rates"
-                to="/enrollement/rack-rates"
-                icon={<RateReviewIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+              
               <Item
                 title="E-Card"
                 to="/profile"
@@ -257,38 +368,104 @@ const Sidebar = () => {
             </SubMenu>
 
             <SubMenu
-              title="Claim"
+                title="Endorsement"
+                to="/enrollment/endorsement"
+                icon={<BeenhereIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              >
+
+              <Item
+                title="Addition"
+                to={`/Addition?accountId=${selectedAccount}`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              <Item
+                title="Deletion"
+                to={`/Deletion?accountId=${selectedAccount}`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              <Item
+                title="CD Statement"
+                to={`/CDStatement?accountId=${selectedAccount}`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              <Item
+                title="Rack-Rates"
+                to="/enrollement/rack-rates"
+                icon={<RateReviewIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              </SubMenu>
+
+           
+
+            <SubMenu
+              title="Claim Dump"
               icon={<MiscellaneousServicesIcon />}
             >
 
               <Item
-                title="Claim Dump"
-                to="/claim/claimdumb"
+                title="Self With Parents"
+                to={`/claim/Selfclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
 
               <Item
-                title="Claim Analysis"
-                to="/claim/claimanalysis"
+                title="Floater With Parents"
+                to={`/claim/Floaterclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
 
+            </SubMenu>
+
+            <SubMenu
+              title="Claim Analysis"
+              icon={<MiscellaneousServicesIcon />}
+            >
+
+            <Item
+                title="Self With Parents"
+                to={`/claim/Selfclaimanalysis?accountId=${selectedAccount}`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+            />
+
+            <Item
+                title="Floater With Parents"
+                to={`/claim/Floaterclaimanalysis?accountId=${selectedAccount}`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+            />
 
             </SubMenu>
 
             
 
-            <Item
+            {/* <Item
               title="Downloads"
               to="/downloads"
               icon={<SimCardDownloadIcon />}
               selected={selected}
               setSelected={setSelected}
-            /> 
+            />  */}
 
             <Item
               title="Wellness"
@@ -327,7 +504,7 @@ const Sidebar = () => {
               setSelected={setSelected}
             /> */}
 
-            <Typography
+            {/* <Typography
               variant="h6"
               style={{color:"white" , fontSize:'17px', fontWeight:600}}
               sx={{ m: "15px 0 5px 20px" }}
@@ -361,7 +538,7 @@ const Sidebar = () => {
               icon={<MapOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

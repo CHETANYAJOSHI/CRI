@@ -12,9 +12,9 @@ router.get('/download/:accountId/:fileType', async (req, res) => {
     // Map fileType to the respective file field
     const fileFields = {
       networkHospitalFile: 'networkHospitalFile',
-      claimsFile: 'claimsFile',
-      exclusionFile: 'exclusionFile',
-      checklistFile: 'checklistFile'
+      claimABFile: 'claimABFile',
+      exclusionListFile: 'exclusionListFile',
+      checkListFile: 'checkListFile'
     };
 
     // Check if the provided fileType is valid

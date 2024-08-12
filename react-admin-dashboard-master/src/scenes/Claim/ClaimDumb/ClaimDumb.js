@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import Header from '../../../components/Header';
+
 import styled from 'styled-components';
 import {
   Box,
@@ -17,6 +19,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
+import AddIcon from '@mui/icons-material/Add';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -61,6 +64,8 @@ const ClaimDumb = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [editRow, setEditRow] = useState(null);
   const [editData, setEditData] = useState({});
+  const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
+  const [newUserData, setNewUserData] = useState({});
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -105,7 +110,7 @@ const ClaimDumb = () => {
     const accountId = e.target.value;
     setSelectedAccount(accountId);
     if (accountId) {
-      navigate(`/claim/claimdumb?accountId=${accountId}`);
+      navigate(`/claim/Selfclaimdumb?accountId=${accountId}`);
       fetchLiveDataFile(accountId);
     }
   };
@@ -155,7 +160,7 @@ const ClaimDumb = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'data.xlsx');
+      link.setAttribute('download', 'SelfClaimDump.xlsx');
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -197,6 +202,31 @@ const ClaimDumb = () => {
     )
   );
 
+
+  const handleAddUserClick = () => {
+    setOpenAddUserDialog(true);
+  };
+
+  const handleAddUserChange = (e) => {
+    const { name, value } = e.target;
+    setNewUserData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleAddUserSave = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/add-claim-self-row`, {
+        newRowData: newUserData,
+      });
+      fetchLiveDataFile(selectedAccount);
+    } catch (error) {
+      console.error('Error adding new row:', error);
+    } finally {
+      setOpenAddUserDialog(false);
+      setNewUserData({});
+    }
+  };
+
+
   const columns = [
     {
       field: 'actions',
@@ -225,7 +255,13 @@ const ClaimDumb = () => {
     return rowData;
   });
 
+  const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
+
+
   return (
+
+    <Box mt="20px" style={{textAlign:'center'}}>
+      <Header title={`${selectedAccountName}`}/>
     <Box
       style={{
         width: '80vw',
@@ -237,7 +273,26 @@ const ClaimDumb = () => {
         flexDirection: 'row',
       }}
     >
-      <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+
+<div className="Detailsm">
+
+<div className="totalPremium">
+  <p>Paid Claim</p>
+  <p>Rs. 15000000</p>
+</div>
+
+<div className="totalPremium">
+  <p>OutStanding Claims</p>
+  <p>5000000</p>
+</div>
+
+<div className="totalPremium">
+  <p>Claim Ratio</p>
+  <p>40%</p>
+</div>
+
+
+      {/* <DropdownWrapper style={{ width: '100%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
         <Label htmlFor="account-select">Account</Label>
         <Select
           id="account-select"
@@ -251,7 +306,9 @@ const ClaimDumb = () => {
             </Option>
           ))}
         </Select>
-      </DropdownWrapper>
+      </DropdownWrapper> */}
+
+      </div>
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <Button
@@ -259,6 +316,7 @@ const ClaimDumb = () => {
           color="primary"
           onClick={handleDownloadClick}
           startIcon={<DownloadIcon />}
+          style={{height:'50%'}}
         >
           Download
         </Button>
@@ -273,7 +331,7 @@ const ClaimDumb = () => {
           color="secondary"
           onClick={() => document.getElementById('file-input').click()}
           startIcon={<UploadIcon />}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: '10px', height:'50%' }}
         >
           Upload
         </Button>
@@ -281,10 +339,27 @@ const ClaimDumb = () => {
           variant="contained"
           color="secondary"
           onClick={handleUploadClick}
-          style={{ marginLeft: '10px' }}
+          style={{ marginLeft: '10px', height:'50%' }}
+          startIcon={<UploadIcon />}
         >
-          Upload File
+          Submit Upload
         </Button>
+        {/* <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddUserClick}
+          startIcon={<AddIcon />}
+          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
+        >
+          Add User
+        </Button> */}
+        <TextField
+          label="Search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          style={{ marginLeft: '10px'}}
+        />
       </Box>
 
       {loading ? (
@@ -353,6 +428,35 @@ const ClaimDumb = () => {
           <Button onClick={handleEditSave}>Save</Button>
         </DialogActions>
       </Dialog>
+
+      <Dialog
+        open={openAddUserDialog}
+        onClose={() => setOpenAddUserDialog(false)}
+      >
+        <DialogTitle>Add User</DialogTitle>
+        <DialogContent>
+          {headers.map((header, index) => (
+            <TextField
+              key={index}
+              label={header}
+              name={header}
+              value={newUserData[header] || ''}
+              onChange={handleAddUserChange}
+              fullWidth
+              margin="normal"
+            />
+          ))}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAddUserDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleAddUserSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </Box>
     </Box>
   );
 };

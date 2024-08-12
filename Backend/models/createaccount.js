@@ -1,4 +1,3 @@
-// backend/models/User.js
 const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
@@ -6,54 +5,108 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  TPAName: {
+    type: String,
+    required: true,
+  },
+  InsuranceName: {
+    type: String,
+    required: true,
+  },
+  hrName: {
+    type: String,
+    required: true,
+  },
+  hrEmail: {
+    type: String,
+    required: true,
+    unique:true,
+  },
+  hrNumber: {
+    type: String,
+    required: true,
+    unique:true,
+  },
+  // corporateName: {
+  //   type: String,
+  //   required: true,
+  // },
   networkHospitalLink: {
     type: String,
     required: false,
   },
-  claimsFile: {
+  cdStatementFile: {
     type: String,
     required: false,
   },
-  exclusionFile: {
+  claimSelfAnalysisFile: {
     type: String,
     required: false,
   },
-  checklistFile: {
+  claimFloaterAnalysisFile: {
     type: String,
     required: false,
   },
-  liveDataFile: {
+  claimDumpSelfFile: {
     type: String,
     required: false,
   },
-  cdStatementFile:{ 
+  claimDumpFloaterFile:{ 
     type:String,
     required:false
   },
-  claimFormFile:{ 
+  liveDataSelfFile:{ 
     type:String,
     required:false
   },
-  claimAnalysisFile:{ 
+  liveDataFloaterFile:{ 
     type:String,
     required:false
   },
-  claimDumpFile:{ 
+  // endrosementAdditionFile:{ 
+  //   type:String,
+  //   required:false
+  // },
+  // endrosementDeletionFile:{ 
+  //   type:String,
+  //   required:false
+  // },
+  claimABFile:{ 
     type:String,
     required:false
   },
-  EndorsementFile:{ 
+  checkListFile:{ 
     type:String,
     required:false
   },
-  selfParentFile:{ 
+  exclusionListFile:{ 
     type:String,
     required:false
   },
-  floaterParentFile:{ 
+  // deletionDataSelfFile:{ 
+  //   type:String,
+  //   required:false
+  // },
+  additionDataFile:{ 
     type:String,
     required:false
-  }
+  },
+  // additionDataSelfFile:{ 
+  //   type:String,
+  //   required:false
+  // },
+  deletionDataFile:{ 
+    type:String,
+    required:false
+  },
+  policyCoverageSelfFile:{
+    type:String,
+    required:false
+  },
+  policyCoverageFloaterFile:{
+    type:String,
+    required:false
+  },
 
 });
 

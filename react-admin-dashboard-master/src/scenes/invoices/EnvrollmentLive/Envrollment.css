@@ -23,3 +23,23 @@
     width:150px;
     padding:10px;
 }
+
+.Detailsm{
+    display:flex;
+    gap: 35px;
+    align-items: center;
+    justify-content: center;
+}
+
+.totalPremium{
+    text-align: center;
+    background:rgb(57, 49, 132);
+    padding:2px;
+    width:100%;
+    border-radius:20px;
+    color:white;
+    font-size:17px;
+    font-weight:600;
+
+    
+}

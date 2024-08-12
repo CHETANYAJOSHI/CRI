@@ -71,6 +71,14 @@ const Message = styled.p`
   text-align: center;
 `;
 
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+`;  
+
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -112,62 +120,95 @@ const CloseButton = styled.button`
 
 const CreateAccount = () => {
   const [accountName, setAccountName] = useState('');
+  const [hrName, sethrName] = useState('');
+  const [hrEmail, sethrEmail] = useState('');
+  const [hrNumber, sethrNumber] = useState('');
+  const [TPAName, setTPA] = useState('');
+  const [InsuranceName, setInsuranceName] = useState('');
   const [networkHospitalLink, setNetworkHospitalLink] = useState('');
-  const [networkHospitalFile, setNetworkHospitalFile] = useState(null);
-  const [claimsFile, setClaimsFile] = useState(null);
-  const [exclusionFile, setExclusionFile] = useState(null);
-  const [checklistFile, setChecklistFile] = useState(null);
-  const [liveDataFile, setLiveDataFile] = useState(null);
-  const [cdStatementFile, setCdStatementFile] = useState(null);
-  const [claimFormFile, setClaimFormFile] = useState(null);
-  const [claimAnalysisFile, setClaimAnalysisFile] = useState(null);
-  const [claimDumpFile, setClaimDumpFile] = useState(null);
-  const [EndorsementFile, setEndorsementFile] = useState(null);
-  const [selfParentFile, setselfParentFile] = useState(null);
-  const [floaterParentFile, setfloaterParentFile] = useState(null);
+  const [cdStatementFile, setcdStatementFile] = useState(null);
+  const [claimSelfAnalysisFile, setclaimSelfAnalysisFile] = useState(null);
+  const [claimFloaterAnalysisFile, setclaimFloaterAnalysisFile] = useState(null);
+  const [claimDumpSelfFile, setclaimDumpSelfFile] = useState(null);
+  const [claimDumpFloaterFile, setclaimDumpFloaterFile] = useState(null);
+  const [liveDataSelfFile, setliveDataSelfFile] = useState(null);
+  const [liveDataFloaterFile, setliveDataFloaterFile] = useState(null);
+  // const [endrosementAdditionFile, setendrosementAdditionFile] = useState(null);
+  // const [endrosementDeletionFile, setendrosementDeletionFile] = useState(null);
+  const [claimABFile, setclaimABFile] = useState(null);
+  const [checkListFile, setcheckListFile] = useState(null);
+  const [exclusionListFile, setexclusionListFile] = useState(null);
+  // const [deletionDataSelfFile, setdeletionDataSelfFile] = useState(null);
+  const [additionDataFile, setadditionDataFile] = useState(null);
+  // const [additionDataSelfFile, setadditionDataSelfFile] = useState(null);
+  const [deletionDataFile, setdeletionDataFile] = useState(null);
+  const [policyCoverageSelfFile, setpolicyCoverageSelfFile] = useState(null);
+  const [policyCoverageFloaterFile, setpolicyCoverageFloaterFile] = useState(null);
+  // const [hrMobile, setHrMobile] = useState('');
+  // const [hrEmail, setHrEmail] = useState('');
+  // const [hrName, setHrName] = useState('');
   const [message, setMessage] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [accountDetails, setAccountDetails] = useState({});
+  
 
   const onFileChange = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
       switch (name) {
-        case 'networkHospitalFile':
-          setNetworkHospitalFile(files[0]);
+        case 'cdStatementFile':
+          setcdStatementFile(files[0]);
           break;
-        case 'claimsFile':
-          setClaimsFile(files[0]);
+        case 'claimSelfAnalysisFile':
+          setclaimSelfAnalysisFile(files[0]);
           break;
-        case 'exclusionFile':
-          setExclusionFile(files[0]);
+        case 'claimFloaterAnalysisFile':
+          setclaimFloaterAnalysisFile(files[0]);
           break;
-        case 'checklistFile':
-          setChecklistFile(files[0]);
+        case 'claimDumpSelfFile':
+          setclaimDumpSelfFile(files[0]);
           break;
-        case 'liveDataFile':
-          setLiveDataFile(files[0]);
+        case 'claimDumpFloaterFile':
+          setclaimDumpFloaterFile(files[0]);
           break;
-          case 'cdStatementFile':
-            setCdStatementFile(files[0]);
+        case 'liveDataSelfFile':
+          setliveDataSelfFile(files[0]);
           break;
-          case 'claimFormFile':
-            setClaimFormFile(files[0]);
+        case 'liveDataFloaterFile':
+          setliveDataFloaterFile(files[0]);
           break;
-          case 'claimAnalysisFile':
-            setClaimAnalysisFile(files[0]);
+        // case 'endrosementAdditionFile':
+        //   setendrosementAdditionFile(files[0]);
+        //   break;
+        // case 'endrosementDeletionFile':
+        //   setendrosementDeletionFile(files[0]);
+        //   break;
+        case 'claimABFile':
+          setclaimABFile(files[0]);
           break;
-          case 'claimDumpFile':
-            setClaimDumpFile(files[0]);
+        case 'checkListFile':
+          setcheckListFile(files[0]);
           break;
-          case 'EndorsementFile':
-            setEndorsementFile(files[0]);
+          case 'exclusionListFile':
+          setexclusionListFile(files[0]);
           break;
-          case 'selfParentFile':
-            setselfParentFile(files[0]);
+          // case 'deletionDataSelfFile':
+          // setdeletionDataSelfFile(files[0]);
+          // break;
+          case 'additionDataFile':
+          setadditionDataFile(files[0]);
           break;
-          case 'floaterParentFile':
-            setfloaterParentFile(files[0]);
+          // case 'additionDataSelfFile':
+          // setadditionDataSelfFile(files[0]);
+          // break;
+          case 'deletionDataFile':
+          setdeletionDataFile(files[0]);
+          break;
+          case 'policyCoverageSelfFile':
+          setpolicyCoverageSelfFile(files[0]);
+          break;
+          case 'policyCoverageFloaterFile':
+          setpolicyCoverageFloaterFile(files[0]);
           break;
         default:
           break;
@@ -175,150 +216,284 @@ const CreateAccount = () => {
     }
   };
 
-  const onSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const formData = new FormData();
     formData.append('accountName', accountName);
+    formData.append('hrName', hrName);
+    formData.append('hrEmail', hrEmail);
+    formData.append('hrNumber', hrNumber);
+    formData.append('TPAName', TPAName);
+    formData.append('InsuranceName', InsuranceName);
     formData.append('networkHospitalLink', networkHospitalLink);
-    formData.append('networkHospitalFile', networkHospitalFile);
-    formData.append('claimsFile', claimsFile);
-    formData.append('exclusionFile', exclusionFile);
-    formData.append('checklistFile', checklistFile);
-    formData.append('liveDataFile', liveDataFile);
     formData.append('cdStatementFile', cdStatementFile);
-    formData.append('claimFormFile', claimFormFile);
-    formData.append('claimAnalysisFile', claimAnalysisFile);
-    formData.append('claimDumpFile', claimDumpFile);
-    formData.append('EndorsementFile', EndorsementFile);
-    formData.append('selfParentFile', selfParentFile);
-    formData.append('floaterParentFile', floaterParentFile);
+    formData.append('claimSelfAnalysisFile', claimSelfAnalysisFile);
+    formData.append('claimFloaterAnalysisFile', claimFloaterAnalysisFile);
+    formData.append('claimDumpSelfFile', claimDumpSelfFile);
+    formData.append('claimDumpFloaterFile', claimDumpFloaterFile);
+    formData.append('liveDataSelfFile', liveDataSelfFile);
+    formData.append('liveDataFloaterFile', liveDataFloaterFile);
+    // formData.append('endrosementAdditionFile', endrosementAdditionFile);
+    // formData.append('endrosementDeletionFile', endrosementDeletionFile);
+    formData.append('claimABFile', claimABFile);
+    formData.append('checkListFile', checkListFile);
+    formData.append('exclusionListFile', exclusionListFile);
+    // formData.append('deletionDataSelfFile', deletionDataSelfFile);
+    formData.append('additionDataFile', additionDataFile);
+    // formData.append('additionDataSelfFile', additionDataSelfFile);
+    formData.append('deletionDataFile', deletionDataFile);
+    formData.append('policyCoverageSelfFile', policyCoverageSelfFile);
+    formData.append('policyCoverageFloaterFile', policyCoverageFloaterFile);
+    // formData.append('hrMobile', hrMobile);
+    // formData.append('hrEmail', hrEmail);
+    // formData.append('hrName', hrName);
+   
 
     try {
-      const res = await axios.post('http://localhost:5000/api/createaccount', formData, {
+      const response = await axios.post('http://localhost:5000/api/createaccount', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      setAccountDetails(res.data.user);
-      setMessage(res.data.message);
-      setModalVisible(true); // Show modal on success
-    } catch (err) {
-      setMessage('File upload failed');
+      setMessage(response.data.message);
+      setAccountDetails(response.data.user);
+      console.log(response.data);
+      setModalVisible(true);
+    } catch (error) {
+      console.error(error);
+      setMessage('Error creating account. Please try again.');
     }
   };
 
-  const handleCloseModal = () => {
-    setModalVisible(false);
-  };
-
   return (
-    <Container>
-      <FormWrapper>
-        <Title>Create New Account</Title>
-        <Form onSubmit={onSubmit}>
+    <Container style={{alignItems:'normal' , gap:'15px'}}>
+      <FormWrapper style={{maxWidth:'500px'}}>
+        <Title>Create Account</Title>
+
+        <Form onSubmit={handleSubmit} className="d-flex">
+            
           <FormGroup>
-            <Label htmlFor="accountName">Account Name</Label>
+            <Label>Corporate Name:</Label>
             <Input
               type="text"
-              id="accountName"
-              name="accountName"
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
               required
             />
           </FormGroup>
+
           <FormGroup>
-            <Label htmlFor="networkHospitalLink">Network Hospital Link</Label>
+            <Label>HR Name:</Label>
             <Input
               type="text"
-              id="networkHospitalLink"
-              name="networkHospitalLink"
+              value={hrName}
+              onChange={(e) => sethrName(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>HR Email:</Label>
+            <Input
+              type="text"
+              value={hrEmail}
+              onChange={(e) => sethrEmail(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>HR Number:</Label>
+            <Input
+              type="text"
+              value={hrNumber}
+              onChange={(e) => sethrNumber(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+        
+
+        
+
+          <FormGroup>
+            <Label>TPA Name:</Label>
+            <Input
+              type="text"
+              value={TPAName}
+              onChange={(e) => setTPA(e.target.value)}
+              required
+            />
+          </FormGroup>
+          
+          <FormGroup>
+            <Label>Insurance Company Name:</Label>
+            <Input
+              type="text"
+              value={InsuranceName}
+              onChange={(e) => setInsuranceName(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Network Hospital Link</Label>
+            <Input
+              type="text"
               value={networkHospitalLink}
               onChange={(e) => setNetworkHospitalLink(e.target.value)}
+              required
             />
+          </FormGroup>
+          <FormGroup>
+            <Label>CD Statement File</Label>
+            <Input type="file" name="cdStatementFile" onChange={onFileChange} accept=".pdf" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Self with Parents Claim Analysis File</Label>
+            <Input type="file" name="claimSelfAnalysisFile" onChange={onFileChange}  accept=".pdf" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Floater with Parents Claim Analysis File</Label>
+            <Input type="file" name="claimFloaterAnalysisFile" onChange={onFileChange}  accept=".pdf" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Self with Parents Claim Dump File</Label>
+            <Input type="file" name="claimDumpSelfFile" onChange={onFileChange}  accept=".xlsx" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Floater with Parents Claim Dump File</Label>
+            <Input type="file" name="claimDumpFloaterFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Self with Parents Live Data File</Label>
+            <Input type="file" name="liveDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Floater with Parents Live Data File</Label>
+            <Input type="file" name="liveDataFloaterFile" onChange={onFileChange} accept=".xlsx" required />
           </FormGroup>
           {/* <FormGroup>
-            <Label htmlFor="networkHospitalFile">Upload Network Hospital File</Label>
-            <Input
-              type="file"
-              id="networkHospitalFile"
-              name="networkHospitalFile"
-              onChange={onFileChange}
-            />
+            <Label>Self with Parents Endorsement</Label>
+            <Input type="file" name="endrosementAdditionFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Floater with Parents Endorsement File</Label>
+            <Input type="file" name="endrosementDeletionFile"  onChange={onFileChange} accept=".xlsx" required />
           </FormGroup> */}
           <FormGroup>
-            <Label htmlFor="claimsFile">Upload Claims File</Label>
-            <Input type="file" id="claimsFile" name="claimsFile" onChange={onFileChange} />
+            <Label>Claim A & B Form</Label>
+            <Input type="file" name="claimABFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="exclusionFile">Upload Exclusion File</Label>
-            <Input type="file" id="exclusionFile" name="exclusionFile" onChange={onFileChange} />
+            <Label>checkListFile File</Label>
+            <Input type="file" name="checkListFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="checklistFile">Upload Checklist File</Label>
-            <Input type="file" id="checklistFile" name="checklistFile" onChange={onFileChange} />
+            <Label>Exclusion List File</Label>
+            <Input type="file" name="exclusionListFile" onChange={onFileChange} accept=".pdf" required />
+          </FormGroup>
+          {/* <FormGroup>
+            <Label>Self with Parents Deletion File</Label>
+            <Input type="file" name="deletionDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup> */}
+          <FormGroup>
+            <Label>Endorsement Addition File</Label>
+            <Input type="file" name="additionDataFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup>
+          {/* <FormGroup>
+            <Label>Self with Parents Addition File</Label>
+            <Input type="file" name="additionDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
+          </FormGroup> */}
+          <FormGroup>
+            <Label>Endorsement Deletion File</Label>
+            <Input type="file" name="deletionDataFile" onChange={onFileChange} accept=".xlsx" required />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="liveDataFile">Upload Live Data File</Label>
-            <Input type="file" id="liveDataFile" name="liveDataFile" onChange={onFileChange} />
+            <Label>Self with Parents Policy Coverage</Label>
+            <Input type="file" name="policyCoverageSelfFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
           <FormGroup>
-            <Label htmlFor="cdStatementFile">Upload cdStatementFile File</Label>
-            <Input type="file" id="cdStatementFile" name="cdStatementFile" onChange={onFileChange} />
+            <Label>Floater with Parents Policy Coverage</Label>
+            <Input type="file" name="policyCoverageFloaterFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
-          <FormGroup>
-            <Label htmlFor="claimFormFile">Upload claimFormFile File</Label>
-            <Input type="file" id="claimFormFile" name="claimFormFile" onChange={onFileChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="claimAnalysisFile">Upload claimAnalysisFile File</Label>
-            <Input type="file" id="claimAnalysisFile" name="claimAnalysisFile" onChange={onFileChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="claimDumpFile">Upload claimDumpFile File</Label>
-            <Input type="file" id="claimDumpFile" name="claimDumpFile" onChange={onFileChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="EndorsementFile">Upload EndorsementFile File</Label>
-            <Input type="file" id="EndorsementFile" name="EndorsementFile" onChange={onFileChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="selfParentFile">Upload selfParentFile File</Label>
-            <Input type="file" id="selfParentFile" name="selfParentFile" onChange={onFileChange} />
-          </FormGroup>
-          <FormGroup>
-            <Label htmlFor="floaterParentFile">Upload floaterParentFile File</Label>
-            <Input type="file" id="floaterParentFile" name="floaterParentFile" onChange={onFileChange} />
-          </FormGroup>
-          <Button type="submit">Upload</Button>
+          <Button type="submit">Create Account</Button>
+         
         </Form>
+
+        
         {message && <Message>{message}</Message>}
+        {modalVisible && (
+          <Modal >
+            <ModalContent style={{height:'90vh' , overflow:'scroll'}}>
+              <CloseButton onClick={() => setModalVisible(false)}>Close</CloseButton>
+              <h3>Account Created</h3>
+              <p><strong>Account Name:</strong> {accountDetails.accountName}</p>
+              <p><strong>Network Hospital Link:</strong> {accountDetails.networkHospitalLink}</p>
+              <p><strong>cdStatementFile :</strong> {accountDetails.cdStatementFile}</p>
+              <p><strong>claimSelfAnalysisFile :</strong> {accountDetails.claimSelfAnalysisFile}</p>
+              <p><strong>claimFloaterAnalysisFile :</strong> {accountDetails.claimFloaterAnalysisFile}</p>
+              <p><strong>claimDumpSelfFile :</strong> {accountDetails.claimDumpSelfFile}</p>
+              <p><strong>claimDumpFloaterFile :</strong> {accountDetails.claimDumpFloaterFile}</p>
+              <p><strong>liveDataSelfFile :</strong> {accountDetails.liveDataSelfFile}</p>
+              <p><strong>liveDataFloaterFile :</strong> {accountDetails.liveDataFloaterFile}</p>
+              {/* <p><strong>endrosementAdditionFile :</strong> {accountDetails.endrosementAdditionFile}</p>
+              <p><strong>endrosementDeletionFile :</strong> {accountDetails.endrosementDeletionFile}</p> */}
+              <p><strong>claimABFile :</strong> {accountDetails.claimABFile}</p>
+              <p><strong>checkListFile :</strong> {accountDetails.checkListFile}</p>
+              <p><strong>exclusionListFile :</strong> {accountDetails.exclusionListFile}</p>
+              {/* <p><strong>deletionDataSelfFile :</strong> {accountDetails.deletionDataSelfFile}</p> */}
+              <p><strong>additionDataFile :</strong> {accountDetails.additionDataFile}</p>
+              {/* <p><strong>additionDataSelfFile :</strong> {accountDetails.additionDataSelfFile}</p> */}
+              <p><strong>deletionDataFile :</strong> {accountDetails.deletionDataFile}</p>
+              <p><strong>Self Policy Coverage :</strong> {accountDetails.policyCoverageSelfFile}</p>
+              <p><strong>Floater Policy Coverage:</strong> {accountDetails.policyCoverageFloaterFile}</p>
+              
+            </ModalContent>
+          </Modal>
+        )}
       </FormWrapper>
 
-      {/* Modal for displaying account details */}
-      {modalVisible && (
-        <Modal style={{height:'100vh' , overflow:'auto'}}>
-          <ModalContent>
-            <CloseButton onClick={handleCloseModal}>Close</CloseButton>
-            <Title>Account Created Successfully</Title>
-            <p><strong>Account Name:</strong> {accountDetails.accountName}</p>
-            <p><strong>Network Hospital Link:</strong> {accountDetails.networkHospitalLink}</p>
-            <p><strong>Network Hospital File:</strong> {accountDetails.networkHospitalFile}</p>
-            <p><strong>Claims File:</strong> {accountDetails.claimsFile}</p>
-            <p><strong>Exclusion File:</strong> {accountDetails.exclusionFile}</p>
-            <p><strong>Checklist File:</strong> {accountDetails.checklistFile}</p>
-            <p><strong>LiveData File:</strong> {accountDetails.liveDataFile}</p>
-            <p><strong>cdStatementFile File:</strong> {accountDetails.cdStatementFile}</p>
-            <p><strong>claimFormFile File:</strong> {accountDetails.claimFormFile}</p>
-            <p><strong>claimAnalysisFile File:</strong> {accountDetails.claimAnalysisFile}</p>
-            <p><strong>claimDumpFile File:</strong> {accountDetails.claimDumpFile}</p>
-            <p><strong>EndorsementFile File:</strong> {accountDetails.EndorsementFile}</p>
-            <p><strong>selfParentFile File:</strong> {accountDetails.selfParentFile}</p>
-            <p><strong>floaterParentFile File:</strong> {accountDetails.floaterParentFile}</p>
-          </ModalContent>
-        </Modal>
-      )}
+      {/* <FormWrapper style={{maxWidth:'400px' , maxHeight:'400px'}}>
+        <Title>HR DETAILS</Title>
+            <Form>
+            <FormGroup>
+            <Label htmlFor="hrName">HR Name</Label>
+            <Input
+              type="text"
+              id="hrName"
+              value={hrName}
+              onChange={(e) => setHrName(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="hrMobile">HR Mobile Number</Label>
+            <Input
+              type="tel"
+              id="hrMobile"
+              value={hrMobile}
+              onChange={(e) => setHrMobile(e.target.value)}
+              required
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="hrEmail">HR Email ID</Label>
+            <Input
+              type="email"
+              id="hrEmail"
+              value={hrEmail}
+              onChange={(e) => setHrEmail(e.target.value)}
+              required
+            />
+          </FormGroup>
+            </Form>
+        </FormWrapper> */}
+
+        
     </Container>
   );
 };

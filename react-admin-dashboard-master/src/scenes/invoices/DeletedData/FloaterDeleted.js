@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styled from 'styled-components';
+import Header from '../../../components/Header';
 import {
   Box,
   TextField,
@@ -249,8 +250,13 @@ const DeletedData = () => {
     });
     return rowData;
   });
+  const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
 
   return (
+
+    <Box mt="20px" style={{textAlign:'center'}}>
+      <Header title={` ${selectedAccountName}`}/>
+
     <Box
       style={{
         width: '80vw',
@@ -262,7 +268,7 @@ const DeletedData = () => {
         flexDirection: 'row',
       }}
     >
-      <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+      {/* <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
         <Label htmlFor="account-select">Account</Label>
         <Select
           id="account-select"
@@ -276,7 +282,7 @@ const DeletedData = () => {
             </Option>
           ))}
         </Select>
-      </DropdownWrapper>
+      </DropdownWrapper> */}
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <Button
@@ -307,12 +313,13 @@ const DeletedData = () => {
           variant="contained"
           color="secondary"
           onClick={handleUploadClick}
+          startIcon={<UploadIcon />}
           style={{ marginLeft: '10px' , height:'50%' }}
         >
-          Upload File
+          Submit Upload
         </Button>
 
-        <Button
+        {/* <Button
           variant="contained"
           color="primary"
           onClick={handleAddUserClick}
@@ -320,7 +327,7 @@ const DeletedData = () => {
           style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
         >
           Add User
-        </Button>
+        </Button> */}
 
         <TextField
           label="Search"
@@ -425,6 +432,7 @@ const DeletedData = () => {
           </Button>
         </DialogActions>
       </Dialog>
+    </Box>
     </Box>
   );
 };

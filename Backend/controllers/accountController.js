@@ -41,15 +41,15 @@ const updateAccount = async (req, res) => {
 
     // Replace files
    
-    if (files.claimsFile) {
-      const filePath = path.join(__dirname, '../NewAccounts', files.claimsFile.name);
-      files.claimsFile.mv(filePath);
-      account.claimsFile = filePath;
+    if (files.claimABFile) {
+      const filePath = path.join(__dirname, '../NewAccounts', files.claimABFile.name);
+      files.claimABFile.mv(filePath);
+      account.claimABFile = filePath;
     }
-    if (files.exclusionFile) {
-      const filePath = path.join(__dirname, '../NewAccounts', files.exclusionFile.name);
-      files.exclusionFile.mv(filePath);
-      account.exclusionFile = filePath;
+    if (files.exclusionListFile) {
+      const filePath = path.join(__dirname, '../NewAccounts', files.exclusionListFile.name);
+      files.exclusionListFile.mv(filePath);
+      account.exclusionListFile = filePath;
     }
     if (files.checklistFile) {
       const filePath = path.join(__dirname, '../NewAccounts', files.checklistFile.name);

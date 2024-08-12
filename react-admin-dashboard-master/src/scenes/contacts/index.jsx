@@ -5,8 +5,11 @@ import Header from '../../components/Header';
 import ClaimForm from '../../../src/files/Claim form.pdf';
 import CheckList from '../../../src/files/Check List.doc';
 import { useLocation } from 'react-router-dom';
+import SelfPolicy from './SelfPolicy';
+import FolaterPolicy from './FolaterPolicy';
 
 import './contacts.css';
+import { textAlign } from '@mui/system';
 
 const Contacts = () => {
   const [insurance, setInsurance] = useState("XYZ Ltd");
@@ -16,10 +19,11 @@ const Contacts = () => {
   const [accountData, setAccountData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedPolicy, setSelectedPolicy] = useState(null);
   const location = useLocation();
 
   // Define custom colors
-  const primaryColor = '#1E88E5';
+  const primaryColor = '#0a88ef';
   const secondaryColor = '#FFC107';
   const darkColor = '#333';
   const lightColor = '#FFF';
@@ -57,7 +61,7 @@ const Contacts = () => {
 
   
   return (
-    <Box m="20px">
+    <Box m="20px" style={{textAlign:'center'}}>
       <Header title={`Policy Coverage : ${accountData.accountName}`} />
       
       <Box
@@ -70,6 +74,7 @@ const Contacts = () => {
           border: `1px solid ${borderColor}`,
           borderRadius: 2,
           backgroundColor: lightColor,
+         
         }}
       >
         <Typography variant="body1" sx={{ fontWeight: 600 , fontSize:'16px' }}>Insurance:</Typography>
@@ -86,7 +91,7 @@ const Contacts = () => {
       </Box>
 
       <Box className="userbutton" mb={3}>
-        <Grid container spacing={2}>
+        <Grid container spacing={2} style={{justifyContent:'center'}}>
           <Grid item>
             <Button
               variant="contained"
@@ -104,7 +109,7 @@ const Contacts = () => {
               style={{ backgroundColor: secondaryColor , fontSize:'15px'}}
               href={ClaimForm}
               target="_blank"
-              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/claimsFile`, '_blank')}
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/claimABFile`, '_blank')}
             >
               Claim Form A & B
             </Button>
@@ -113,7 +118,7 @@ const Contacts = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: '#343a40', color: '#FFF' , fontSize:'15px'}}
-              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/exclusionFile`, '_blank')}
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/exclusionListFile`, '_blank')}
             >
               Exclusion List
             </Button>
@@ -122,9 +127,9 @@ const Contacts = () => {
             <Button
               variant="contained"
               style={{ backgroundColor: '#28a745', color: '#FFF' , fontSize:'15px'}}
-              href={CheckList}
+             
               target="_blank"
-              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/checklistFile`, '_blank')}
+              onClick={() => window.open(`http://localhost:5000/api/files/download/${accountId}/checkListFile`, '_blank')}
             >
               Check List
             </Button>
@@ -132,7 +137,7 @@ const Contacts = () => {
         </Grid>
       </Box>
 
-      <Paper elevation={3} sx={{ p: 2 }}>
+      {/* <Paper elevation={3} sx={{ p: 2 }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ backgroundColor: primaryColor, color: 'white' }}>
@@ -233,7 +238,28 @@ const Contacts = () => {
             </tr>
           </tbody>
         </table>
-      </Paper>
+      </Paper> */}
+
+<div className="d-flex justify-content-around">
+         <Button
+          className="btn btn-secondary"
+          onClick={() => setSelectedPolicy('self')} 
+          style={{fontSize:'17px' , fontWeight:'600'}}>
+            Self With Parents Policy Coverage
+        </Button>
+
+
+        <Button
+          className="btn btn-secondary"
+          onClick={() => setSelectedPolicy('floater')}
+          style={{fontSize:'17px' , fontWeight:'600'}}
+        >
+          Floater With Parents Policy Coverage
+        </Button>
+</div>
+
+{selectedPolicy === 'self' && <SelfPolicy />}
+{selectedPolicy === 'floater' && <FolaterPolicy />}
     </Box>
   );
 };
