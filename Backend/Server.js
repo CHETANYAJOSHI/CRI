@@ -6,6 +6,7 @@ const xlsx = require('xlsx');
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
 const accountRouters = require('./routes/accountRoutes');
+const authRoutes = require('./routes/authRoutes');
 const Accounts= require('./models/createaccount');
 const Account=require('./routes/download');
 const multer = require('multer');
@@ -53,6 +54,9 @@ app.use('/api' , accountRouters)
 app.use('/api', userRoutes)
 
 
+// Otp Routes
+
+app.use('/api/auth' , authRoutes);
 
 
 app.get('/process-excel', (req, res) => {

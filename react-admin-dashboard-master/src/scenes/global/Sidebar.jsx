@@ -40,11 +40,12 @@ import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SpaIcon from '@mui/icons-material/Spa';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-import profile from "../../images/profile.avif"
+import profile from "../../images/profile.avif";
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import styled from 'styled-components';
 import './Slidebar.css';
-
+import HRbar from "./HRbar";
+import Adminbar from "./Adminbar";
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -113,16 +114,22 @@ const Sidebar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  // const [role, setRole] = useState('');
+  const [mobileNumber, setMobileNumber] = useState('');
+  const [otp, setOtp] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(() => {
     // Retrieve from localStorage if available
     return localStorage.getItem('selectedAccount') || ''});
-    
     const [accounts, setAccounts] = useState([]);
 
 const Nav = ()=>{
   Navigate("/createaccount")
 }
 
+
+
+
+const role = sessionStorage.getItem('role');
 
 
 useEffect(() => {
@@ -153,397 +160,12 @@ const handleSelectChange = (e) => {
 };
 
 
-
-
-
-
-
-
-
-
   return (
-    <Box
-      sx={{
-        "& .pro-sidebar-inner": {
-          background: `${colors.primary[400]} !important`,
-        },
-        "& .pro-icon-wrapper": {
-          backgroundColor: "transparent !important",
-        },
-        "& .pro-inner-item": {
-          padding: "5px 35px 5px 20px !important",
-        },
-        "& .pro-inner-item:hover": {
-          color: "#868dfb !important",
-        },
-        "& .pro-menu-item.active": {
-          color: "#6870fa !important",
-        },
-      }}
-    >
-      <ProSidebar collapsed={isCollapsed} style={{width:'100px'}}>
-        <Menu iconShape="square">
-          {/* LOGO AND MENU ICON */}
-          <MenuItem
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            icon={isCollapsed ? <MenuOutlinedIcon /> : undefined}
-            style={{
-              margin: "10px 0 20px 0",
-              color: "white",
-            }}
-          >
-            {!isCollapsed && (
-              <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                ml="15px"
-              >
-                <Typography variant="h3" style={{color:'white' , fontWeight:'600'}}>
-                  ADMIN
-                  
-                </Typography>
-                <IconButton onClick={() => setIsCollapsed(!isCollapsed)} style={{color:"white"}}>
-                  <MenuOutlinedIcon />
-                </IconButton>
-              </Box>
-            )}
-          </MenuItem>
-
-          {!isCollapsed && (
-            <Box mb="25px">
-              <Box display="flex" justifyContent="center" alignItems="center">
-                <img
-                  alt="profile-user"
-                  width="100px"
-                  height="100px"
-                  src={profile}
-                  style={{ cursor: "pointer", borderRadius: "50%" }}
-                />
-              </Box>
-              <Box textAlign="center">
-                <Typography
-                  variant="h2"
-                  style={{color:"white"}}
-                  fontWeight="bold"
-                  sx={{ m: "10px 0 0 0" }}
-                >
-                  
-                 Mr. Vinod Rai
-                 
-                </Typography>
-              </Box>
-              <Button style={{backgroundColor:'red' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button>
-              <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">
-        
-        <Select
-          id="account-select"
-          value={selectedAccount}
-          onChange={handleSelectChange}
-        >
-          <Option value="">--Select an Account--</Option>
-          {accounts.map((account) => (
-            <Option key={account._id} value={account._id}>
-              {account.accountName}
-            </Option>
-          ))}
-        </Select>
-      </DropdownWrapper>
-
-
-
-
-            </Box>
-
-          )}
-
-         
-
-          <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
-              title="Dashboard"
-              to="/dashboard"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            {/* <Item
-              title="Create Account"
-              to="/createaccount"
-              icon={<FolderSharedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-
-            
-            <Item
-              title="Profile"
-              to="/profile"
-              icon={<PeopleOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-
-
-            <Item
-              title="Policy Coverage"
-              to={`/policycoverage?accountId=${selectedAccount}`}
-              icon={<ContactsOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            {/* Enrollments with Dropdown */}
-            <SubMenu
-              title="Enrollments"
-              icon={<InsertPageBreakIcon />}
-            >
-
-          <SubMenu
-                title="Live Data"
-                to={`/enrollment/live`}
-                icon={<ImportContactsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
-              
-              <Item
-                title="Self With Parents"
-                to={`/enrollment/SelfLive?accountId=${selectedAccount}`}
-                icon={<ImportContactsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-            <Item
-                title="Floater With Parents"
-                to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
-                icon={<ImportContactsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              </SubMenu>
-              
-              <SubMenu
-                title="Deleted Data"
-                to="/enrollment/deleted"
-                icon={<DeleteForeverIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
-
-                <Item title="Self With Parents"
-                to={`enrollment/deleted/self?accountId=${selectedAccount}`}
-                icon={< ControlPointIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                />
-                <Item title="Floater With Parents"
-                to={`enrollment/deleted/floater?accountId=${selectedAccount}`}
-                icon={< ControlPointIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                />
-
-                </SubMenu>
-              
-              <Item
-                title="Calculated Premium"
-                to="/enrollment/premium"
-                icon={<AttachMoneyIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              
-              <Item
-                title="E-Card"
-                to="/profile"
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-            </SubMenu>
-
-            <SubMenu
-                title="Endorsement"
-                to="/enrollment/endorsement"
-                icon={<BeenhereIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
-
-              <Item
-                title="Addition"
-                to={`/Addition?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              <Item
-                title="Deletion"
-                to={`/Deletion?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              <Item
-                title="CD Statement"
-                to={`/CDStatement?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              <Item
-                title="Rack-Rates"
-                to="/enrollement/rack-rates"
-                icon={<RateReviewIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              </SubMenu>
-
-           
-
-            <SubMenu
-              title="Claim Dump"
-              icon={<MiscellaneousServicesIcon />}
-            >
-
-              <Item
-                title="Self With Parents"
-                to={`/claim/Selfclaimdumb?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-              <Item
-                title="Floater With Parents"
-                to={`/claim/Floaterclaimdumb?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-
-            </SubMenu>
-
-            <SubMenu
-              title="Claim Analysis"
-              icon={<MiscellaneousServicesIcon />}
-            >
-
-            <Item
-                title="Self With Parents"
-                to={`/claim/Selfclaimanalysis?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-            />
-
-            <Item
-                title="Floater With Parents"
-                to={`/claim/Floaterclaimanalysis?accountId=${selectedAccount}`}
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-            />
-
-            </SubMenu>
-
-            
-
-            {/* <Item
-              title="Downloads"
-              to="/downloads"
-              icon={<SimCardDownloadIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />  */}
-
-            <Item
-              title="Wellness"
-              to="/wellness"
-              icon={<SpaIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            {/* <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-            <Item
-              title="Profile Form"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-
-            {/* <Typography
-              variant="h6"
-              style={{color:"white" , fontSize:'17px', fontWeight:600}}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-          </Box>
-        </Menu>
-      </ProSidebar>
-    </Box>
-  );
+    <div>
+      {role === 'Admin' && <Adminbar />}
+      {role === 'HR' && <HRbar />}
+    </div>
+      );
 };
 
 export default Sidebar;
