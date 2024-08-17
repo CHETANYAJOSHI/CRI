@@ -3,6 +3,7 @@ const Account = require('../models/createaccount')
 const path = require('path');
 const fs = require('fs');
 const router = express.Router();
+// const authenticateAdmin = require('../controllers/authController');
 
 // Download a specific file for a given account
 router.get('/download/:accountId/:fileType', async (req, res) => {

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createUser, upload } = require('../controllers/userControllers');
+// const authenticateAdmin = require("../controllers/authController");
 
 router.post('/createaccount', upload.fields([
   { name: 'cdStatementFile', maxCount: 1 },

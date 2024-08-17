@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Login.css';
 import logo from '../../images/CRI-logo 1.jpg';
+import { setToken } from '../auth';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -45,19 +46,30 @@ const Login = () => {
         if (response.data.message) {
           console.log(response)
           alert('OTP Verified');
-          navigate("/dashboard");
+
+          
 
           sessionStorage.setItem('role' , response.data.role);
           sessionStorage.setItem('accountName' , response.data.accountName);
           sessionStorage.setItem('hrId' , response.data.hrId);
           sessionStorage.setItem('hrName' , response.data.hrName);
+         localStorage.setItem('authToken' , response.data.token);
 
+         if(sessionStorage.getItem('role') === 'HR'){
+          navigate("/profile");
+        }else{
+          navigate("/dashboard");
+        }
+
+       
+
+          
         } else {
           alert('Invalid OTP');
         }
       } catch (error) {
         console.error('Error verifying OTP', error);
-        alert('Error verifying OTP');
+        alert('User Not Found');
       }
     }
   };

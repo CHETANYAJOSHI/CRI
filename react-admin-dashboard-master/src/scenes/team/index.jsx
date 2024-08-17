@@ -2,7 +2,8 @@ import { Box } from "@mui/material";
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import Header from "../../components/Header";
-import Profile from '../../images/profile.jpeg'
+import Profile from '../../images/family.png'
+
 import './team.css';
 
 const Team = () => {

@@ -114,11 +114,11 @@ const HRbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [selectedAccount, setSelectedAccount] = useState(sessionStorage.getItem('hrId'))
-    const [accounts, setAccounts] = useState([]);
+  const [accounts, setAccounts] = useState([]);
 
-    const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
-    const [accountName,setaccountName] = useState(sessionStorage.getItem('accountName'));
-    const [hrId,sethrId] = useState(sessionStorage.getItem('hrId'));
+  const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
+  const [accountName,setaccountName] = useState(sessionStorage.getItem('accountName'));
+  const [hrId,sethrId] = useState(sessionStorage.getItem('hrId'));
     // const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
 
 const Nav = ()=>{
@@ -146,6 +146,20 @@ useEffect(() => {
   // Store the selectedAccount in localStorage whenever it changes
   localStorage.setItem('selectedAccount', selectedAccount);
 }, [selectedAccount]);
+
+const Logout=()=>{
+  
+  const confirmed = window.confirm("Are you sure you want to logout?");
+  if (confirmed) {
+    // Clear the user's token or session data
+    localStorage.removeItem('token'); // or your method of storing tokens
+    // Navigate to the login or home page after logout
+    sessionStorage.clear();
+    Navigate("/"); // or wherever you want to redirect after logout
+  }
+  
+  
+}
 
 
 
@@ -209,6 +223,9 @@ useEffect(() => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
+
+                <button className="btn btn-danger mt-3" style={{textAlign:'center' ,margin:'auto' , display:'flex'}} onClick={Logout}>Logout</button>
+
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -250,13 +267,13 @@ useEffect(() => {
          
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            <Item
+            {/* <Item
               title="Dashboard"
               to="/dashboard"
               icon={<HomeOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
             {/* <Item
               title="Create Account"

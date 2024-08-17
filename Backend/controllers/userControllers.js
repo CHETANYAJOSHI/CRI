@@ -2,7 +2,7 @@ const User = require('../models/createaccount');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
-
+const nodemailer = require('nodemailer');
 // Multer configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,6 +42,30 @@ const createUser = async (req, res) => {
       }
     }
 
+    const trasnporter = nodemailer.createTransport({
+      service:'Gmail',
+      auth:{
+        user:'chetanyajoshi9654@gmail.com',
+        pass:"uale nfrb oqjp joga"
+      }
+    })
+
+    const sendEmail = async (hrEmail , hrName , accountName , hrNumber)=>{
+      const mailOptions={
+        from : "chetanyajoshi9654@gmail.com",
+        to:hrEmail,
+        subject:"Account Created Successfully",
+        text : `Hello ${hrName}, \n\nYour account for ${accountName} has been successfully created \n\nNow you can Login with this Number ${hrNumber} \n\nThank You`
+      };
+
+      try{
+        await trasnporter.sendMail(mailOptions);
+        console.log("Email Sent Successfully");
+      }catch(e){
+          console.log('Error sending email' ,e);
+      }
+    }
+
     // Create a new user with relative file paths
     const user = new User({
       accountName,
@@ -72,6 +96,8 @@ const createUser = async (req, res) => {
       policyCoverageFloaterFile: path.join(accountName, files.policyCoverageFloaterFile[0].originalname),
             
     });
+
+    await sendEmail(hrEmail , hrName , accountName , hrNumber)
 
     await user.save();
     res.json({ message: 'Account created successfully', user });

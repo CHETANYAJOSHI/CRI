@@ -10,7 +10,8 @@
   }
 
   .inner-submenu-arrows{
-    height:200vh;
+    height:100vh;
+    overflow:scroll;
   }
 
 

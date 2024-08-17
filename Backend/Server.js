@@ -10,6 +10,7 @@ const authRoutes = require('./routes/authRoutes');
 const Accounts= require('./models/createaccount');
 const Account=require('./routes/download');
 const multer = require('multer');
+// const authenticateAdmin = require('./controllers/authController');
 
 const readxlsxFile = require('read-excel-file/node');
 // const fileUpload = require('express-fileupload');

@@ -36,7 +36,7 @@ import SelfPolicy from "./scenes/contacts/SelfPolicy";
 import FolaterPolicy from "./scenes/contacts/FolaterPolicy";
 import Addition from "./scenes/Endorsement/Addition";
 import Deletion from "./scenes/Endorsement/Deletion";
-
+import PrivateRoute from "./components/PrivateRoute";
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -55,7 +55,13 @@ function App() {
           <main className="content">
             {!noSidebarPaths.includes(location.pathname) && <Topbar setIsSidebar={setIsSidebar} />}
             <Routes>
-              <Route path="/createaccount" element={<CreateAccount />} />
+            <Route
+                path="/createaccount"
+                element={
+                  <PrivateRoute>
+                    <CreateAccount />
+                  </PrivateRoute>
+                }/>
               
               <Route path="/selectAccount" element={<SelectAccount />} />
               <Route path="/policycoverage/selfPolicy" element={<SelfPolicy />} />
@@ -77,7 +83,11 @@ function App() {
               <Route path="/Addition" element={<Addition />} />
               <Route path="/Deletion" element={<Deletion />} />
               <Route path="/wellness" element={<Wellness />} />
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard"  element={
+                  <PrivateRoute>
+                    <Dashboard />
+                  </PrivateRoute>
+                }/>
               <Route path="/profile" element={<Team />} />
               <Route path="/policycoverage" element={<Contacts />} />
               <Route path="/enrollment" element={<Invoices />} />

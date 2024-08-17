@@ -40,7 +40,7 @@ import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
 import SpaIcon from '@mui/icons-material/Spa';
 import RateReviewIcon from '@mui/icons-material/RateReview';
-import profile from "../../images/profile.avif"
+import profile from "../../images/profile.avif";
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import styled from 'styled-components';
 import './Slidebar.css';
@@ -150,6 +150,19 @@ const handleSelectChange = (e) => {
  
   Navigate("/dashboard")
 };
+const Logout=()=>{
+  
+  const confirmed = window.confirm("Are you sure you want to logout?");
+  if (confirmed) {
+    // Clear the user's token or session data
+    localStorage.removeItem('token'); // or your method of storing tokens
+    // Navigate to the login or home page after logout
+    sessionStorage.clear();
+    Navigate("/"); // or wherever you want to redirect after logout
+  }
+  
+  
+}
 
 
   return (
@@ -212,6 +225,9 @@ const handleSelectChange = (e) => {
                   style={{ cursor: "pointer", borderRadius: "50%" }}
                 />
               </Box>
+
+              <button className="btn btn-danger mt-3" style={{textAlign:'center' ,margin:'auto' , display:'flex'}} onClick={Logout}>Logout</button>
+
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -224,7 +240,7 @@ const handleSelectChange = (e) => {
                  
                 </Typography>
               </Box>
-              <Button style={{backgroundColor:'red' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button>
+              <Button style={{backgroundColor:'green' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button>
               <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">
         
         <Select

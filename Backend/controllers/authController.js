@@ -2,6 +2,7 @@ const OTP = require('../models/otpschema');
 const Accounts = require('../models/createaccount');
 const {generateOTP , generateExpireTime} = require('../utils/otpGenrator');
 const {sendOtpSMS} = require("../services/smsService");
+const {generateToken, verifyToken} = require('../utils/jwt');
 
 exports.sendOtp = async(req,res)=>{
     const {mobileNumber} = req.body;
@@ -48,7 +49,8 @@ exports.verfiyOtp = async (req,res) => {
         let role = "";
         if(mobileNumber == "8744959397"){
             role="Admin";
-            return res.status(200).json({message:'Admin Login' , role});
+            const token = generateToken({mobileNumber , role}); //Generate JWT For the Admin
+            return res.status(200).json({message:'Admin Login' , role , token});
         }
 
         const hrRecord = await Accounts.findOne({hrNumber : mobileNumber});
@@ -59,11 +61,13 @@ exports.verfiyOtp = async (req,res) => {
 
         //OTP Verfied Successfully
         role="HR";
+        const token = generateToken({mobileNumber , role});
         res.status(200).json({
         message: 'OTP Verified Successfully',
         hrName: hrRecord.hrName,
         accountName: hrRecord.accountName,
         hrId: hrRecord._id, // Sending the _id in the response
+        token,
         role
       });
 
@@ -74,3 +78,26 @@ exports.verfiyOtp = async (req,res) => {
         res.status(500).json({message:'Error Verifying OTP'});
     }
 }
+
+
+exports.authenticateAdmin = (req , res , next) =>{
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+
+    if(!token){
+        return res.status(401).json({message:'Access Denied'});
+    }
+
+    try{
+        const decoded = verifyToken(token);
+        if(decoded.role !== 'Admin'){
+            return res.status(403).json({message:"Access Denied Insufficient Permissions"});
+        }
+        req.user = decoded;
+        next();
+    }
+    catch(error){
+        res.status(401).json({message:"Invalid token"});
+    }
+}
+
