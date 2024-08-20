@@ -18,6 +18,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import AddIcon from '@mui/icons-material/Add';
+import Header from '../../../components/Header';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -165,12 +166,16 @@ useEffect(() => {
   loadPdfViewer();
 });
 
+const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
+
+
   return (
-    <div>
+    <Box mt="20px" style={{textAlign:'center'}}>
+      <Header title={` ${selectedAccountName}`}/>
 
 
 
-        <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+        {/* <DropdownWrapper style={{ width: '10%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
         <Label htmlFor="account-select">Account</Label>
         <Select
           id="account-select"
@@ -184,7 +189,7 @@ useEffect(() => {
             </Option>
           ))}
         </Select>
-      </DropdownWrapper>
+      </DropdownWrapper> */}
 
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
@@ -236,7 +241,7 @@ useEffect(() => {
             ></iframe>
           
       
-    </div>
+    </Box>
   );
 };
 

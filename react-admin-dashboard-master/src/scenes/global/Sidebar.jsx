@@ -129,7 +129,7 @@ const Nav = ()=>{
 
 
 
-const role = sessionStorage.getItem('role');
+const role = localStorage.getItem('role');
 
 
 useEffect(() => {

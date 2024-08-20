@@ -113,12 +113,12 @@ const HRbar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const [selectedAccount, setSelectedAccount] = useState(sessionStorage.getItem('hrId'))
+  const [selectedAccount, setSelectedAccount] = useState(localStorage.getItem('hrId'))
   const [accounts, setAccounts] = useState([]);
 
-  const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
-  const [accountName,setaccountName] = useState(sessionStorage.getItem('accountName'));
-  const [hrId,sethrId] = useState(sessionStorage.getItem('hrId'));
+  const [hrName,sethrName] = useState(localStorage.getItem('hrName'));
+  const [accountName,setaccountName] = useState(localStorage.getItem('accountName'));
+  const [hrId,sethrId] = useState(localStorage.getItem('hrId'));
     // const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
 
 const Nav = ()=>{
@@ -153,6 +153,11 @@ const Logout=()=>{
   if (confirmed) {
     // Clear the user's token or session data
     localStorage.removeItem('token'); // or your method of storing tokens
+    localStorage.removeItem('hrName'); 
+    localStorage.removeItem('accountName');
+    localStorage.removeItem('hrId'); 
+    localStorage.removeItem('authToken'); 
+    localStorage.removeItem('selectedAccount'); 
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout
@@ -255,7 +260,7 @@ const Logout=()=>{
         </Select>
       </DropdownWrapper> */}
 
-    <div style={{color:'white' , textAlign:'center' , fontSize:'17px'}} className="mt-3">
+    <div style={{color:'white' , textAlign:'center' , fontSize:'17px' , fontWeight:'600',color:'#4cceac'}} className="mt-3">
 
     {accountName}
 

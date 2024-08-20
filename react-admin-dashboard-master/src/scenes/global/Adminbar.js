@@ -155,7 +155,7 @@ const Logout=()=>{
   const confirmed = window.confirm("Are you sure you want to logout?");
   if (confirmed) {
     // Clear the user's token or session data
-    localStorage.removeItem('token'); // or your method of storing tokens
+    localStorage.clear(); // or your method of storing tokens
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout
@@ -284,13 +284,13 @@ const Logout=()=>{
             /> */}
 
             
-            <Item
+            {/* <Item
               title="Profile"
               to="/profile"
               icon={<PeopleOutlinedIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
 
 
@@ -308,7 +308,7 @@ const Logout=()=>{
               icon={<InsertPageBreakIcon />}
             >
 
-          <SubMenu
+              <SubMenu
                 title="Live Data"
                 to={`/enrollment/live`}
                 icon={<ImportContactsIcon />}
@@ -324,7 +324,7 @@ const Logout=()=>{
                 setSelected={setSelected}
               />
 
-            <Item
+              <Item
                 title="Floater With Parents"
                 to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}

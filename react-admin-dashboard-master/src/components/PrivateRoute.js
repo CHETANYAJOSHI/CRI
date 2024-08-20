@@ -12,8 +12,11 @@ const PrivateRoute = ({ children  }) => {
   if (token) {
     try {
       decodedToken = jwtDecode(token); // Decode the token to access its payload
+      if(decodedToken.role === "Admin"){
+        isAuthenticated = true;
+      }
       console.log(decodedToken.role);  // Log the role from the decoded token
-      isAuthenticated = true;
+      
     } catch (error) {
       console.error("Invalid token:", error);
     }
