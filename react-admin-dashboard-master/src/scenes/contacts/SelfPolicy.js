@@ -166,6 +166,8 @@ useEffect(() => {
   loadPdfViewer();
 });
 
+const role = localStorage.getItem('role');
+
   return (
     <div>
 
@@ -205,27 +207,39 @@ useEffect(() => {
           style={{ display: 'none' }}
           onChange={handleFileChange}
         />
-        <label htmlFor="upload-file">
-          <Button
-            variant="contained"
-           color="secondary"
-            component="span"
-            startIcon={<UploadIcon />}
-            style={{ marginRight: '10px'}}
-            
-          >
-            Upload File
-          </Button>
-        </label>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={handleUpload}
-          startIcon={<UploadIcon />}
-          style={{ height:'50%'}}
-        >
-          Submit Upload
-        </Button>
+
+
+{(role !== 'HR' && role !== 'Employee') ? (
+<label htmlFor="upload-file">
+<Button
+  variant="contained"
+ color="secondary"
+  component="span"
+  startIcon={<UploadIcon />}
+  style={{ marginRight: '10px'}}
+  
+>
+  Upload File
+</Button>
+</label>
+
+) : null}
+
+
+{(role !== 'HR' && role !== 'Employee') ? (
+    <Button
+    variant="contained"
+    color="secondary"
+    onClick={handleUpload}
+    startIcon={<UploadIcon />}
+    style={{ height:'50%'}}
+  >
+    Submit Upload
+  </Button>
+  ) : null}
+
+        
+        
 
       </Box>
 

@@ -30,10 +30,10 @@ const createUser = async (req, res) => {
 
     const files = req.files;
     const requiredFiles = [
-      'cdStatementFile', 'claimSelfAnalysisFile', 'claimFloaterAnalysisFile', 'claimDumpSelfFile', 
-      'claimDumpFloaterFile', 'liveDataSelfFile', 'liveDataFloaterFile', 
-      'claimABFile', 'checkListFile','exclusionListFile',
-      'additionDataFile','deletionDataFile','policyCoverageSelfFile','policyCoverageFloaterFile'
+      // 'cdStatementFile',  'claimFloaterAnalysisFile',  
+      // 'claimDumpFloaterFile', 'liveDataFloaterFile', 
+      // 'claimABFile', 'checkListFile','exclusionListFile',
+      // 'additionDataFile','deletionDataFile','policyCoverageFloaterFile'
     ];
 
     for (const file of requiredFiles) {
@@ -41,6 +41,8 @@ const createUser = async (req, res) => {
         return res.status(400).json({ message: "file missing"});
       }
     }
+
+    
 
     const trasnporter = nodemailer.createTransport({
       service:'Gmail',
@@ -76,24 +78,22 @@ const createUser = async (req, res) => {
       hrEmail,
       hrNumber,
       // corporateName,
-      cdStatementFile: path.join(accountName, files.cdStatementFile[0].originalname),
-      claimSelfAnalysisFile: path.join(accountName, files.claimSelfAnalysisFile[0].originalname),
-      claimFloaterAnalysisFile: path.join(accountName, files.claimFloaterAnalysisFile[0].originalname),
-      claimDumpSelfFile: path.join(accountName, files.claimDumpSelfFile[0].originalname),
-      claimDumpFloaterFile: path.join(accountName, files.claimDumpFloaterFile[0].originalname),
-      liveDataSelfFile: path.join(accountName, files.liveDataSelfFile[0].originalname),
-      liveDataFloaterFile: path.join(accountName, files.liveDataFloaterFile[0].originalname),
-      // endrosementSelfFile: path.join(accountName, files.endrosementSelfFile[0].originalname),
-      // endrosementFloaterFile: path.join(accountName, files.endrosementFloaterFile[0].originalname),
-      claimABFile: path.join(accountName, files.claimABFile[0].originalname),
-      checkListFile: path.join(accountName, files.checkListFile[0].originalname),
-      exclusionListFile: path.join(accountName, files.exclusionListFile[0].originalname),
-      // deletionDataSelfFile: path.join(accountName, files.deletionDataSelfFile[0].originalname),
-      additionDataFile: path.join(accountName, files.additionDataFile[0].originalname),
-      // additionDataSelfFile: path.join(accountName, files.additionDataSelfFile[0].originalname),
-      deletionDataFile: path.join(accountName, files.deletionDataFile[0].originalname),
-      policyCoverageSelfFile: path.join(accountName, files.policyCoverageSelfFile[0].originalname),
-      policyCoverageFloaterFile: path.join(accountName, files.policyCoverageFloaterFile[0].originalname),
+      cdStatementFile: files.cdStatementFile ? path.join(accountName, files.cdStatementFile[0].originalname) : null,
+      claimSelfAnalysisFile: files.claimSelfAnalysisFile ? path.join(accountName, files.claimSelfAnalysisFile[0].originalname) : null,
+      claimFloaterAnalysisFile: files.claimFloaterAnalysisFile ? path.join(accountName, files.claimFloaterAnalysisFile[0].originalname) : null,
+      claimDumpSelfFile: files.claimDumpSelfFile ? path.join(accountName, files.claimDumpSelfFile[0].originalname) : null,
+      claimDumpFloaterFile: files.claimDumpFloaterFile ? path.join(accountName, files.claimDumpFloaterFile[0].originalname) : null,
+      liveDataSelfFile: files.liveDataSelfFile ? path.join(accountName, files.liveDataSelfFile[0].originalname) : null,
+      liveDataFloaterFile: files.liveDataFloaterFile ? path.join(accountName, files.liveDataFloaterFile[0].originalname) : null,
+      claimABFile: files.claimABFile ? path.join(accountName, files.claimABFile[0].originalname) : null,
+      rackRatesFile: files.rackRatesFile ? path.join(accountName, files.rackRatesFile[0].originalname) : null,
+      
+      checkListFile: files.checkListFile ? path.join(accountName, files.checkListFile[0].originalname) : null,
+      exclusionListFile: files.exclusionListFile ? path.join(accountName, files.exclusionListFile[0].originalname) : null,
+      additionDataFile: files.additionDataFile ? path.join(accountName, files.additionDataFile[0].originalname) : null,
+      deletionDataFile: files.deletionDataFile ? path.join(accountName, files.deletionDataFile[0].originalname) : null,
+      policyCoverageSelfFile: files.policyCoverageSelfFile ? path.join(accountName, files.policyCoverageSelfFile[0].originalname) : null,
+      policyCoverageFloaterFile: files.policyCoverageFloaterFile ? path.join(accountName, files.policyCoverageFloaterFile[0].originalname) : null
             
     });
 
@@ -107,5 +107,36 @@ const createUser = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+const removeUniqueIndex = async () => {
+  try {
+    await User.collection.dropIndex('hrNumber_1' , 'hrEmail_1');
+    
+    console.log('Unique index on hrNumber removed successfully');
+  } catch (error) {
+    console.error('Error removing unique index:', error);
+  }
+};
+const removeUniqueIndex1 = async () => {
+  try {
+    await User.collection.dropIndex('hrEmail_1');
+    
+    console.log('Unique index on hrNumber removed successfully');
+  } catch (error) {
+    console.error('Error removing unique index:', error);
+  }
+};
+const removeUniqueIndex3 = async () => {
+  try {
+    await User.collection.dropIndex('accountName_1');
+    
+    console.log('Unique index on hrNumber removed successfully');
+  } catch (error) {
+    console.error('Error removing unique index:', error);
+  }
+};
+removeUniqueIndex();
+removeUniqueIndex1();
+removeUniqueIndex3();
 
 module.exports = { createUser, upload };

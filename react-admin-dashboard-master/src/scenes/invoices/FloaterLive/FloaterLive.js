@@ -66,6 +66,9 @@ const FloaterLive = () => {
   const [editData, setEditData] = useState({});
   const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
   const [newUserData, setNewUserData] = useState({});
+  const [totalPremium , setTotalPremium] = useState(0);
+  const [activeLive , setactiveLive] = useState(0);
+  const [cdBalance , setCDBalance] = useState(0);
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -79,8 +82,23 @@ const FloaterLive = () => {
     if (accountId) {
       setSelectedAccount(accountId);
       fetchLiveDataFile(accountId);
+      fetchData(accountId);
     }
   }, [searchParams]);
+
+  const fetchData = async (accountId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/getSpecificSelfFloaterFile`);
+      
+      setactiveLive(response.data.data[0]['Active live']);
+      setTotalPremium(response.data.data[0]['Total Preimium']);
+      setCDBalance(response.data.data[0]['CD Balance'])
+      setLoading(false);
+    } catch (err) {
+      console.log('Failed to fetch data');
+      setLoading(false);
+    }
+  };
 
 
   useEffect(() => {
@@ -261,7 +279,7 @@ const FloaterLive = () => {
   });
 
   const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-
+  const role = localStorage.getItem('role');
   return (
 
     <Box mt="20px" style={{textAlign:'center'}}>
@@ -285,17 +303,17 @@ const FloaterLive = () => {
 
 <div className="totalPremium">
   <p>Total Premium</p>
-  <p>Rs. 150000</p>
+  <p>Rs. {totalPremium}</p>
 </div>
 
 <div className="totalPremium">
   <p>Total Life</p>
-  <p>Rs. 150000</p>
+  <p>{activeLive}</p>
 </div>
 
 <div className="totalPremium">
   <p>CD Balance</p>
-  <p>Rs. 150000</p>
+  <p>{cdBalance}</p>
 </div>
       
       {/* <DropdownWrapper style={{ width: '100%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
@@ -331,6 +349,7 @@ const FloaterLive = () => {
           style={{ display: 'none' }}
           id="file-input"
         />
+        {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -340,6 +359,9 @@ const FloaterLive = () => {
         >
           Upload
         </Button>
+        )}
+
+      {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -349,6 +371,7 @@ const FloaterLive = () => {
         >
           Submit File
         </Button>
+         )}
         {/* <Button
           variant="contained"
           color="primary"

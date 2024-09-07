@@ -88,6 +88,8 @@ const FolaterPolicy = () => {
     fetchAccounts();
   }, []);
 
+  
+
   const handleSelectChange = (e) => {
     const accountId = e.target.value;
     setSelectedAccount(accountId);
@@ -167,6 +169,7 @@ useEffect(() => {
 });
 
 const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
+const role = localStorage.getItem('role');
 
 
   return (
@@ -208,18 +211,25 @@ const selectedAccountName = accounts.find(account => account._id === selectedAcc
           style={{ display: 'none' }}
           onChange={handleFileChange}
         />
-        <label htmlFor="upload-file">
-          <Button
-            variant="contained"
-           color="secondary"
-            component="span"
-            startIcon={<UploadIcon />}
-            style={{ marginRight: '10px'}}
-            
-          >
-            Upload File
-          </Button>
-        </label>
+
+
+{(role !== 'HR' && role !== 'Employee') ? (
+  <label htmlFor="upload-file">
+    <Button
+      variant="contained"
+      color="secondary"
+      component="span"
+      startIcon={<UploadIcon />}
+      style={{ marginRight: '10px' }}
+    >
+      Upload File
+    </Button>
+  </label>
+) : null}
+
+
+
+{(role !== 'HR' && role !== 'Employee') ? (
         <Button
           variant="contained"
           color="secondary"
@@ -229,7 +239,7 @@ const selectedAccountName = accounts.find(account => account._id === selectedAcc
         >
           Submit Upload
         </Button>
-
+) : null}
       </Box>
 
 

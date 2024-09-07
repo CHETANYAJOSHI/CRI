@@ -14,6 +14,7 @@ router.post('/createaccount', upload.fields([
   // { name: 'endrosementSelfFile', maxCount: 1 },
   // { name: 'endrosementFloaterFile', maxCount: 1 },
   { name: 'claimABFile', maxCount: 1 },
+  { name: 'rackRatesFile', maxCount: 1 },
   { name: 'checkListFile', maxCount: 1 },
   { name: 'exclusionListFile', maxCount: 1 },
   // { name: 'deletionDataSelfFile', maxCount: 1 },

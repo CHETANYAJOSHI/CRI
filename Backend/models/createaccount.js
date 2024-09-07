@@ -20,12 +20,12 @@ const UserSchema = new mongoose.Schema({
   hrEmail: {
     type: String,
     required: true,
-    unique:true,
+    
   },
   hrNumber: {
     type: String,
     required: true,
-    unique:true,
+    
   },
   // corporateName: {
   //   type: String,
@@ -72,6 +72,10 @@ const UserSchema = new mongoose.Schema({
   //   required:false
   // },
   claimABFile:{ 
+    type:String,
+    required:false
+  },
+  rackRatesFile:{
     type:String,
     required:false
   },

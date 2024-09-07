@@ -167,7 +167,7 @@ useEffect(() => {
 });
 
 const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-
+const role = localStorage.getItem('role');
 
   return (
     <Box mt="20px" style={{textAlign:'center'}}>
@@ -210,6 +210,7 @@ const selectedAccountName = accounts.find(account => account._id === selectedAcc
           onChange={handleFileChange}
         />
         <label htmlFor="upload-file">
+        {role !== 'HR' && (
           <Button
             variant="contained"
            color="secondary"
@@ -220,7 +221,9 @@ const selectedAccountName = accounts.find(account => account._id === selectedAcc
           >
             Upload File
           </Button>
+           )}
         </label>
+        {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -230,6 +233,7 @@ const selectedAccountName = accounts.find(account => account._id === selectedAcc
         >
           Submit Upload
         </Button>
+        )}
 
       </Box>
 

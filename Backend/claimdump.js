@@ -24,16 +24,69 @@ const getClaimsDataFile = async (req, res) => {
 
     // Read Excel file and send the data
     readxlsxFile(claimsFilePath).then((rows) => {
-      const headers = rows[0];
+      let headers = rows[0];
+
+      // Define headers to exclude
+      const excludedHeaders = ["Paid Claim", "Outstanding Claim", "Total Preimium", "Preimium As on date", "ICR"];
+
+      // Filter out excluded headers
+      headers = headers.filter(header => !excludedHeaders.includes(header));
+
+      // Map data to filtered headers
       const data = rows.slice(1).map(row => {
         let rowData = {};
         row.forEach((cell, index) => {
-          rowData[headers[index]] = cell;
+          if (!excludedHeaders.includes(headers[index])) {
+            rowData[headers[index]] = cell;
+          }
         });
         return rowData;
       });
 
       res.json({ headers, data });
+    }).catch(error => {
+      console.error('Error reading Excel file:', error);
+      res.status(500).json({ error: 'Failed to read Excel file' });
+    });
+  } catch (error) {
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const getSpecificSelfClaimsData = async (req, res) => {
+  try {
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { claimDumpSelfFile } = account;
+    if (!claimDumpSelfFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const claimsFilePath = path.join(__dirname, 'NewAccounts', claimDumpSelfFile);
+
+    // Read Excel file and send the data
+    readxlsxFile(claimsFilePath).then((rows) => {
+      const headers = rows[0];
+      const requiredHeaders = ["Paid Claim", "Outstanding Claim", "Total Preimium", "Preimium As on date", "ICR"];
+      const selectedHeaders = headers.filter(header => requiredHeaders.includes(header));
+
+      const data = rows.slice(1).map(row => {
+        let rowData = {};
+        row.forEach((cell, index) => {
+          if (selectedHeaders.includes(headers[index])) {
+            rowData[headers[index]] = cell;
+          }
+        });
+        return rowData;
+      });
+
+      res.json({ headers: selectedHeaders, data });
     }).catch(error => {
       console.error('Error reading Excel file:', error);
       res.status(500).json({ error: 'Failed to read Excel file' });
@@ -244,5 +297,6 @@ module.exports = {
   uploadClaimsDataFile,
   updateClaimsDataRow,
   AddSelfClaim,
+  getSpecificSelfClaimsData,
   claimupload
 };

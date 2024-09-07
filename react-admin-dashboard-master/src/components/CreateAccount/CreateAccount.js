@@ -136,6 +136,7 @@ const CreateAccount = () => {
   // const [endrosementAdditionFile, setendrosementAdditionFile] = useState(null);
   // const [endrosementDeletionFile, setendrosementDeletionFile] = useState(null);
   const [claimABFile, setclaimABFile] = useState(null);
+  const [rackRatesFile, setrackRatesFile] = useState(null);
   const [checkListFile, setcheckListFile] = useState(null);
   const [exclusionListFile, setexclusionListFile] = useState(null);
   // const [deletionDataSelfFile, setdeletionDataSelfFile] = useState(null);
@@ -186,6 +187,9 @@ const CreateAccount = () => {
         case 'claimABFile':
           setclaimABFile(files[0]);
           break;
+          case 'rackRatesFile':
+          setrackRatesFile(files[0]);
+          break;
         case 'checkListFile':
           setcheckListFile(files[0]);
           break;
@@ -227,24 +231,21 @@ const CreateAccount = () => {
     formData.append('TPAName', TPAName);
     formData.append('InsuranceName', InsuranceName);
     formData.append('networkHospitalLink', networkHospitalLink);
-    formData.append('cdStatementFile', cdStatementFile);
-    formData.append('claimSelfAnalysisFile', claimSelfAnalysisFile);
-    formData.append('claimFloaterAnalysisFile', claimFloaterAnalysisFile);
-    formData.append('claimDumpSelfFile', claimDumpSelfFile);
-    formData.append('claimDumpFloaterFile', claimDumpFloaterFile);
-    formData.append('liveDataSelfFile', liveDataSelfFile);
-    formData.append('liveDataFloaterFile', liveDataFloaterFile);
-    // formData.append('endrosementAdditionFile', endrosementAdditionFile);
-    // formData.append('endrosementDeletionFile', endrosementDeletionFile);
-    formData.append('claimABFile', claimABFile);
-    formData.append('checkListFile', checkListFile);
-    formData.append('exclusionListFile', exclusionListFile);
-    // formData.append('deletionDataSelfFile', deletionDataSelfFile);
-    formData.append('additionDataFile', additionDataFile);
-    // formData.append('additionDataSelfFile', additionDataSelfFile);
-    formData.append('deletionDataFile', deletionDataFile);
-    formData.append('policyCoverageSelfFile', policyCoverageSelfFile);
-    formData.append('policyCoverageFloaterFile', policyCoverageFloaterFile);
+  if (cdStatementFile) formData.append('cdStatementFile', cdStatementFile);
+  if (claimSelfAnalysisFile) formData.append('claimSelfAnalysisFile', claimSelfAnalysisFile);
+  if (claimFloaterAnalysisFile) formData.append('claimFloaterAnalysisFile', claimFloaterAnalysisFile);
+  if (claimDumpSelfFile) formData.append('claimDumpSelfFile', claimDumpSelfFile);
+  if (claimDumpFloaterFile) formData.append('claimDumpFloaterFile', claimDumpFloaterFile);
+  if (liveDataSelfFile) formData.append('liveDataSelfFile', liveDataSelfFile);
+  if (liveDataFloaterFile) formData.append('liveDataFloaterFile', liveDataFloaterFile);
+  if (claimABFile) formData.append('claimABFile', claimABFile);
+  if (rackRatesFile) formData.append('rackRatesFile', rackRatesFile);
+  if (checkListFile) formData.append('checkListFile', checkListFile);
+  if (exclusionListFile) formData.append('exclusionListFile', exclusionListFile);
+  if (additionDataFile) formData.append('additionDataFile', additionDataFile);
+  if (deletionDataFile) formData.append('deletionDataFile', deletionDataFile);
+  if (policyCoverageSelfFile) formData.append('policyCoverageSelfFile', policyCoverageSelfFile);
+  if (policyCoverageFloaterFile) formData.append('policyCoverageFloaterFile', policyCoverageFloaterFile);
     // formData.append('hrMobile', hrMobile);
     // formData.append('hrEmail', hrEmail);
     // formData.append('hrName', hrName);
@@ -350,26 +351,26 @@ const CreateAccount = () => {
             <Label>CD Statement File</Label>
             <Input type="file" name="cdStatementFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <Label>Self with Parents Claim Analysis File</Label>
-            <Input type="file" name="claimSelfAnalysisFile" onChange={onFileChange}  accept=".pdf" required />
-          </FormGroup>
+            <Input type="file" name="claimSelfAnalysisFile" onChange={onFileChange}  accept=".pdf"  />
+          </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Claim Analysis File</Label>
             <Input type="file" name="claimFloaterAnalysisFile" onChange={onFileChange}  accept=".pdf" required />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <Label>Self with Parents Claim Dump File</Label>
-            <Input type="file" name="claimDumpSelfFile" onChange={onFileChange}  accept=".xlsx" required />
-          </FormGroup>
+            <Input type="file" name="claimDumpSelfFile" onChange={onFileChange}  accept=".xlsx"  />
+          </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Claim Dump File</Label>
             <Input type="file" name="claimDumpFloaterFile" onChange={onFileChange} accept=".xlsx" required />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <Label>Self with Parents Live Data File</Label>
-            <Input type="file" name="liveDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
-          </FormGroup>
+            <Input type="file" name="liveDataSelfFile" onChange={onFileChange} accept=".xlsx"  />
+          </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Live Data File</Label>
             <Input type="file" name="liveDataFloaterFile" onChange={onFileChange} accept=".xlsx" required />
@@ -385,6 +386,10 @@ const CreateAccount = () => {
           <FormGroup>
             <Label>Claim A & B Form</Label>
             <Input type="file" name="claimABFile" onChange={onFileChange} accept=".pdf" required />
+          </FormGroup>
+          <FormGroup>
+            <Label>Rack-Rates File</Label>
+            <Input type="file" name="rackRatesFile" onChange={onFileChange} accept=".pdf" required />
           </FormGroup>
           <FormGroup>
             <Label>checkListFile File</Label>
@@ -410,10 +415,10 @@ const CreateAccount = () => {
             <Label>Endorsement Deletion File</Label>
             <Input type="file" name="deletionDataFile" onChange={onFileChange} accept=".xlsx" required />
           </FormGroup>
-          <FormGroup>
+          {/* <FormGroup>
             <Label>Self with Parents Policy Coverage</Label>
-            <Input type="file" name="policyCoverageSelfFile" onChange={onFileChange} accept=".pdf" required />
-          </FormGroup>
+            <Input type="file" name="policyCoverageSelfFile" onChange={onFileChange} accept=".pdf"  />
+          </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Policy Coverage</Label>
             <Input type="file" name="policyCoverageFloaterFile" onChange={onFileChange} accept=".pdf" required />
@@ -441,6 +446,7 @@ const CreateAccount = () => {
               {/* <p><strong>endrosementAdditionFile :</strong> {accountDetails.endrosementAdditionFile}</p>
               <p><strong>endrosementDeletionFile :</strong> {accountDetails.endrosementDeletionFile}</p> */}
               <p><strong>claimABFile :</strong> {accountDetails.claimABFile}</p>
+              <p><strong>Rack-RatesFile :</strong> {accountDetails.rackRatesFile}</p>
               <p><strong>checkListFile :</strong> {accountDetails.checkListFile}</p>
               <p><strong>exclusionListFile :</strong> {accountDetails.exclusionListFile}</p>
               {/* <p><strong>deletionDataSelfFile :</strong> {accountDetails.deletionDataSelfFile}</p> */}

@@ -1,143 +1,128 @@
-// deletedFileHandler.js
-const express = require('express');
 const path = require('path');
-const xlsx = require('xlsx');
+const fs = require('fs');
 const multer = require('multer');
+const express = require('express');
+const Accounts = require('./models/createaccount'); // Adjust the path according to your project structure
 
-const DELETED_FILE_PATH = path.join(__dirname, 'rackrates', 'rackrates.xlsx');
-
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-      cb(null, 'rackrates/'); // Destination folder for uploaded files
-  },
-  filename: function (req, file, cb) {
-      cb(null, 'rackrates.xlsx'); // Always save as data.xlsx
-  }
-});
-
-const fileFilter = (req, file, cb) => {
-  if (file.mimetype !== 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' &&
-      file.mimetype !== 'application/vnd.ms-excel') {
-      return cb(new Error('Only Excel files are allowed'), false);
-  }
-  cb(null, true);
-};
-
-
-
-const rack = multer({ storage: storage,fileFilter:fileFilter });
-
-const rackupload = (req, res) => {
+// Function to fetch and read PDF file
+const getrackRatesFile = async (req, res) => {
   try {
-      if (!req.file) {
-          return res.status(400).send('No file uploaded.');
-      }
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
 
-      // Process the uploaded file
-      const fileInfo = {
-          filename: req.file.filename,
-          originalName: req.file.originalname,
-          size: req.file.size
-      };
-      res.json({ message: 'File uploaded and replaced successfully', fileInfo });
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { accountName, rackRatesFile } = account;
+    if (!accountName || !rackRatesFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const rackRatesFilePath = path.join(__dirname, 'NewAccounts', rackRatesFile);
+
+    if (fs.existsSync(rackRatesFilePath)) {
+      res.sendFile(rackRatesFilePath);
+    } else {
+      res.status(404).json({ error: 'File not found' });
+    }
   } catch (error) {
-      console.error('Error uploading file:', error);
-      res.status(500).send('Error uploading file');
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-// Function to read Excel data from the first sheet
-const rackexcel = () => {
-  const workbook = xlsx.readFile(DELETED_FILE_PATH);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-  const xlData = xlsx.utils.sheet_to_json(worksheet, { header: 1, defval: '', raw: false });
-  return xlData;
-};
+// Function to download PDF file
+const downloadrackRatesFile = async (req, res) => {
+  const accountId = req.params.accountId;
+  const account = await Accounts.findById(accountId);
+  const { rackRatesFile } = account;
+  if (!rackRatesFile) {
+    return res.status(400).json({ error: 'Invalid account data' });
+  }
 
- const rackdownload = (req,res) => {
-  const filePath = DELETED_FILE_PATH;
-  res.download(filePath, 'deleted_data.xlsx', (err) => {
-      if (err) {
+  if (account) {
+    const filePath = path.join(__dirname, './NewAccounts', rackRatesFile);
+    if (fs.existsSync(filePath)) {
+      res.download(filePath, err => {
+        if (err) {
           console.error('Error downloading file:', err);
           res.status(500).send('Error downloading file');
-      }
-  });
-};
-
-// Function to write Excel data to the file
-const rackexceldata = (xlData) => {
-  const newWorkbook = xlsx.utils.book_new();
-  const newWorksheet = xlsx.utils.aoa_to_sheet(xlData);
-  xlsx.utils.book_append_sheet(newWorkbook, newWorksheet, 'Sheet1');
-  xlsx.writeFile(newWorkbook, DELETED_FILE_PATH);
-};
-
-// Handler to fetch data from Excel file
-const rackdatahandler = (req, res) => {
-  try {
-    const xlData = rackexcel();
-    const headers = xlData[0];
-    const data = xlData.slice(1);
-    res.json({ headers, data });
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    res.status(500).json({ error: 'Failed to fetch data' });
+        }
+      });
+    } else {
+      res.status(404).send('File not found');
+    }
+  } else {
+    res.status(404).send('Account not found');
   }
 };
 
-// Handler to update a specific row
-const updaterack = (req, res) => {
-  try {
-    const { rowIndex } = req.params;
-    const updatedData = req.body;
+// Configure Multer for PDF file upload
+const pdfStorage = multer.diskStorage({
+  destination: async (req, file, cb) => {
+    const accountId = req.params.accountId;
+    const account = await Accounts.findById(accountId);
 
-    let xlData = rackexcel();
-
-    if (isNaN(rowIndex) || rowIndex < 0 || rowIndex >= xlData.length - 1) {
-      return res.status(400).json({ error: 'Invalid row index' });
+    if (!account) {
+      return cb(new Error('Account not found'), false);
     }
 
-    const headers = xlData[0];
-    const updatedRow = headers.map((header, index) => updatedData[`column_${index}`] || '');
-    xlData[parseInt(rowIndex) + 1] = updatedRow;
+    const accountFolder = path.join(__dirname, 'NewAccounts', account.accountName);
 
-    rackexceldata(xlData);
+    if (!fs.existsSync(accountFolder)) {
+      fs.mkdirSync(accountFolder, { recursive: true });
+    }
 
-    res.json({ message: 'Data updated successfully' });
-  } catch (error) {
-    console.error('Error updating data:', error);
-    res.status(500).json({ error: 'Failed to update data' });
+    cb(null, accountFolder);
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
+});
+
+const rackRatesUpload = multer({ storage: pdfStorage });
+
+// Function to upload PDF file
+const uploadrackRatesFile = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'No file uploaded' });
   }
-};
 
-// Handler to delete a specific row
-const deleteRowHandler = (req, res) => {
   try {
-    const { rowIndex } = req.params;
+    const accountId = req.params.accountId;
+    const account = await Accounts.findById(accountId);
 
-    let xlData = rackexcel();
-
-    if (isNaN(rowIndex) || rowIndex < 0 || rowIndex >= xlData.length - 1) {
-      return res.status(400).json({ error: 'Invalid row index' });
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
     }
 
-    xlData = xlData.filter((_, index) => index !== parseInt(rowIndex) + 1);
+    const newFilePath = path.join(account.accountName, req.file.originalname);
+    const newFileFullPath = path.join(__dirname, 'NewAccounts', newFilePath);
 
-    rackexceldata(xlData);
+    // Delete the old claimSelfAnalysisFile if it exists
+    const oldrackRatesFilePath = path.join(__dirname, 'NewAccounts', account.accountName, account.rackRatesFile);
+    if (fs.existsSync(oldrackRatesFilePath)) {
+      fs.unlinkSync(oldrackRatesFilePath);
+    }
 
-    res.json({ message: 'Data deleted successfully' });
+    // Update the account with the new claimSelfAnalysisFile path
+    account.rackRatesFile = newFilePath;
+    await account.save();
+
+    res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
   } catch (error) {
-    console.error('Error deleting data:', error);
-    res.status(500).json({ error: 'Failed to delete data' });
+    console.error('Error uploading file and updating database:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
 module.exports = {
-  rackdatahandler,
-  updaterack,
-  rackdownload,
-  rackupload,
-  rack
+  getrackRatesFile,
+  downloadrackRatesFile,
+  uploadrackRatesFile,
+  rackRatesUpload
 };
+
+// Express routes to handle requests
+

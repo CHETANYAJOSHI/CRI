@@ -162,7 +162,7 @@ const Deletion = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'data.xlsx');
+      link.setAttribute('download', 'Deletion.xlsx');
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -351,22 +351,7 @@ const Deletion = () => {
         >
           Submit File
         </Button>
-        {/* <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddUserClick}
-          startIcon={<AddIcon />}
-          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
-        >
-          Add User
-        </Button> */}
-        <TextField
-          label="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          variant="outlined"
-          style={{ marginLeft: '10px'}}
-        />
+        
       </Box>
 
       {loading ? (

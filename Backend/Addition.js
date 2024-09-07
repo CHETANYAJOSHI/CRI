@@ -4,6 +4,7 @@ const multer = require('multer');
 const xlsx = require('xlsx');
 const readxlsxFile = require('read-excel-file/node');
 const Accounts = require('./models/createaccount'); // Adjust the path according to your project structure
+const fileNotificationSchema = require('./models/FileChangeNotification');
 
 // Function to fetch and read claims data file
 const getAdditionDataFile = async (req, res) => {
@@ -12,7 +13,7 @@ const getAdditionDataFile = async (req, res) => {
     const account = await Accounts.findById(accountId);
 
     if (!account) {
-      return res.status(404).json({ error: 'Account not found' });
+      return res.status(404).json({error:'Account not found'});
     }
 
     const { accountName, additionDataFile } = account;
@@ -75,17 +76,13 @@ const storage = multer.diskStorage({
   destination: async (req, file, cb) => {
     const accountId = req.params.accountId;
     const account = await Accounts.findById(accountId);
-
     if (!account) {
       return cb(new Error('Account not found'), false);
     }
-
     const accountFolder = path.join(__dirname, 'NewAccounts', account.accountName);
-
     if (!fs.existsSync(accountFolder)) {
       fs.mkdirSync(accountFolder, { recursive: true });
     }
-
     cb(null, accountFolder);
   },
   filename: (req, file, cb) => {
@@ -122,9 +119,25 @@ const uploadAdditionDataFile = async (req, res) => {
     account.additionDataFile = newFilePath;
     await account.save();
 
+    const notification = new fileNotificationSchema({
+      type: 'file_upload',
+      message: `A new file has been uploaded for account: ${account.accountName}. File path: ${newFilePath}.`
+    });
+    await notification.save();
+
     res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
   } catch (error) {
     console.error('Error uploading file and updating database:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const getNotifications = async (req, res) => {
+  try {
+    const notifications = await fileNotificationSchema.find().sort({ date: -1 }); // Fetches notifications in descending order
+    res.json(notifications);
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -244,5 +257,6 @@ module.exports = {
     uploadAdditionDataFile,
     updateAdditionDataRow,
     AddSelfAddition,
+    getNotifications,
     Additionupload
 };

@@ -46,6 +46,7 @@ import styled from 'styled-components';
 import './Slidebar.css';
 import HRbar from "./HRbar";
 import Adminbar from "./Adminbar";
+import Employe from "./Employe";
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -164,6 +165,7 @@ const handleSelectChange = (e) => {
     <div>
       {role === 'Admin' && <Adminbar />}
       {role === 'HR' && <HRbar />}
+      {role === 'Employee' && <Employe />}
     </div>
       );
 };

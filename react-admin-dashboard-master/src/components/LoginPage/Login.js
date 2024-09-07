@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Modal, Spinner, Button } from 'react-bootstrap';
 import './Login.css';
 import logo from '../../images/CRI-logo 1.jpg';
+// import { AuthContext } from '../AuthContext';
 
 const Login = () => {
   const navigate = useNavigate();
+  // const { setAuthData } = useContext(AuthContext);
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [showOtpInput, setShowOtpInput] = useState(false);
@@ -64,19 +66,26 @@ const Login = () => {
     } else {
       try {
         const response = await axios.post('http://localhost:5000/api/auth/verify-otp', { mobileNumber, otp });
+        console.log(response)
         if (response.data.message) {
           setModalMessage('OTP Verified Successfully');
           setShowModal(true);
-
+          // setAuthData(response.data);
+          // console.log(setAuthData);
+          localStorage.setItem('hrDetails', JSON.stringify(response.data.hrDetails));
           localStorage.setItem('role', response.data.role);
           localStorage.setItem('accountName', response.data.accountName);
           localStorage.setItem('hrId', response.data.hrId);
           localStorage.setItem('hrName', response.data.hrName);
           localStorage.setItem('authToken', response.data.token);
+          localStorage.setItem('mobileNumber' , response.data.mobileNumber);
+          localStorage.setItem('employeeNumber' , response.data.mobileNumber);
 
-          if (localStorage.getItem('role') === 'HR') {
+          if (localStorage.getItem('role') === 'HR' || localStorage.getItem('role') == 'Employee') {
             navigate("/profile");
-          } else {
+          }
+          
+          else {
             navigate("/dashboard");
           }
         } else {
@@ -161,10 +170,10 @@ const Login = () => {
                       </div>
                       <div className="d-flex justify-content-between align-items-center mb-3 flex-column">
                       <div className="timer mb-3">
-                          <p className="mb-0" style={{fontSize:'20px' , color:"rgb(57 49 132)" , fontWeight:'bold'}}>{otpExpired ? 'OTP expired' : `Time left: ${formatTime(timeLeft)}`}</p>
+                          <p className="mb-0" style={{fontSize:'20px' , color:"rgb(57 49 132)" , fontWeight:'bold'}}>{otpExpired ? 'OTP expired' : `OTP ExpiredIn: ${formatTime(timeLeft)}`}</p>
                         </div>
 
-                        <button
+                       <button
                           type="button"
                           className="btn btn-secondary btn-block"
                           onClick={handleResetNumber}

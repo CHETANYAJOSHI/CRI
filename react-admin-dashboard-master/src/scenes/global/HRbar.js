@@ -1,4 +1,4 @@
-import { useState , useEffect } from "react";
+import { useState , useEffect , useContext } from "react";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
 import {
@@ -44,6 +44,8 @@ import profile from "../../images/profile.avif";
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
 import styled from 'styled-components';
 import './Slidebar.css';
+// import { AuthContext } from "../../components/AuthContext";//
+
 
 
 const DropdownWrapper = styled.div`
@@ -111,6 +113,7 @@ const HRbar = () => {
   const theme = useTheme();
   const Navigate = useNavigate();
   const colors = tokens(theme.palette.mode);
+  // const { authData } = useContext(AuthContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [selectedAccount, setSelectedAccount] = useState(localStorage.getItem('hrId'))
@@ -119,12 +122,34 @@ const HRbar = () => {
   const [hrName,sethrName] = useState(localStorage.getItem('hrName'));
   const [accountName,setaccountName] = useState(localStorage.getItem('accountName'));
   const [hrId,sethrId] = useState(localStorage.getItem('hrId'));
+  const [hrDetails, setHrDetails] = useState([]);
+  const [mobileNumber , setMobileNumber] = useState();
+  const [selectedHr, setSelectedHr] = useState('');
+  const [nullFields, setNullFields] = useState([]);
     // const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
 
 const Nav = ()=>{
   Navigate("/createaccount")
 }
 
+useEffect(() => {
+  const fetchNullFields = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/check-null-fields/${selectedAccount}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setNullFields(data.nullFields);
+      } else {
+        console.error('Error fetching null fields:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching null fields:', error);
+    }
+  };
+
+  fetchNullFields();
+}, [selectedAccount]);
 
 
 useEffect(() => {
@@ -142,22 +167,69 @@ useEffect(() => {
 
 
 
+
+useEffect(() => {
+  // Fetch HR details from localStorage or make an API call
+  const storedHrDetails = JSON.parse(localStorage.getItem('hrDetails'));
+  if (storedHrDetails) {
+    setHrDetails(storedHrDetails);
+    if (storedHrDetails.length > 0) {
+      // Set the first HR as the default selected HR
+      setSelectedHr(storedHrDetails[0].hrId);
+      setSelectedAccount(storedHrDetails[0].hrId);
+      sethrName(storedHrDetails[0].hrName);
+      setMobileNumber(storedHrDetails[0].hrNumber);
+    }
+  }
+}, []);
+
+const handleSelectChange = (event) => {
+  const selectedHrId = event.target.value;
+
+  // Find the selected HR from hrDetails based on hrId
+  const selectedHr = hrDetails.find((hr) => hr.hrId === selectedHrId);
+
+  if (selectedHr) {
+    const { hrId, hrName,hrNumber } = selectedHr;
+
+    console.log('Selected HR:', selectedHr);
+
+    // Set the selected HR ID and HR Name
+    setSelectedAccount(hrId);
+    sethrName(hrName);
+    setMobileNumber(hrNumber);
+
+    // Navigate to the profile page
+    Navigate('/profile');
+  }
+};
+
+
+
 useEffect(() => {
   // Store the selectedAccount in localStorage whenever it changes
   localStorage.setItem('selectedAccount', selectedAccount);
+  localStorage.setItem('mobileNumber' , mobileNumber);
 }, [selectedAccount]);
+// console.log(authData)
 
 const Logout=()=>{
   
   const confirmed = window.confirm("Are you sure you want to logout?");
   if (confirmed) {
     // Clear the user's token or session data
+    localStorage.removeItem('role');
     localStorage.removeItem('token'); // or your method of storing tokens
     localStorage.removeItem('hrName'); 
     localStorage.removeItem('accountName');
     localStorage.removeItem('hrId'); 
     localStorage.removeItem('authToken'); 
     localStorage.removeItem('selectedAccount'); 
+    localStorage.removeItem('hrDetails');
+    localStorage.removeItem('mobileNumber');
+    localStorage.removeItem('employeeNumber');
+    
+    
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout
@@ -243,28 +315,23 @@ const Logout=()=>{
                  
                 </Typography>
               </Box>
-              {/* <Button style={{backgroundColor:'red' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button> */}
-              {/* <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">
-        
-        <Select
-          id="account-select"
-          value={selectedAccount}
-          onChange={handleSelectChange}
-        >
-          <Option value="">--Select an Account--</Option>
-          {accounts.map((account) => (
-            <Option key={account._id} value={account._id}>
-              {account.accountName}
-            </Option>
-          ))}
-        </Select>
-      </DropdownWrapper> */}
+              
 
-    <div style={{color:'white' , textAlign:'center' , fontSize:'17px' , fontWeight:'600',color:'#4cceac'}} className="mt-3">
+    <div style={{display:'flex' , justifyContent:'center'}}>
+          {/* <label htmlFor="hr-dropdown">Select HR:</label> */}
+          <select id="hr-dropdown" onChange={handleSelectChange}>
+            <option value="" disabled selected>
+              Choose an HR
+            </option>
+            {hrDetails.map((hr) => (
+              <option key={hr.hrId} value={hr.hrId}>
+                {/* {hr.hrName} -  */}
+                {hr.accountName}
+              </option>
+            ))}
+          </select>
+        </div>
 
-    {accountName}
-
-    </div>
             </Box>
 
           )}
@@ -272,21 +339,7 @@ const Logout=()=>{
          
 
           <Box paddingLeft={isCollapsed ? undefined : "10%"}>
-            {/* <Item
-              title="Dashboard"
-              to="/dashboard"
-              icon={<HomeOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-
-            {/* <Item
-              title="Create Account"
-              to="/createaccount"
-              icon={<FolderSharedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
+            
 
             
             <Item
@@ -313,66 +366,29 @@ const Logout=()=>{
               icon={<InsertPageBreakIcon />}
             >
 
-          <SubMenu
-                title="Live Data"
-                to={`/enrollment/live`}
-                icon={<ImportContactsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
               
-              <Item
-                title="Self With Parents"
+              
+              {!nullFields.includes('liveDataSelfFile') && <Item
+                title="Live Data"
                 to={`/enrollment/SelfLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              />}
 
-            <Item
-                title="Floater With Parents"
+              
+{!nullFields.includes('liveDataFloaterFile') && <Item
+                title="Live Data"
                 to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
-
-              </SubMenu>
+              />}
               
-              <SubMenu
-                title="Deleted Data"
-                to="/enrollment/deleted"
-                icon={<DeleteForeverIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
-
-                <Item title="Self With Parents"
-                to={`enrollment/deleted/self?accountId=${selectedAccount}`}
-                icon={< ControlPointIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                />
-                <Item title="Floater With Parents"
-                to={`enrollment/deleted/floater?accountId=${selectedAccount}`}
-                icon={< ControlPointIcon />}
-                selected={selected}
-                setSelected={setSelected}
-                />
-
-                </SubMenu>
-              
+        
               <Item
-                title="Calculated Premium"
-                to="/enrollment/premium"
-                icon={<AttachMoneyIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
-              
-              <Item
-                title="E-Card"
-                to="/profile"
+                title="Request E-Card"
+                to="/reqestECard"
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
@@ -413,8 +429,16 @@ const Logout=()=>{
 
               <Item
                 title="Rack-Rates"
-                to="/enrollement/rack-rates"
+                to={`/endorsement/rack-rates?accountId=${selectedAccount}`}
                 icon={<RateReviewIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
+
+              <Item
+                title="Calculated Premium"
+                to="/enrollment/premium"
+                icon={<AttachMoneyIcon />}
                 selected={selected}
                 setSelected={setSelected}
               />
@@ -423,134 +447,46 @@ const Logout=()=>{
 
            
 
-            <SubMenu
-              title="Claim Dump"
-              icon={<MiscellaneousServicesIcon />}
-            >
+            
 
-              <Item
-                title="Self With Parents"
+{!nullFields.includes('claimDumpSelfFile') && <Item
+                title="Claim Dump"
                 to={`/claim/Selfclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
-
-              <Item
-                title="Floater With Parents"
+              />}
+              
+              {!nullFields.includes('claimDumpFloaterFile') && <Item
+                title="Claim Dump"
                 to={`/claim/Floaterclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              /> }
+              
 
-            </SubMenu>
+           
 
-            <SubMenu
-              title="Claim Analysis"
-              icon={<MiscellaneousServicesIcon />}
-            >
+            
 
-            <Item
-                title="Self With Parents"
+
+{!nullFields.includes('claimSelfAnalysisFile') && <Item
+                title="Claim Analysis"
                 to={`/claim/Selfclaimanalysis?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-            />
-
-            <Item
-                title="Floater With Parents"
+            />}
+            
+            {!nullFields.includes('claimFloaterAnalysisFile') && <Item
+                title="Claim Analysis"
                 to={`/claim/Floaterclaimanalysis?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-            />
-
-            </SubMenu>
-
+            />}
             
-
-            {/* <Item
-              title="Downloads"
-              to="/downloads"
-              icon={<SimCardDownloadIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />  */}
-
-            <Item
-              title="Wellness"
-              to="/wellness"
-              icon={<SpaIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-
-            {/* <Typography
-              variant="h6"
-              color={colors.grey[300]}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Pages
-            </Typography>
-            <Item
-              title="Profile Form"
-              to="/form"
-              icon={<PersonOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Calendar"
-              to="/calendar"
-              icon={<CalendarTodayOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="FAQ Page"
-              to="/faq"
-              icon={<HelpOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
-
-            {/* <Typography
-              variant="h6"
-              style={{color:"white" , fontSize:'17px', fontWeight:600}}
-              sx={{ m: "15px 0 5px 20px" }}
-            >
-              Charts
-            </Typography>
-            <Item
-              title="Bar Chart"
-              to="/bar"
-              icon={<BarChartOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Pie Chart"
-              to="/pie"
-              icon={<PieChartOutlineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Line Chart"
-              to="/line"
-              icon={<TimelineOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            />
-            <Item
-              title="Geography Chart"
-              to="/geography"
-              icon={<MapOutlinedIcon />}
-              selected={selected}
-              setSelected={setSelected}
-            /> */}
           </Box>
         </Menu>
       </ProSidebar>

@@ -57,7 +57,9 @@ const Option = styled.option``;
 
 const FloaterClaimDump = () => {
   const [data, setData] = useState([]);
+  const [data1 , setData1] = useState([]);
   const [headers, setHeaders] = useState([]);
+  const [headers1, setHeaders1] = useState([]);
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
   const [selectedAccount, setSelectedAccount] = useState('');
@@ -67,6 +69,9 @@ const FloaterClaimDump = () => {
   const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
   const [newUserData, setNewUserData] = useState({});
   const [file, setFile] = useState(null);
+  const [paidClaim, setPaidClaim] = useState(0);
+const [outstandingClaims, setOutstandingClaims] = useState(0);
+const [claimRatio, setClaimRatio] = useState(0);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -90,6 +95,49 @@ const FloaterClaimDump = () => {
 
     fetchAccounts();
   }, []);
+
+
+  const fetchClaimsFloaterSpecific = async (accountId) => {
+    setLoading(true);
+    try {
+        const response = await axios.get(`http://localhost:5000/api/claims-floater-specific/${accountId}`);
+        return response.data;
+        console.log(response.data.data[0]['Paid Claim']);
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    } finally {
+        setLoading(false);
+    }
+};
+
+// Use this function to fetch data
+const loadData = async () => {
+  if (selectedAccount) {
+    const data = await fetchClaimsFloaterSpecific(selectedAccount);
+    if (data) {
+      setPaidClaim(data.data[0]['Paid Claim']);
+      setOutstandingClaims(data.data[0]['Outstanding Claim']);
+      setClaimRatio(data.data[0]['ICR']);
+    }
+  }
+};
+
+useEffect(() => {
+  const accountIdFromUrl = searchParams.get('accountId');
+  if (accountIdFromUrl) {
+    setSelectedAccount(accountIdFromUrl);
+  }
+}, [searchParams]);
+
+useEffect(() => {
+  if (selectedAccount) {
+    loadData();
+  }
+}, [selectedAccount]);
+
+
+
 
   const fetchLiveDataFile = async (accountId) => {
     setLoading(true);
@@ -256,7 +304,7 @@ const FloaterClaimDump = () => {
   });
 
   const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-
+  const role = localStorage.getItem('role');
 
   return (
 <Box mt="20px" style={{textAlign:'center'}}>
@@ -278,17 +326,17 @@ const FloaterClaimDump = () => {
 
 <div className="totalPremium">
   <p>Paid Claim</p>
-  <p>Rs. 15000000</p>
+  <p>Rs. {paidClaim}</p>
 </div>
 
 <div className="totalPremium">
   <p>OutStanding Claims</p>
-  <p>5000000</p>
+  <p>Rs. {outstandingClaims}</p>
 </div>
 
 <div className="totalPremium">
   <p>Claim Ratio</p>
-  <p>40%</p>
+  <p>{claimRatio}%</p>
 </div>
 
 
@@ -326,6 +374,9 @@ const FloaterClaimDump = () => {
           style={{ display: 'none' }}
           id="file-input"
         />
+
+        {role !== 'HR' && (
+
         <Button
           variant="contained"
           color="secondary"
@@ -335,6 +386,9 @@ const FloaterClaimDump = () => {
         >
           Upload
         </Button>
+        )}
+
+        {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -344,6 +398,7 @@ const FloaterClaimDump = () => {
         >
           Submit Upload
         </Button>
+         )}
         {/* <Button
           variant="contained"
           color="primary"

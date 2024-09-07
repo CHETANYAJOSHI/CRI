@@ -109,14 +109,7 @@ const Addition = () => {
     }
   };
 
-  // const handleSelectChange = (e) => {
-  //   const accountId = e.target.value;
-  //   setSelectedAccount(accountId);
-  //   if (accountId) {
-  //     navigate(`/enrollment/SelfLive?accountId=${accountId}`);
-  //     fetchLiveDataFile(accountId); 
-  //   }
-  // };
+  
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -162,7 +155,7 @@ const Addition = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'data.xlsx');
+      link.setAttribute('download', 'Addition.xlsx');
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -196,9 +189,6 @@ const Addition = () => {
       console.log(file);
       console.log(formData.append('file', file))
     }
-  };
-  const handleAddUserClick = () => {
-    setOpenAddUserDialog(true);
   };
 
   const handleAddUserChange = (e) => {
@@ -278,44 +268,13 @@ const Addition = () => {
     >
 
 
-      {/* <div className="Detailsm">
-
-          <div className="totalPremium">
-            <p>Total Premium</p>
-            <p>Rs. 150000</p>
-          </div>
-
-          <div className="totalPremium">
-            <p>Total Life</p>
-            <p>50000</p>
-          </div>
-
-          <div className="totalPremium">
-            <p>CD Balance</p>
-            <p>50000</p>
-          </div> */}
+     
 
      
 
 
 
-      {/* <DropdownWrapper style={{ width: '100%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
-        <Label htmlFor="account-select">Account</Label>
-        <Select
-          id="account-select"
-          value={selectedAccount}
-          onChange={handleSelectChange}
-        >
-          <Option value="">--Select an Account--</Option>
-          {accounts.map((account) => (
-            <Option key={account._id} value={account._id}>
-              {account.accountName}
-            </Option>
-          ))}
-        </Select>
-      </DropdownWrapper> */}
-
-      {/* </div> */}
+      
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <Button
@@ -351,22 +310,8 @@ const Addition = () => {
         >
           Submit File
         </Button>
-        {/* <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddUserClick}
-          startIcon={<AddIcon />}
-          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
-        >
-          Add User
-        </Button> */}
-        <TextField
-          label="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          variant="outlined"
-          style={{ marginLeft: '10px'}}
-        />
+       
+        
       </Box>
 
       {loading ? (

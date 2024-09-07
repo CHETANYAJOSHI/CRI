@@ -9,6 +9,9 @@ const accountRouters = require('./routes/accountRoutes');
 const authRoutes = require('./routes/authRoutes');
 const Accounts= require('./models/createaccount');
 const Account=require('./routes/download');
+const bulkRequest=require('./routes/bulkRequest');
+const notification = require('./routes/notifications');
+const employeeRequest = require('./routes/employeeRequests');
 const multer = require('multer');
 // const authenticateAdmin = require('./controllers/authController');
 
@@ -20,15 +23,23 @@ const { embedPdfInExcel } = require('./processexcel');
 const app = express();
 const PORT = 5000;
 const FILE_PATH = path.join(__dirname, 'uploads', 'data.xlsx');
+
+//
+// BulkRequest 
+
+// const bulkRequest = require('./routes/bulkRequest');
+
+//
+
 const { getSelfParentDataFile, downloadSelfParentDataFile, uploadSelfParentDataFile, updateSelfParentDataRow, AddSelfParentUser,selfupload } = require('./deletedFileHandle');
-const {   getFloaterParentDataFile,   downloadFloaterParentDataFile,   uploadFloaterParentDataFile,   updateFloaterParentDataRow, AddFloaterParentUser,   floaterUpload } = require('./floaterDeleted');
-const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow,AddSelfClaim, claimupload } = require('./claimdump')
-const {rackdatahandler,updaterack,rackdownload,rackupload,rack}= require("./rackrates");
-const { getFloaterLive, downloadFloaterLive, uploadFloaterLive, updateFloaterLive, AddFloaterLive , floaterUploadLive , countBenefStatus} = require('./Livefloater');
-const { getClaimsfloaterFile, downloadClaimsfloaterFile, uploadClaimsfloaterFile, updateClaimsfloaterRow, AddfloaterClaim,claimFloaterupload } = require('./Floaterclaimdump')
+const { getFloaterParentDataFile,   downloadFloaterParentDataFile,   uploadFloaterParentDataFile,   updateFloaterParentDataRow, AddFloaterParentUser,   floaterUpload } = require('./floaterDeleted');
+const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow,AddSelfClaim,getSpecificSelfClaimsData, claimupload } = require('./claimdump');
+const { getrackRatesFile,downloadrackRatesFile,uploadrackRatesFile,rackRatesUpload}= require("./rackrates");
+const { getFloaterLive, downloadFloaterLive, uploadFloaterLive, updateFloaterLive, AddFloaterLive , floaterUploadLive , countBenefStatus , getSpecificSelfFloaterFile} = require('./Livefloater');
+const { getClaimsfloaterFile, downloadClaimsfloaterFile, uploadClaimsfloaterFile, updateClaimsfloaterRow, AddfloaterClaim,getSpecificClaimsData,claimFloaterupload } = require('./Floaterclaimdump')
 const { getClaimSelfAnalysis, downloadClaimSelfAnalysis, uploadClaimSelfAnalysis , claimSelfAnalysisUpload } = require('./ClaimAnalysis')
 const { getClaimFloaterAnalysis, downloadClaimFloaterAnalysis, uploadClaimFloaterAnalysis , claimFloaterAnalysisUpload } = require('./FloaterClaimAnalysis');
-const { getAdditionDataFile, downloadAdditionDataFile, uploadAdditionDataFile, updateAdditionDataRow, AddSelfAddition , Additionupload } = require('./Addition');
+const { getAdditionDataFile, downloadAdditionDataFile, uploadAdditionDataFile, updateAdditionDataRow, AddSelfAddition,getNotifications , Additionupload } = require('./Addition');
 const { getDeletionDataFile, downloadDeletionDataFile, uploadDeletionDataFile, updateDeletionDataRow, AddSelfDeletion , Deletionupload } = require('./Deletition');
 
 const { getCDfile, downloadCDfile, uploadCDfile , CDfileUpload } = require('./CDStatement');
@@ -41,6 +52,7 @@ const pdfRouter = require('./pdfHandler');
 require('dotenv').config();
 
 const connectDB = require('./config');
+// const {BulkRequest} = require('./models/BulkRequest');
 
 // app.use(fileUpload());
 
@@ -54,10 +66,13 @@ app.use('/api/files' , Account)
 app.use('/api' , accountRouters)
 app.use('/api', userRoutes)
 
-
+app.use('/api' , bulkRequest);
+app.use('/api' , notification);
+app.use('/api', employeeRequest);
 // Otp Routes
 
 app.use('/api/auth' , authRoutes);
+// app.use('/api' , BulkRequest);
 
 
 app.get('/process-excel', (req, res) => {
@@ -128,6 +143,7 @@ app.post('/api/account/:accountId/upload-livefloater-parent-file', floaterUpload
 app.put('/api/account/:accountId/update-livefloater-parent-row', updateFloaterLive);
 app.post('/api/account/:accountId/add-livefloater-parent-row' , AddFloaterLive);
 app.get('/api/pdf/countBenefStatus/:id' , countBenefStatus);
+app.get('/api/account/:id/getSpecificSelfFloaterFile' , getSpecificSelfFloaterFile);
 
 
 
@@ -167,6 +183,7 @@ app.post('/api/account/:accountId/upload-claim-file', claimupload.single('file')
 // Update a row in the claims data file
 app.put('/api/account/:accountId/update-claim-row', updateClaimsDataRow);
 app.post('/api/account/:accountId/add-claim-self-row' , AddSelfClaim);
+app.get('/api/claims-Self-specific/:id', getSpecificSelfClaimsData);
 
 
 //FloaterClaimDump
@@ -183,6 +200,7 @@ app.post('/api/account/:accountId/upload-floaterclaim-file', claimFloaterupload.
 // Update a row in the claims data file
 app.put('/api/account/:accountId/update-floaterclaim-row', updateClaimsfloaterRow);
 app.post('/api/account/:accountId/add-claim-floater-row' , AddfloaterClaim);
+app.get('/api/claims-floater-specific/:id', getSpecificClaimsData);
 
 
 
@@ -194,11 +212,13 @@ app.post('/api/account/:accountId/add-claim-floater-row' , AddfloaterClaim);
 // app.post('/api/claimdumpupload-file',claimdump.single('file'), claimdumpupload);
 
 
-app.get('/api/rackexcel', rackdatahandler);
-app.put('/api/rackupdate/:rowIndex', updaterack);
-// app.delete('/api/floatdelete-row/:rowIndex', floatdeleteRowHandler);
-app.get('/api/rackdownload-file', rackdownload);
-app.post('/api/rackupload-file',rack.single('file'), rackupload);
+app.get('/api/account/:id/rackrates-file', getrackRatesFile);
+app.get('/api/account/:accountId/download-rackrates-file', downloadrackRatesFile);
+app.post('/api/account/:accountId/upload-rackratesfile', rackRatesUpload.single('file'), uploadrackRatesFile);
+// app.put('/api/account/:accountId/update-rackrates-row', updaterackRatesFile);
+// app.post('/api/account/:accountId/add-rackrates-row' , AddrackRatesFile);
+// app.get('/api/pdf/countBenefStatus/:id' , countBenefStatus);
+
 
 
 // try this
@@ -210,6 +230,7 @@ app.get('/api/account/:accountId/download-Addition', downloadAdditionDataFile);
 app.post('/api/account/:accountId/upload-Addition', Additionupload.single('file'), uploadAdditionDataFile);
 app.put('/api/account/:accountId/update-Addition', updateAdditionDataRow);
 app.post('/api/account/:accountId/add-Addition' , AddSelfAddition);
+app.get('/api/fileNotification' , getNotifications);
 
 
 //Endorsement Deletion Data
@@ -219,6 +240,167 @@ app.get('/api/account/:accountId/download-Deletion', downloadDeletionDataFile);
 app.post('/api/account/:accountId/upload-Deletion', Deletionupload.single('file'), uploadDeletionDataFile);
 app.put('/api/account/:accountId/update-Deletion', updateDeletionDataRow);
 app.post('/api/account/:accountId/add-Deletion' , AddSelfDeletion);
+
+
+
+//
+
+const formatExcelDate = (serialDate) => {
+  const startDate = new Date(1899, 11, 30); // Excel's base date is December 30, 1899
+  const days = Math.floor(serialDate);
+  const date = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
+  return date.toISOString().split('T')[0]; // Return date in YYYY-MM-DD format
+};
+
+const searchFile = async (filePath, mobileNumber) => {
+  try {
+      const workbook = xlsx.readFile(filePath);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+
+      const headers = worksheet[0];
+      const dataRows = worksheet.slice(1);
+
+      let mobileIndex = headers.indexOf('Mobile No');
+      if (mobileIndex === -1) {
+          mobileIndex = headers.indexOf('benef_mobile no');
+          if (mobileIndex === -1) {
+              return { error: '"Mobile No" or "benef_mobile no" column not found' };
+          }
+      }
+
+      const matchedRows = dataRows.filter(row => row[mobileIndex] == mobileNumber);
+      if (matchedRows.length === 0) {
+          return null;
+      }
+
+      return {
+          filename: path.basename(filePath),
+          data: matchedRows.map(row => {
+              const rowData = {};
+              headers.forEach((header, index) => {
+                  let value = row[index];
+
+                  if (header.toLowerCase().includes('dob') || 
+                      header.toLowerCase().includes('polstartdate') || 
+                      header.toLowerCase().includes('polenddate')) {
+                      if (typeof value === 'number') {
+                          value = formatExcelDate(value);
+                      }
+                  }
+
+                  rowData[header] = value;
+              });
+              return rowData;
+          })
+      };
+  } catch (error) {
+      console.error('Error reading file:', error);
+      return { error: 'Failed to read the Excel file' };
+  }
+};
+
+app.post('/api/employee/login', async (req, res) => {
+  try {
+      const { mobileNumber } = req.body;
+      if (!mobileNumber) {
+          return res.status(400).json({ error: 'Mobile number is required' });
+      }
+
+      // Fetch all accounts
+      const accounts = await Accounts.find();
+
+      for (const account of accounts) {
+          const { _id,  liveDataSelfFile ,liveDataFloaterFile} = account;
+
+          // Search the liveDataFloaterFile if available
+          if (liveDataFloaterFile) {
+              const liveDataFloaterFilePath = path.join(__dirname, 'NewAccounts', liveDataFloaterFile);
+              let result = await searchFile(liveDataFloaterFilePath, mobileNumber);
+
+              if (result) {
+                  return res.json({
+                      message: 'Employee data found',
+                      accountId: _id,
+                      // filename: result.filename,
+                      // data: result.data
+                  });
+              }
+          }
+
+          // Search the liveDataSelfFile if available
+          if (liveDataSelfFile) {
+              const liveDataSelfFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
+              let result = await searchFile(liveDataSelfFilePath, mobileNumber);
+
+              if (result) {
+                  return res.json({
+                      message: 'Employee data found',
+                      accountId: _id,
+                      // filename: result.filename,
+                      // data: result.data
+                  });
+              }
+          }
+      }
+
+      res.status(404).json({ error: 'No data found for the given mobile number' });
+  } catch (error) {
+      console.error('Error processing request:', error);
+      res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+//
+
+
+
+app.get('/api/check-null-fields/:accountId', async (req, res) => {
+  const { accountId } = req.params;
+
+  try {
+    // Find the account by ID
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    // Fields to check for null values
+    const fieldsToCheck = [
+      'cdStatementFile',
+      'claimSelfAnalysisFile',
+      'claimFloaterAnalysisFile',
+      'claimDumpSelfFile',
+      'claimDumpFloaterFile',
+      'liveDataSelfFile',
+      'liveDataFloaterFile',
+      'claimABFile',
+      'rackRatesFile',
+      'checkListFile',
+      'exclusionListFile',
+      'additionDataFile',
+      'deletionDataFile',
+      'policyCoverageSelfFile',
+      'policyCoverageFloaterFile',
+    ];
+
+    // Find null fields
+    const nullFields = fieldsToCheck.filter(field => account[field] === null);
+
+    if (nullFields.length > 0) {
+      console.log('Null fields:', nullFields);
+    } else {
+      console.log('No null fields found.');
+    }
+
+    // Send the null fields in the response
+    res.status(200).json({ nullFields });
+  } catch (error) {
+    console.error('Error checking null fields:', error);
+    res.status(500).json({ error: 'Error checking null fields' });
+  }
+});
 
 
 
@@ -260,6 +442,224 @@ app.get('/api/account/:id/live-data-file', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+  app.get('/api/account/:id/live-data-specificedata', async (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const account = await Accounts.findById(accountId);
+  
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+  
+      const { accountName, liveDataSelfFile } = account;
+      if (!accountName || !liveDataSelfFile) {
+        return res.status(400).json({ error: 'Invalid account data' });
+      }
+  
+      const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
+  
+      // Read Excel file and filter specific headers
+      readxlsxFile(liveDataFilePath)
+        .then((rows) => {
+          const headers = rows[0];
+          const requiredHeaders = ['Active live', 'Total Preimium', 'Name of TPA', 'CD Balance'];
+          
+          // Get the indices of the required headers
+          const indices = headers.reduce((acc, header, index) => {
+            if (requiredHeaders.includes(header)) {
+              acc.push(index);
+            }
+            return acc;
+          }, []);
+          
+          // If none of the required headers are found, return an error
+          if (indices.length === 0) {
+            return res.status(400).json({ error: 'Required headers not found in the Excel file' });
+          }
+  
+          // Filter the rows to include only the required columns
+          const filteredData = rows.slice(1).map((row) => {
+            let rowData = {};
+            indices.forEach((index) => {
+              rowData[headers[index]] = row[index];
+            });
+            return rowData;
+          });
+  
+          // Send the filtered data and headers
+          const filteredHeaders = indices.map(index => headers[index]);
+          res.json({ headers: filteredHeaders, data: filteredData });
+        })
+        .catch((error) => {
+          console.error('Error reading Excel file:', error);
+          res.status(500).json({ error: 'Failed to read Excel file' });
+        });
+    } catch (error) {
+      console.error('Error fetching account:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
+  app.get('/api/account/:id/pribenef-data-file', async (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const account = await Accounts.findById(accountId);
+  
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+  
+      const { accountName, liveDataFloaterFile } = account;
+      if (!accountName || !liveDataFloaterFile) {
+        return res.status(400).json({ error: 'Invalid account data' });
+      }
+  
+      const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataFloaterFile);
+  
+      // Read Excel file and send the data
+      readxlsxFile(liveDataFilePath).then((rows) => {
+        const headers = rows[0];
+        const pribenefIndex = headers.indexOf('pribenef_name');
+  
+        if (pribenefIndex === -1) {
+          return res.status(400).json({ error: 'Column "pribenef_name" not found in the Excel file' });
+        }
+  
+        const pribenefData = rows.slice(1).map(row => row[pribenefIndex]);
+  
+        res.json({ pribenef_name: pribenefData });
+      }).catch(error => {
+        console.error('Error reading Excel file:', error);
+        res.status(500).json({ error: 'Failed to read Excel file' });
+      });
+    } catch (error) {
+      console.error('Error fetching account:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+
+  
+  
+  app.get('/api/account/:id/live-data-by-mobile/:mobile', async (req, res) => {
+    try {
+      const accountId = req.params.id;
+      const mobileNumber = req.params.mobile;
+  
+      // Find the account by ID
+      const account = await Accounts.findById(accountId);
+  
+      if (!account) {
+        return res.status(404).json({ error: 'Account not found' });
+      }
+  
+      const { accountName, liveDataFloaterFile, liveDataSelfFile } = account;
+      if (!accountName || (!liveDataFloaterFile && !liveDataSelfFile)) {
+        return res.status(400).json({ error: 'Invalid account data' });
+      }
+  
+      // Helper function to read and search a file
+      const searchFile = async (filePath) => {
+        try {
+          // Read the Excel file
+          const workbook = xlsx.readFile(filePath);
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
+  
+          // Extract headers and data rows
+          const headers = worksheet[0];
+          const dataRows = worksheet.slice(1);
+  
+          // Try to find the index of "Mobile No" column
+          let mobileIndex = headers.indexOf('Mobile No');
+  
+          // If "Mobile No" column not found, check for alternative column names
+          if (mobileIndex === -1) {
+            mobileIndex = headers.indexOf('benef_mobile no');
+            if (mobileIndex === -1) {
+              return { error: '"Mobile No" or "benef_mobile" column not found' };
+            }
+          }
+  
+          // Filter rows that match the specific mobile number
+          const matchedRows = dataRows.filter(row => row[mobileIndex] == mobileNumber);
+          if (matchedRows.length === 0) {
+            return null;
+          }
+  
+          // Format rows for response
+          const formattedRows = matchedRows.map(row => {
+            const rowData = {};
+            headers.forEach((header, index) => {
+              let value = row[index];
+  
+              // Convert date values if necessary
+              if (header.toLowerCase().includes('dob') && typeof value === 'number') {
+                value = formatExcelDate(value);
+              } else if (header.toLowerCase() === 'polstartdate' && typeof value === 'number') {
+                value = formatExcelDate(value);
+              } else if (header.toLowerCase() === 'polenddate' && typeof value === 'number') {
+                value = formatExcelDate(value);
+              }
+  
+              rowData[header] = value;
+            });
+            return rowData;
+          });
+  
+          return formattedRows;
+        } catch (error) {
+          console.error('Error reading file:', error);
+          return { error: 'Error reading file' };
+        }
+      };
+  
+      // Check the liveDataFloaterFile first
+      if (liveDataFloaterFile) {
+        const liveDataFloaterFilePath = path.join(__dirname, 'NewAccounts', liveDataFloaterFile);
+        let result = await searchFile(liveDataFloaterFilePath);
+  
+        // If no data found in liveDataFloaterFile, check liveDataSelfFile
+        if (!result) {
+          if (liveDataSelfFile) {
+            const liveDataSelfFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
+            result = await searchFile(liveDataSelfFilePath);
+          }
+        }
+  
+        // Return the result if found
+        if (result && result.error) {
+          return res.status(400).json({ error: result.error });
+        } else if (result && result.length === 0) {
+          return res.status(404).json({ error: 'No data found for the given mobile number' });
+        }
+  
+        return res.json(result);
+      } else if (liveDataSelfFile) {
+        // If liveDataFloaterFile is null, directly check liveDataSelfFile
+        const liveDataSelfFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
+        const result = await searchFile(liveDataSelfFilePath);
+  
+        // Return the result if found
+        if (result && result.error) {
+          return res.status(400).json({ error: result.error });
+        } else if (result && result.length === 0) {
+          return res.status(404).json({ error: 'No data found for the given mobile number' });
+        }
+  
+        return res.json(result);
+      } else {
+        return res.status(400).json({ error: 'No valid data file available' });
+      }
+    } catch (error) {
+      console.error('Error fetching account:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+  
+
 
   const sanitizePath = (filePath) => path.resolve(__dirname, 'NewAccounts', filePath);
 

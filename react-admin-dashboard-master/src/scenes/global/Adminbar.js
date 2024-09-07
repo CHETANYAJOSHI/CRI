@@ -1,6 +1,8 @@
 import { useState , useEffect } from "react";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
+
+import NotificationsIcon from "@mui/icons-material/Notifications";
 import {
   ProSidebar,
   Menu,
@@ -12,6 +14,7 @@ import {
   IconButton,
   Typography,
   useTheme,
+  Badge,
   Button
 } from "@mui/material";
 import { Link } from "react-router-dom";
@@ -113,14 +116,42 @@ const Adminbar = () => {
   const colors = tokens(theme.palette.mode);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
+  const [notifications, setNotifications] = useState(0);
   const [selectedAccount, setSelectedAccount] = useState(() => {
     // Retrieve from localStorage if available
     return localStorage.getItem('selectedAccount') || ''});
+
+    const [hrNumber, sethrNumber] = useState(() => {
+      // Retrieve from localStorage if available
+      return localStorage.getItem('mobileNumber') || ''});
+
     const [accounts, setAccounts] = useState([]);
+    const [nullFields, setNullFields] = useState([]);
 
 const Nav = ()=>{
   Navigate("/createaccount")
 }
+
+
+useEffect(() => {
+  const fetchNullFields = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/check-null-fields/${selectedAccount}`);
+      const data = await response.json();
+
+      if (response.ok) {
+        setNullFields(data.nullFields);
+      } else {
+        console.error('Error fetching null fields:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching null fields:', error);
+    }
+  };
+
+  fetchNullFields();
+}, [selectedAccount]);
+
 
 
 
@@ -147,15 +178,36 @@ useEffect(() => {
 const handleSelectChange = (e) => {
   const accountId = e.target.value;
   setSelectedAccount(accountId);
- 
+  console.log(accountId);
+
+  const selectedAcc = accounts.find(acc => acc._id === accountId);
+  if (selectedAcc && selectedAcc.hrNumber) {
+    const hrNum = selectedAcc.hrNumber;
+    sethrNumber(hrNum);
+    localStorage.setItem('mobileNumber', hrNum); // Persist HR number
+  } else {
+    sethrNumber('');
+    localStorage.removeItem('mobileNumber'); // Remove if not found
+  }
+
+
   Navigate("/dashboard")
 };
+
+
 const Logout=()=>{
   
   const confirmed = window.confirm("Are you sure you want to logout?");
   if (confirmed) {
     // Clear the user's token or session data
-    localStorage.clear(); // or your method of storing tokens
+    localStorage.removeItem('role');
+    localStorage.removeItem('token'); // or your method of storing tokens
+    localStorage.removeItem('hrName'); 
+    localStorage.removeItem('accountName');
+    localStorage.removeItem('hrId'); 
+    localStorage.removeItem('authToken'); 
+    localStorage.removeItem('selectedAccount');  // or your method of storing tokens
+    localStorage.removeItem('mobileNumber');
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout
@@ -226,8 +278,17 @@ const Logout=()=>{
                 />
               </Box>
 
-              <button className="btn btn-danger mt-3" style={{textAlign:'center' ,margin:'auto' , display:'flex'}} onClick={Logout}>Logout</button>
+            <div style={{display:'flex' , justifyContent:'center'}}>
+              <button className="btn btn-danger mt-3" style={{textAlign:'center'  , display:'flex'}} onClick={Logout}>Logout</button>
+              <Box sx={{ marginTop: 2 }} onClick={()=>(Navigate('/notification'))}>
+              <IconButton color="inherit" >
+              <Badge badgeContent={notifications} color="error" >
+                <NotificationsIcon style={{fontSize:'23px'}}/>
+              </Badge>
+            </IconButton>
+      </Box>
 
+      </div>
               <Box textAlign="center">
                 <Typography
                   variant="h2"
@@ -241,8 +302,8 @@ const Logout=()=>{
                 </Typography>
               </Box>
               <Button style={{backgroundColor:'green' , color:'White', fontWeight:'600' , marginLeft:'45px'}} className="mt-3" onClick={Nav}>Create Account</Button>
-              <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">
-        
+          
+          <DropdownWrapper style={{ width: '70%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' , marginLeft:'45px' , background:'' }} className="mt-3">  
         <Select
           id="account-select"
           value={selectedAccount}
@@ -256,10 +317,6 @@ const Logout=()=>{
           ))}
         </Select>
       </DropdownWrapper>
-
-
-
-
             </Box>
 
           )}
@@ -308,33 +365,27 @@ const Logout=()=>{
               icon={<InsertPageBreakIcon />}
             >
 
-              <SubMenu
-                title="Live Data"
-                to={`/enrollment/live`}
-                icon={<ImportContactsIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              >
               
-              <Item
-                title="Self With Parents"
+              
+              {!nullFields.includes('liveDataSelfFile') && <Item
+                title="Live Data"
                 to={`/enrollment/SelfLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              />}
 
-              <Item
-                title="Floater With Parents"
+{!nullFields.includes('liveDataFloaterFile') && <Item
+                title="Live Data"
                 to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              />}
 
-              </SubMenu>
+             
               
-              <SubMenu
+              {/* <SubMenu
                 title="Deleted Data"
                 to="/enrollment/deleted"
                 icon={<DeleteForeverIcon />}
@@ -355,23 +406,17 @@ const Logout=()=>{
                 setSelected={setSelected}
                 />
 
-                </SubMenu>
+                </SubMenu> */}
               
-              <Item
-                title="Calculated Premium"
-                to="/enrollment/premium"
-                icon={<AttachMoneyIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
               
-              <Item
+              
+              {/* <Item
                 title="E-Card"
                 to="/profile"
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              /> */}
             </SubMenu>
 
             <SubMenu
@@ -406,9 +451,19 @@ const Logout=()=>{
                 setSelected={setSelected}
               />
 
+
+<Item
+                title="Calculated Premium"
+                to="/enrollment/premium"
+                icon={<AttachMoneyIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />  
+
+
               <Item
                 title="Rack-Rates"
-                to="/enrollement/rack-rates"
+                to={`/endorsement/rack-rates?accountId=${selectedAccount}`}
                 icon={<RateReviewIcon />}
                 selected={selected}
                 setSelected={setSelected}
@@ -418,51 +473,43 @@ const Logout=()=>{
 
            
 
-            <SubMenu
-              title="Claim Dump"
-              icon={<MiscellaneousServicesIcon />}
-            >
+            
 
-              <Item
-                title="Self With Parents"
+{!nullFields.includes('claimDumpSelfFile') && <Item
+                title="Claim Dump"
                 to={`/claim/Selfclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              />}
 
-              <Item
-                title="Floater With Parents"
+{!nullFields.includes('claimDumpFloaterFile') && <Item
+                title="Claim Dump"
                 to={`/claim/Floaterclaimdumb?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              /> }
 
-            </SubMenu>
+          
+            
 
-            <SubMenu
-              title="Claim Analysis"
-              icon={<MiscellaneousServicesIcon />}
-            >
-
-            <Item
-                title="Self With Parents"
+{!nullFields.includes('claimSelfAnalysisFile') && <Item
+                title="Claim Analysis"
                 to={`/claim/Selfclaimanalysis?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-            />
+            />}
 
-            <Item
-                title="Floater With Parents"
+{!nullFields.includes('claimFloaterAnalysisFile') && <Item
+                title="Claim Analysis"
                 to={`/claim/Floaterclaimanalysis?accountId=${selectedAccount}`}
                 icon={<CreditCardIcon />}
                 selected={selected}
                 setSelected={setSelected}
-            />
-
-            </SubMenu>
+            />}
+          
 
             
 
@@ -474,13 +521,13 @@ const Logout=()=>{
               setSelected={setSelected}
             />  */}
 
-            <Item
+            {/* <Item
               title="Wellness"
               to="/wellness"
               icon={<SpaIcon />}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
 
             {/* <Typography
               variant="h6"

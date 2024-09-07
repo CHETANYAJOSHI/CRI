@@ -7,8 +7,7 @@ const OtpSchema = new mongoose.Schema({
         unique:true
     },
     otp:{
-        type:String,
-        
+        type:String,   
     },
     otpExpireAt:{
         type:Date,

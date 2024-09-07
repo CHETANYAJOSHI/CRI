@@ -44,6 +44,66 @@ const getFloaterLive = async (req, res) => {
   }
 };
 
+const getSpecificSelfFloaterFile = async(req,res)=>{
+  try {
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { accountName, liveDataFloaterFile } = account;
+    if (!accountName || !liveDataFloaterFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataFloaterFile);
+
+    // Read Excel file and filter specific headers
+    readxlsxFile(liveDataFilePath)
+      .then((rows) => {
+        const headers = rows[0];
+        const requiredHeaders = ['Active live', 'Total Preimium', 'Name of TPA', 'CD Balance'];
+        
+        // Get the indices of the required headers
+        const indices = headers.reduce((acc, header, index) => {
+          if (requiredHeaders.includes(header)) {
+            acc.push(index);
+          }
+          return acc;
+        }, []);
+        
+        // If none of the required headers are found, return an error
+        if (indices.length === 0) {
+          return res.status(400).json({ error: 'Required headers not found in the Excel file' });
+        }
+
+        // Filter the rows to include only the required columns
+        const filteredData = rows.slice(1).map((row) => {
+          let rowData = {};
+          indices.forEach((index) => {
+            rowData[headers[index]] = row[index];
+          });
+          return rowData;
+        });
+
+        // Send the filtered data and headers
+        const filteredHeaders = indices.map(index => headers[index]);
+        res.json({ headers: filteredHeaders, data: filteredData });
+      })
+      .catch((error) => {
+        console.error('Error reading Excel file:', error);
+        res.status(500).json({ error: 'Failed to read Excel file' });
+      });
+  } catch (error) {
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+
+
 // Function to download floater-parent data file
 const downloadFloaterLive = async (req, res) => {
   const accountId = req.params.accountId;
@@ -296,6 +356,7 @@ module.exports = {
     uploadFloaterLive,
     updateFloaterLive,
     AddFloaterLive,
-  floaterUploadLive,
-  countBenefStatus,
+    getSpecificSelfFloaterFile,
+    floaterUploadLive,
+    countBenefStatus,
 };

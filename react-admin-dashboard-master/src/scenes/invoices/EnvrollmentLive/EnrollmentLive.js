@@ -67,6 +67,9 @@ const Invoices = () => {
   const [editData, setEditData] = useState({});
   const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
   const [newUserData, setNewUserData] = useState({});
+  const [totalPremium , setTotalPremium] = useState(0);
+  const [activeLive , setactiveLive] = useState(0);
+  const [cdBalance , setCDBalance] = useState(0);
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -77,8 +80,28 @@ const Invoices = () => {
     if (accountId) {
       setSelectedAccount(accountId);
       fetchLiveDataFile(accountId);
+      fetchData(accountId);
     }
   }, [searchParams]);
+
+
+
+    // Fetch live data file when component mounts
+    const fetchData = async (accountId) => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/account/${accountId}/live-data-specificedata`);
+        
+        setactiveLive(response.data.data[0]['Active live']);
+        setTotalPremium(response.data.data[0]['Total Preimium']);
+        setCDBalance(response.data.data[0]['CD Balance'])
+        setLoading(false);
+      } catch (err) {
+        console.log('Failed to fetch data');
+        setLoading(false);
+      }
+    };
+
+ 
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -256,7 +279,7 @@ const Invoices = () => {
   });
 
     const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-
+    const role = localStorage.getItem('role');
 
   return (
 
@@ -282,17 +305,17 @@ const Invoices = () => {
 
           <div className="totalPremium">
             <p>Total Premium</p>
-            <p>Rs. 150000</p>
+            <p>Rs. {totalPremium}</p>
           </div>
 
           <div className="totalPremium">
             <p>Total Life</p>
-            <p>50000</p>
+            <p>{activeLive}</p>
           </div>
 
           <div className="totalPremium">
             <p>CD Balance</p>
-            <p>50000</p>
+            <p>{cdBalance}</p>
           </div>
 
      
@@ -333,6 +356,9 @@ const Invoices = () => {
           style={{ display: 'none' }}
           id="file-input"
         />
+
+
+{role !== 'HR' && ( 
         <Button
           variant="contained"
           color="secondary"
@@ -342,6 +368,10 @@ const Invoices = () => {
         >
           Upload
         </Button>
+)}
+
+
+    {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -351,6 +381,7 @@ const Invoices = () => {
         >
           Submit File
         </Button>
+         )}
         {/* <Button
           variant="contained"
           color="primary"
@@ -365,7 +396,7 @@ const Invoices = () => {
           value={searchQuery}
           onChange={handleSearchChange}
           variant="outlined"
-          style={{ marginLeft: '10px'}}
+          style={{ marginLeft: '10px' }}
         />
       </Box>
 

@@ -37,7 +37,15 @@ import FolaterPolicy from "./scenes/contacts/FolaterPolicy";
 import Addition from "./scenes/Endorsement/Addition";
 import Deletion from "./scenes/Endorsement/Deletion";
 import PrivateRoute from "./components/PrivateRoute";
-
+import SelfFloaterCreate from "./components/CreateAccount/SelfFloaterCreate";
+import { AuthProvider } from "./components/AuthContext";
+import Profile from "./scenes/team/Profile";
+import RequestECard from "./components/RequestECard/RequestECard";
+import BulkRequest from "./components/RequestECard/BulkRequest";
+import EmployeeRequest from "./components/RequestECard/EmployeeRequest";
+import NotificationPage from "./components/Notification/NotificationPage";
+import DefaultAccount from "./components/CreateAccount/DefaultAccount";
+import Request from "./components/Notification/Request";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -54,15 +62,31 @@ function App() {
           {!noSidebarPaths.includes(location.pathname) && <Sidebar isSidebar={isSidebar} />}
           <main className="content">
             {!noSidebarPaths.includes(location.pathname) && <Topbar setIsSidebar={setIsSidebar} />}
+            <AuthProvider>
             <Routes>
-            <Route
+            {/* <Route
+                path="/SelfFloaterCreate"
+                element={
+                  <PrivateRoute>
+                    <SelfFloaterCreate />
+                  </PrivateRoute>
+                }/> */}
+
+              {/* <Route
                 path="/createaccount"
                 element={
                   <PrivateRoute>
                     <CreateAccount />
                   </PrivateRoute>
-                }/>
-              
+                }/> */}
+               
+                <Route path="/CreateAccount" element={<PrivateRoute>
+                    <DefaultAccount />
+                  </PrivateRoute>} />
+              <Route path="/notification" element={<Request />} />
+              <Route path="/bulkRequest" element={<BulkRequest />} />
+              <Route path="/EmployeeRequest" element={<EmployeeRequest />} />
+              <Route path="/reqestECard" element={<RequestECard />} />
               <Route path="/selectAccount" element={<SelectAccount />} />
               <Route path="/policycoverage/selfPolicy" element={<SelfPolicy />} />
               <Route path="/policycoverage/floaterPolicy" element={<FolaterPolicy />} />
@@ -74,7 +98,7 @@ function App() {
               <Route path="/downloads" element={<Downloads/>} />
               <Route path="/enrollment/SelfLive" element={<EnrollmentLive />} />
               <Route path="/enrollment/FloaterLive" element={<FloaterLive />} />
-              <Route path="/enrollement/rack-rates" element={<RackRates />} />
+              <Route path="/endorsement/rack-rates" element={<RackRates />} />
               <Route path="/enrollment/premium" element={<Premium />} />
               <Route path="/enrollment/endorsement" element={<Endorsement />} />
               <Route path="/enrollment/deleted/self" element={<DeletedData />} />
@@ -88,7 +112,7 @@ function App() {
                     <Dashboard />
                   </PrivateRoute>
                 }/>
-              <Route path="/profile" element={<Team />} />
+              <Route path="/profile" element={<Profile />} />
               <Route path="/policycoverage" element={<Contacts />} />
               <Route path="/enrollment" element={<Invoices />} />
               <Route path="/form" element={<Form />} />
@@ -99,6 +123,7 @@ function App() {
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/geography" element={<Geography />} />
             </Routes>
+            </AuthProvider>
           </main>
         </div>
       </ThemeProvider>
