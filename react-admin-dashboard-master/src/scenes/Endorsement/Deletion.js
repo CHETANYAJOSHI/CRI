@@ -154,7 +154,6 @@ const Deletion = () => {
       alert('Please select an account first.');
       return;
     }
-
     try {
       const response = await axios.get(`http://localhost:5000/api/account/${selectedAccount}/download-Deletion`, {
         responseType: 'blob',
@@ -179,10 +178,8 @@ const Deletion = () => {
       alert('Please select a file and an account first.');
       return;
     }
-
     const formData = new FormData();
     formData.append('file', file);
-
     try {
       await axios.post(`http://localhost:5000/api/account/${selectedAccount}/upload-Deletion`, formData, {
         headers: {

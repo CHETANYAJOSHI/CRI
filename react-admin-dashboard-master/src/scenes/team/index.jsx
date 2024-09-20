@@ -79,21 +79,36 @@ const Team = () => {
   };
 
   const downloadECard = () => {
-    const input = document.getElementById('employee-profile');
+    const employeeId = localStorage.getItem('employeeId'); // Assuming employeeId is stored in localStorage
 
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
+    if (!employeeId) {
+      console.error('Employee ID not found in localStorage');
+      return;
+    }
+
+    // Fetch the PDF using the employee ID
+    fetch(`http://localhost:5000/api/download-e-card/${employeeId}`, {
+      method: 'GET',
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to download e-card');
+        }
+        return response.blob(); // Convert the response to a Blob object (binary data)
+      })
+      .then((blob) => {
+        // Create a URL for the blob object
+        const url = window.URL.createObjectURL(new Blob([blob]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `e_card_${employeeId}.pdf`); // Set the file name for the download
+        document.body.appendChild(link);
+        link.click(); // Simulate a click to download the file
+        link.parentNode.removeChild(link); // Clean up the link element
+      })
+      .catch((error) => {
+        console.error('Error downloading e-card:', error);
       });
-
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save("e-card.pdf");
-    }).catch((err) => {
-      console.error("Error generating PDF: ", err);
-    });
   };
 
   const getMobileNumber = (data) => {
@@ -116,6 +131,12 @@ const Team = () => {
   const spouseData = getRowDataByRelation('Spouse');
   const sonData = getRowDataByRelation('Son');
   const daughterData = getRowDataByRelation('Daughter');
+
+  useEffect(() => {
+    if (selfData.pribenef_employee_code) {
+      localStorage.setItem('employeeId', selfData.pribenef_employee_code);
+    }
+  }, [selfData.pribenef_employee_code]);
 
   return (
     <>
@@ -149,7 +170,7 @@ const Team = () => {
 
       <div className="E_Card" style={{ float: 'right', marginRight: "50px" }}>
         <button className="btn btn-danger"
-        //  onClick={downloadECard}
+         onClick={downloadECard}
          >
           Download E-Card
           </button>

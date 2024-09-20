@@ -34,7 +34,9 @@ router.get('/notifications', async (req, res) => {
         description: request.description,
         status: request.status,
         account:request.account,
-        createdAt: request.createdAt
+        createdAt: request.createAt,
+        isRead: request.isRead || false,
+        _id:request._id
       };
     });
 
@@ -45,25 +47,51 @@ router.get('/notifications', async (req, res) => {
 });
 
 
-router.put('/updatenotifications', async (req, res) => {
+router.put('/updatenotifications/:id', async (req, res) => {
   try {
-    const { account, status } = req.body;
+    const { id } = req.params; // Get _id from URL parameter
+    const { status } = req.body; // Get status from request body
 
-    // Find the notification by the account name
-    const notification = await BulkRequest.findOne({ account });
+    // Find the notification by _id
+    const notification = await BulkRequest.findById(id);
 
     if (!notification) {
       return res.status(404).json({ error: 'Notification not found' });
     }
 
-    // Update the status
+    // Update the status field
     notification.status = status;
     await notification.save();
 
-    res.status(200).json({ message: 'Status updated successfully' });
+    res.status(200).json({ message: 'Status updated successfully'});
   } catch (error) {
     console.error('Error updating notification status:', error);
-    res.status(500).json({ error: 'Failed to update status' });
+    res.status(500).json({ error: 'Failed to update status'});
+  }
+});
+
+
+router.put('/notifications/markAsRead/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the notification by _id
+    const notification = await BulkRequest.findById(id);
+    
+
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+
+    // Mark the notification as read
+    notification.isRead = true;
+    
+    await notification.save();
+
+    res.status(200).json({ message: 'Notification marked as read successfully' });
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ error: 'Failed to mark notification as read' });
   }
 });
 

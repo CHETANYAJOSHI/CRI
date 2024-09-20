@@ -35,11 +35,11 @@ const { getSelfParentDataFile, downloadSelfParentDataFile, uploadSelfParentDataF
 const { getFloaterParentDataFile,   downloadFloaterParentDataFile,   uploadFloaterParentDataFile,   updateFloaterParentDataRow, AddFloaterParentUser,   floaterUpload } = require('./floaterDeleted');
 const { getClaimsDataFile, downloadClaimsDataFile, uploadClaimsDataFile, updateClaimsDataRow,AddSelfClaim,getSpecificSelfClaimsData, claimupload } = require('./claimdump');
 const { getrackRatesFile,downloadrackRatesFile,uploadrackRatesFile,rackRatesUpload}= require("./rackrates");
-const { getFloaterLive, downloadFloaterLive, uploadFloaterLive, updateFloaterLive, AddFloaterLive , floaterUploadLive , countBenefStatus , getSpecificSelfFloaterFile} = require('./Livefloater');
+const { getFloaterLive, downloadFloaterLive, uploadFloaterLive, updateFloaterLive, AddFloaterLive , getInactiveFloaterLive , floaterUploadLive , countBenefStatus , getSpecificSelfFloaterFile} = require('./Livefloater');
 const { getClaimsfloaterFile, downloadClaimsfloaterFile, uploadClaimsfloaterFile, updateClaimsfloaterRow, AddfloaterClaim,getSpecificClaimsData,claimFloaterupload } = require('./Floaterclaimdump')
 const { getClaimSelfAnalysis, downloadClaimSelfAnalysis, uploadClaimSelfAnalysis , claimSelfAnalysisUpload } = require('./ClaimAnalysis')
 const { getClaimFloaterAnalysis, downloadClaimFloaterAnalysis, uploadClaimFloaterAnalysis , claimFloaterAnalysisUpload } = require('./FloaterClaimAnalysis');
-const { getAdditionDataFile, downloadAdditionDataFile, uploadAdditionDataFile, updateAdditionDataRow, AddSelfAddition,getNotifications , Additionupload } = require('./Addition');
+const { getAdditionDataFile, downloadAdditionDataFile, uploadAdditionDataFile, updateAdditionDataRow, AddSelfAddition,getNotifications,updateNotification , Additionupload } = require('./Addition');
 const { getDeletionDataFile, downloadDeletionDataFile, uploadDeletionDataFile, updateDeletionDataRow, AddSelfDeletion , Deletionupload } = require('./Deletition');
 
 const { getCDfile, downloadCDfile, uploadCDfile , CDfileUpload } = require('./CDStatement');
@@ -144,6 +144,7 @@ app.put('/api/account/:accountId/update-livefloater-parent-row', updateFloaterLi
 app.post('/api/account/:accountId/add-livefloater-parent-row' , AddFloaterLive);
 app.get('/api/pdf/countBenefStatus/:id' , countBenefStatus);
 app.get('/api/account/:id/getSpecificSelfFloaterFile' , getSpecificSelfFloaterFile);
+app.get('/api/account/:id/getInactiveData' , getInactiveFloaterLive);
 
 
 
@@ -230,6 +231,7 @@ app.get('/api/account/:accountId/download-Addition', downloadAdditionDataFile);
 app.post('/api/account/:accountId/upload-Addition', Additionupload.single('file'), uploadAdditionDataFile);
 app.put('/api/account/:accountId/update-Addition', updateAdditionDataRow);
 app.post('/api/account/:accountId/add-Addition' , AddSelfAddition);
+app.put('/api/notifications/mmarkAsRead/:id' ,updateNotification);
 app.get('/api/fileNotification' , getNotifications);
 
 
@@ -240,6 +242,7 @@ app.get('/api/account/:accountId/download-Deletion', downloadDeletionDataFile);
 app.post('/api/account/:accountId/upload-Deletion', Deletionupload.single('file'), uploadDeletionDataFile);
 app.put('/api/account/:accountId/update-Deletion', updateDeletionDataRow);
 app.post('/api/account/:accountId/add-Deletion' , AddSelfDeletion);
+// app.get('/api/delNotification' , getDelNotifications);
 
 
 
@@ -249,8 +252,16 @@ const formatExcelDate = (serialDate) => {
   const startDate = new Date(1899, 11, 30); // Excel's base date is December 30, 1899
   const days = Math.floor(serialDate);
   const date = new Date(startDate.getTime() + days * 24 * 60 * 60 * 1000);
-  return date.toISOString().split('T')[0]; // Return date in YYYY-MM-DD format
+
+  // Extract day, month, and year
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed, so add 1
+  const year = date.getFullYear();
+
+  // Return formatted date in dd-MM-YYYY
+  return `${day}-${month}-${year}`;
 };
+
 
 const searchFile = async (filePath, mobileNumber) => {
   try {
@@ -405,43 +416,43 @@ app.get('/api/check-null-fields/:accountId', async (req, res) => {
 
 
 app.get('/api/account/:id/live-data-file', async (req, res) => {
-    try {
-      const accountId = req.params.id;
-      const account = await Accounts.findById(accountId);
-  
-      if (!account) {
-        return res.status(404).json({ error: 'Account not found' });
-      }
-  
-      const { accountName, liveDataSelfFile } = account;
-      if (!accountName || !liveDataSelfFile) {
-        return res.status(400).json({ error: 'Invalid account data' });
-      }
-  
-      const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
-      
-  
-      // Read Excel file and send the data
-      readxlsxFile(liveDataFilePath).then((rows) => {
-        const headers = rows[0];
-        const data = rows.slice(1).map(row => {
-          let rowData = {};
-          row.forEach((cell, index) => {
-            rowData[headers[index]] = cell;
-          });
-          return rowData;
-        });
-  
-        res.json({ headers, data });
-      }).catch(error => {
-        console.error('Error reading Excel file:', error);
-        res.status(500).json({ error: 'Failed to read Excel file' });
-      });
-    } catch (error) {
-      console.error('Error fetching account:', error);
-      res.status(500).json({ error: 'Internal server error' });
+  try {
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
     }
-  });
+
+    const { accountName, liveDataSelfFile } = account;
+    if (!accountName || !liveDataSelfFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const liveDataFilePath = path.join(__dirname, 'NewAccounts', liveDataSelfFile);
+    
+
+    // Read Excel file and send the data
+    readxlsxFile(liveDataFilePath).then((rows) => {
+      const headers = rows[0];
+      const data = rows.slice(1).map(row => {
+        let rowData = {};
+        row.forEach((cell, index) => {
+          rowData[headers[index]] = cell;
+        });
+        return rowData;
+      });
+
+      res.json({ headers, data });
+    }).catch(error => {
+      console.error('Error reading Excel file:', error);
+      res.status(500).json({ error: 'Failed to read Excel file' });
+    });
+  } catch (error) {
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
   app.get('/api/account/:id/live-data-specificedata', async (req, res) => {
     try {
@@ -538,6 +549,57 @@ app.get('/api/account/:id/live-data-file', async (req, res) => {
       console.error('Error fetching account:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  });
+
+
+  // Find the E-card from the folder
+  app.get('/api/download-e-card/:employeeId', (req, res) => {
+    const { employeeId } = req.params;
+  
+    // Paths to the two folders
+    const folderPaths = [
+      path.join(__dirname, 'Employee and Parents'),
+      path.join(__dirname, 'Employee, Family & Parents'),
+    ];
+  
+    let pdfFile = null;
+  
+    // Function to search for the PDF file in the given folders
+    const searchForPdf = (folders, index = 0) => {
+      if (index >= folders.length) {
+        // If no PDF found in any folder, return 404
+        return res.status(404).json({ error: 'PDF not found for the given employee.' });
+      }
+  
+      const folderPath = folders[index];
+      
+      // Read the files in the current folder
+      fs.readdir(folderPath, (err, files) => {
+        if (err) {
+          return res.status(500).json({ error: `Error reading folder: ${folderPath}` });
+        }
+  
+        // Find the PDF that starts with the employeeId
+        pdfFile = files.find(file => file.startsWith(employeeId) && file.endsWith('.pdf'));
+  
+        if (pdfFile) {
+          // If PDF is found, send the file for download
+          const filePath = path.join(folderPath, pdfFile);
+          res.download(filePath, (err) => {
+            if (err) {
+              console.error('Error sending the PDF:', err);
+              return res.status(500).json({ error: 'Error downloading the PDF.' });
+            }
+          });
+        } else {
+          // If PDF is not found in this folder, check the next one
+          searchForPdf(folders, index + 1);
+        }
+      });
+    };
+  
+    // Start searching for the PDF in both folders
+    searchForPdf(folderPaths);
   });
 
 

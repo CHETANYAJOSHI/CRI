@@ -121,7 +121,7 @@ const uploadAdditionDataFile = async (req, res) => {
 
     const notification = new fileNotificationSchema({
       type: 'file_upload',
-      message: `A new file has been uploaded for account: ${account.accountName}. File path: ${newFilePath}.`
+      message: `A new file has been uploaded for account: ${account.accountName}. File path: Addition File.`,  
     });
     await notification.save();
 
@@ -134,13 +134,36 @@ const uploadAdditionDataFile = async (req, res) => {
 
 const getNotifications = async (req, res) => {
   try {
-    const notifications = await fileNotificationSchema.find().sort({ date: -1 }); // Fetches notifications in descending order
+    const notifications = await fileNotificationSchema.find().sort({ createAt: -1 }); // Fetches notifications in descending order
     res.json(notifications);
   } catch (error) {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+};  
+
+const updateNotification =  async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the notification by _id
+    const notification = await fileNotificationSchema.findById(id);
+
+    if (!notification) {
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+
+    // Mark the notification as read
+    notification.isRead = true;
+    await notification.save();
+
+    res.status(200).json({ message: 'Notification marked as read successfully' });
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    res.status(500).json({ error: 'Failed to mark notification as read' });
+  }
 };
+
 
 // Function to update a row in the claims data file
 const updateAdditionDataRow = async (req, res) => {
@@ -258,5 +281,6 @@ module.exports = {
     updateAdditionDataRow,
     AddSelfAddition,
     getNotifications,
+    updateNotification,
     Additionupload
 };

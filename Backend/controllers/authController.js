@@ -48,10 +48,12 @@ exports.verfiyOtp = async (req, res) => {
             return res.status(400).json({ message: 'OTP Expired' });
         }
 
-        let role = "";
+                let role = "";
 
-        // Check if the user is an Admin
-        if (mobileNumber == process.env.ADMIN_NUMBER) {
+                // Check if the user is an Admin
+                const adminNumbers = process.env.ADMIN_NUMBERS.split(',');
+
+        if (adminNumbers.includes(mobileNumber)) {
             role = "Admin";
             const token = generateToken({ mobileNumber, role }); // Generate JWT for the Admin
             return res.status(200).json({ message: 'Admin Login', role, token });

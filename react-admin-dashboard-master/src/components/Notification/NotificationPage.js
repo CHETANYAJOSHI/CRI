@@ -1,50 +1,75 @@
 import React, { useState, useEffect } from "react";
 import { Box, Typography, List, ListItem, ListItemText, CircularProgress, FormControl, Select, MenuItem, Button } from "@mui/material";
-import Notifications from "@mui/icons-material/Notifications";
+import './Notification.css';
 
 const NotificationPage = () => {
   const [notifications, setNotifications] = useState([]);
-  const [notification1,setNotifications1] = useState([]);
+  const [employeeRequests, setEmployeeRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchNotifications();
-    FilefetchNotifications();
+    const fetchAllNotifications = async () => {
+      try {
+        let accountData = [];
+        let fileData = [];
+        
+
+        // Fetch account notifications
+        try {
+          const accountResponse = await fetch("http://localhost:5000/api/notifications");
+          if (accountResponse.ok) {
+            accountData = await accountResponse.json();
+          } else {
+            console.error("Failed to fetch account notifications");
+          }
+        } catch (error) {
+          console.error("Error fetching account notifications:", error);
+        }
+  
+        // Fetch file notifications
+        try {
+          const fileResponse = await fetch("http://localhost:5000/api/fileNotification");
+          if (fileResponse.ok) {
+            fileData = await fileResponse.json();
+          } else {
+            console.error("Failed to fetch file notifications");
+          }
+        } catch (error) {
+          console.error("Error fetching file notifications:", error);
+        }
+
+        // Fetch employee requests
+        
+  
+        // Merge account and file notifications
+        const mergedNotifications = [
+          ...accountData.map((notification) => ({
+            ...notification,
+            type: "Account Notification",
+            createdAt: notification.createdAt || notification.createAt,
+          })),
+          ...fileData.map((notification) => ({
+            ...notification,
+            type: "File Notification",
+            createdAt: notification.createdAt || notification.createAt,
+          })),
+          
+        ];
+  
+        // Sort the merged array by `createdAt` in descending order (most recent first)
+        mergedNotifications.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+        setNotifications(mergedNotifications);
+        
+      } catch (error) {
+        console.error("Error fetching notifications:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchAllNotifications();
   }, []);
-
-  const fetchNotifications = async () => {
-    try {
-      const response = await fetch("http://localhost:5000/api/notifications");
-      const data = await response.json();
-
-      if (response.ok) {
-        setNotifications(data);
-        console.log(data)
-      } else {
-        console.error("Failed to fetch notifications", data);
-      }
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  const FilefetchNotifications = async () => {
-    try {
-      const response = await fetch('http://localhost:5000/api/fileNotification');
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      setNotifications1(data)
-      console.log(data);
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      throw error;
-    }
-  };
 
   const handleStatusChange = (index, newStatus) => {
     const updatedNotifications = [...notifications];
@@ -52,26 +77,51 @@ const NotificationPage = () => {
     setNotifications(updatedNotifications);
   };
 
-  const handleSubmitStatus = async (account, updatedStatus) => {
+  const handleSubmitStatus = async (_id, updatedStatus) => {
     try {
-      const response = await fetch("http://localhost:5000/api/updatenotifications", {
+      const response = await fetch(`http://localhost:5000/api/updatenotifications/${_id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ account , status: updatedStatus }),
+        body: JSON.stringify({ status: updatedStatus }),
       });
 
       if (response.ok) {
         console.log("Status updated successfully");
-        // Refresh notifications after the update
-        fetchNotifications();
       } else {
         const errorData = await response.json();
         console.error("Failed to update status:", errorData);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error updating status:", error);
+    }
+  };
+
+  const markAsRead = async (id, type) => {
+    try {
+      const apiUrl = type === "Account Notification"
+        ? `http://localhost:5000/api/notifications/markAsRead/${id}`
+        : `http://localhost:5000/api/fileNotification/markAsRead/${id}`; // Fixed URL
+
+      const response = await fetch(apiUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        const updatedNotifications = notifications.map(notification =>
+          notification._id === id ? { ...notification, isRead: true } : notification
+        );
+        setNotifications(updatedNotifications);
+        console.log("Notification marked as read");
+      } else {
+        console.error("Failed to mark notification as read");
+      }
+    } catch (error) {
+      console.error("Error marking notification as read:", error);
     }
   };
 
@@ -79,7 +129,7 @@ const NotificationPage = () => {
     return <CircularProgress />;
   }
 
-  if (notifications.length === 0) {
+  if (notifications.length === 0 && employeeRequests.length === 0) {
     return <Typography>No notifications available</Typography>;
   }
 
@@ -97,10 +147,11 @@ const NotificationPage = () => {
       <Typography variant="h4" align="center" gutterBottom>
         Notifications
       </Typography>
+
       <List>
         {notifications.map((notification, index) => (
           <ListItem
-            key={notification._id}
+            key={notification._id || index}
             sx={{
               display: "flex",
               justifyContent: "space-between",
@@ -109,88 +160,64 @@ const NotificationPage = () => {
               borderRadius: "8px",
               marginBottom: "10px",
               padding: "10px",
+              position: "relative",
             }}
+            onClick={() => markAsRead(notification._id, notification.type)}
           >
+            {!notification.isRead && (
+              <div
+                className="notification-dot"
+                style={{
+                  position: "absolute",
+                  width: "10px",
+                  height: "10px",
+                  backgroundColor: "red",
+                  borderRadius: "50%",
+                  top: "10px",
+                  right: "10px",
+                }}
+              />
+            )}
+
             <ListItemText
               primary={
                 <Typography sx={{ fontWeight: "bold", color: "#333" }}>
-                  {notification.AccountName}
+                  {notification.AccountName || notification.type}
                 </Typography>
               }
               secondary={
                 <Typography variant="body2" color="textSecondary">
-                  {`HR Name: ${notification.hrName} | TPA Name: ${notification.tpaName} | Email: ${notification.emailId} | Description: ${notification.description} | Status: ${notification.status} | Created At: ${new Date(notification.createdAt).toLocaleString()}`}
+                  {notification.description || notification.message || "No description available"}<br /><br />
+                  <div style={{ color: 'green', fontWeight: 'bold' }}>
+                    {notification.createdAt || notification.createAt}
+                  </div>
                 </Typography>
               }
               sx={{ marginRight: "10px" }}
             />
 
-            <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-              <Select
-                value={notification.status}
-                onChange={(e) => handleStatusChange(index, e.target.value)}
-              >
-                <MenuItem value="Pending">Pending</MenuItem>
-                <MenuItem value="Done">Done</MenuItem>
-              </Select>
-            </FormControl>
+            {notification.status && (
+              <>
+                <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+                  <Select
+                    value={notification.status}
+                    onChange={(e) => handleStatusChange(index, e.target.value)}
+                  >
+                    <MenuItem value="Pending">Pending</MenuItem>
+                    <MenuItem value="Done">Done</MenuItem>
+                  </Select>
+                </FormControl>
 
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleSubmitStatus(notification.account, notification.status)}
-              sx={{ marginLeft: "10px" }}
-            >
-              Submit
-            </Button>
-          </ListItem>
-        ))}
-
-{notification1.map((notification, index) => (
-          <ListItem
-            key={notification._id}
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              backgroundColor: index % 2 === 0 ? "#f0f8ff" : "#e6e6fa",
-              borderRadius: "8px",
-              marginBottom: "10px",
-              padding: "10px",
-            }}
-          >
-            <ListItemText
-              // primary={
-              //   <Typography sx={{ fontWeight: "bold", color: "#333" }}>
-              //     {notification.AccountName}
-              //   </Typography>
-              // }
-              secondary={
-                <Typography variant="body2" color="textSecondary">
-                  {`${notification.message}`}
-                </Typography>
-              }
-              sx={{ marginRight: "10px" }}
-            />
-{/* 
-            <FormControl variant="outlined" sx={{ minWidth: 120 }}>
-              <Select
-                value={notification.status}
-                onChange={(e) => handleStatusChange(index, e.target.value)}
-              >
-                <MenuItem value="Pending">Pending</MenuItem>
-                <MenuItem value="Done">Done</MenuItem>
-              </Select>
-            </FormControl>
-
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => handleSubmitStatus(notification.account, notification.status)}
-              sx={{ marginLeft: "10px" }}
-            >
-              Submit
-            </Button> */}
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={() => handleSubmitStatus(notification._id, notification.status)}
+                  sx={{ marginLeft: "10px" }}
+                >
+                  Submit
+                </Button>
+              </>
+            )}
           </ListItem>
         ))}
         

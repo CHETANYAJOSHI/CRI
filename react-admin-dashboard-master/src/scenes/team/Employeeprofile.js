@@ -6,13 +6,17 @@ import Header from "../../components/Header";
 import Profile from '../../images/family.png';
 import './team.css';
 import axios from 'axios';
+// import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const EmployeeProfile = () => { 
+  const Navigate = useNavigate();
   const [accountId, setAccountId] = useState(null);
   const [mobileNumber, setMobileNumber] = useState(null);
   const [rowData, setRowData] = useState([]); // Initialize as an empty array
   const [loading, setLoading] = useState(true); // Loading state
 
+  
   // Fetch live data based on accountId and mobileNumber
   const fetchLiveData = useCallback(async (accountId, mobileNumber) => {
     console.log('Fetching data with Account ID:', accountId);
@@ -40,7 +44,7 @@ const EmployeeProfile = () => {
     try {
       const response = await axios.post('http://localhost:5000/api/employee/login', { mobileNumber });
       if (response.data.error) {
-        console.error(response.data.error);
+        console.error(response.data.error); 
       } else {
         const { accountId } = response.data;
         localStorage.setItem('selectedAccount', accountId);
@@ -48,7 +52,10 @@ const EmployeeProfile = () => {
         fetchLiveData(accountId, mobileNumber);
       }
     } catch (error) {
-      console.error('Error:', error);
+      alert("User Not found");
+      Navigate('/')
+      
+      
     }
   }, [fetchLiveData]);
 
@@ -68,21 +75,7 @@ const EmployeeProfile = () => {
     }
   }, [fetchLiveData, loginEmployee]);
 
-  const downloadECard = () => {
-    const input = document.getElementById('employee-profile');
-    html2canvas(input, { scale: 2 }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF({
-        orientation: 'landscape',
-        unit: 'px',
-        format: [canvas.width, canvas.height]
-      });
-      pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-      pdf.save("e-card.pdf");
-    }).catch((err) => {
-      console.error("Error generating PDF: ", err);
-    });
-  };
+  
 
   const getMobileNumber = (data) => {
     return data["Mobile No"] || data["benef_mobile no"] || 'N/A';
@@ -97,6 +90,44 @@ const spouseData = getRowDataByRelation('Spouse')[0] || {}; // Assuming only one
 const sonsData = getRowDataByRelation('Son'); // Get all sons
 const daughtersData = getRowDataByRelation('Daughter'); // Get all daughters
 
+useEffect(() => {
+  if (selfData.pribenef_employee_code) {
+    localStorage.setItem('employeeId', selfData.pribenef_employee_code);
+  }
+}, [selfData.pribenef_employee_code]);
+
+const downloadECard = () => {
+  const employeeId = localStorage.getItem('employeeId'); // Assuming employeeId is stored in localStorage
+
+  if (!employeeId) {
+    console.error('Employee ID not found in localStorage');
+    return;
+  }
+
+  // Fetch the PDF using the employee ID
+  fetch(`http://localhost:5000/api/download-e-card/${employeeId}`, {
+    method: 'GET',
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error('Failed to download e-card');
+      }
+      return response.blob(); // Convert the response to a Blob object (binary data)
+    })
+    .then((blob) => {
+      // Create a URL for the blob object
+      const url = window.URL.createObjectURL(new Blob([blob]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `e_card_${employeeId}.pdf`); // Set the file name for the download
+      document.body.appendChild(link);
+      link.click(); // Simulate a click to download the file
+      link.parentNode.removeChild(link); // Clean up the link element
+    })
+    .catch((error) => {
+      console.error('Error downloading e-card:', error);
+    });
+};
 
   return (
     <>
@@ -143,7 +174,7 @@ const daughtersData = getRowDataByRelation('Daughter'); // Get all daughters
       </Box>
       <div className="E_Card" style={{ float: 'right', marginRight: "50px" }}>
         <button className="btn btn-danger" 
-        // onClick={downloadECard}///
+        onClick={downloadECard}
         >Download E-Card</button>
       </div>
     </>

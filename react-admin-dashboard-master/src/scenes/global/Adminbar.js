@@ -41,7 +41,7 @@ import CreditCardIcon from '@mui/icons-material/CreditCard';
 import ControlPointIcon from '@mui/icons-material/ControlPoint';
 import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 import SimCardDownloadIcon from '@mui/icons-material/SimCardDownload';
-import SpaIcon from '@mui/icons-material/Spa';
+  import SpaIcon from '@mui/icons-material/Spa';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import profile from "../../images/profile.avif";
 import FolderSharedIcon from '@mui/icons-material/FolderShared';
@@ -117,6 +117,8 @@ const Adminbar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [notifications, setNotifications] = useState(0);
+const [unreadCount, setUnreadCount] = useState(0);
+
   const [selectedAccount, setSelectedAccount] = useState(() => {
     // Retrieve from localStorage if available
     return localStorage.getItem('selectedAccount') || ''});
@@ -131,6 +133,40 @@ const Adminbar = () => {
 const Nav = ()=>{
   Navigate("/createaccount")
 }
+
+
+useEffect(() => {
+  const fetchUnreadNotifications = async () => {
+    let totalUnreadCount = 0;
+
+    try {
+      // Fetch account notifications
+      const accountResponse = await fetch("http://localhost:5000/api/notifications");
+      const accountData = await accountResponse.json();
+
+      // Filter unread notifications from account notifications
+      const unreadAccountNotifications = accountData.filter(notification => !notification.isRead).length;
+
+      // Fetch file notifications
+      const fileResponse = await fetch("http://localhost:5000/api/fileNotification");
+      const fileData = await fileResponse.json();
+
+      // Filter unread notifications from file notifications
+      const unreadFileNotifications = fileData.filter(notification => !notification.isRead).length;
+
+      // Total unread notifications
+      totalUnreadCount = unreadAccountNotifications + unreadFileNotifications;
+
+    } catch (error) {
+      console.error("Error fetching notifications:", error);
+    }
+
+    // Set the total unread count or 0 if none
+    setUnreadCount(totalUnreadCount || 0);
+  };
+
+  fetchUnreadNotifications();
+});
 
 
 useEffect(() => {
@@ -208,6 +244,7 @@ const Logout=()=>{
     localStorage.removeItem('authToken'); 
     localStorage.removeItem('selectedAccount');  // or your method of storing tokens
     localStorage.removeItem('mobileNumber');
+    localStorage.removeItem('employeeId');
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout
@@ -282,11 +319,11 @@ const Logout=()=>{
               <button className="btn btn-danger mt-3" style={{textAlign:'center'  , display:'flex'}} onClick={Logout}>Logout</button>
               <Box sx={{ marginTop: 2 }} onClick={()=>(Navigate('/notification'))}>
               <IconButton color="inherit" >
-              <Badge badgeContent={notifications} color="error" >
+              <Badge badgeContent={unreadCount} color="error" >
                 <NotificationsIcon style={{fontSize:'23px'}}/>
               </Badge>
-            </IconButton>
-      </Box>
+              </IconButton>
+              </Box>
 
       </div>
               <Box textAlign="center">
@@ -367,7 +404,7 @@ const Logout=()=>{
 
               
               
-              {!nullFields.includes('liveDataSelfFile') && <Item
+{!nullFields.includes('liveDataSelfFile') && <Item
                 title="Live Data"
                 to={`/enrollment/SelfLive?accountId=${selectedAccount}`}
                 icon={<ImportContactsIcon />}
@@ -383,7 +420,23 @@ const Logout=()=>{
                 setSelected={setSelected}
               />}
 
-             
+{/* {!nullFields.includes('liveDataSelfFile') && <Item
+                title="Inactive Data"
+                to={`/enrollment/FloaterLive?accountId=${selectedAccount}`}
+                icon={<ImportContactsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />}
+
+
+{!nullFields.includes('liveDataFloaterFile') && <Item
+                title="Inactive Data"
+                to={`/enrollment/InactiveFloaterData?accountId=${selectedAccount}`}
+                icon={<ImportContactsIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />}
+              */}
               
               {/* <SubMenu
                 title="Deleted Data"
@@ -452,7 +505,7 @@ const Logout=()=>{
               />
 
 
-<Item
+              <Item
                 title="Calculated Premium"
                 to="/enrollment/premium"
                 icon={<AttachMoneyIcon />}

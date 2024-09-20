@@ -228,6 +228,7 @@ const Logout=()=>{
     localStorage.removeItem('hrDetails');
     localStorage.removeItem('mobileNumber');
     localStorage.removeItem('employeeNumber');
+    localStorage.removeItem('employeeId');
     
     
     // Navigate to the login or home page after logout
@@ -387,7 +388,7 @@ const Logout=()=>{
               
         
               <Item
-                title="Request E-Card"
+                title="Query To Admin"
                 to="/reqestECard"
                 icon={<CreditCardIcon />}
                 selected={selected}
@@ -465,10 +466,6 @@ const Logout=()=>{
                 setSelected={setSelected}
               /> }
               
-
-           
-
-            
 
 
 {!nullFields.includes('claimSelfAnalysisFile') && <Item

@@ -280,7 +280,7 @@ const CreateAccount = () => {
               type="text"
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -290,7 +290,7 @@ const CreateAccount = () => {
               type="text"
               value={hrName}
               onChange={(e) => sethrName(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -300,7 +300,7 @@ const CreateAccount = () => {
               type="text"
               value={hrEmail}
               onChange={(e) => sethrEmail(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -310,7 +310,7 @@ const CreateAccount = () => {
               type="text"
               value={hrNumber}
               onChange={(e) => sethrNumber(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -324,7 +324,7 @@ const CreateAccount = () => {
               type="text"
               value={TPAName}
               onChange={(e) => setTPA(e.target.value)}
-              required
+              
             />
           </FormGroup>
           
@@ -334,7 +334,7 @@ const CreateAccount = () => {
               type="text"
               value={InsuranceName}
               onChange={(e) => setInsuranceName(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -344,12 +344,12 @@ const CreateAccount = () => {
               type="text"
               value={networkHospitalLink}
               onChange={(e) => setNetworkHospitalLink(e.target.value)}
-              required
+              
             />
           </FormGroup>
           <FormGroup>
             <Label>CD Statement File</Label>
-            <Input type="file" name="cdStatementFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="cdStatementFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Claim Analysis File</Label>
@@ -357,7 +357,7 @@ const CreateAccount = () => {
           </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Claim Analysis File</Label>
-            <Input type="file" name="claimFloaterAnalysisFile" onChange={onFileChange}  accept=".pdf" required />
+            <Input type="file" name="claimFloaterAnalysisFile" onChange={onFileChange}  accept=".pdf"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Claim Dump File</Label>
@@ -365,7 +365,7 @@ const CreateAccount = () => {
           </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Claim Dump File</Label>
-            <Input type="file" name="claimDumpFloaterFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="claimDumpFloaterFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Live Data File</Label>
@@ -373,47 +373,47 @@ const CreateAccount = () => {
           </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Live Data File</Label>
-            <Input type="file" name="liveDataFloaterFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="liveDataFloaterFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Endorsement</Label>
-            <Input type="file" name="endrosementAdditionFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="endrosementAdditionFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           <FormGroup>
             <Label>Floater with Parents Endorsement File</Label>
-            <Input type="file" name="endrosementDeletionFile"  onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="endrosementDeletionFile"  onChange={onFileChange} accept=".xlsx"  />
           </FormGroup> */}
           <FormGroup>
             <Label>Claim A & B Form</Label>
-            <Input type="file" name="claimABFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="claimABFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           <FormGroup>
             <Label>Rack-Rates File</Label>
-            <Input type="file" name="rackRatesFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="rackRatesFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           <FormGroup>
             <Label>checkListFile File</Label>
-            <Input type="file" name="checkListFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="checkListFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           <FormGroup>
             <Label>Exclusion List File</Label>
-            <Input type="file" name="exclusionListFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="exclusionListFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Deletion File</Label>
-            <Input type="file" name="deletionDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="deletionDataSelfFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup> */}
           <FormGroup>
             <Label>Endorsement Addition File</Label>
-            <Input type="file" name="additionDataFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="additionDataFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Addition File</Label>
-            <Input type="file" name="additionDataSelfFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="additionDataSelfFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup> */}
           <FormGroup>
             <Label>Endorsement Deletion File</Label>
-            <Input type="file" name="deletionDataFile" onChange={onFileChange} accept=".xlsx" required />
+            <Input type="file" name="deletionDataFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
             <Label>Self with Parents Policy Coverage</Label>
@@ -421,7 +421,7 @@ const CreateAccount = () => {
           </FormGroup> */}
           <FormGroup>
             <Label>Floater with Parents Policy Coverage</Label>
-            <Input type="file" name="policyCoverageFloaterFile" onChange={onFileChange} accept=".pdf" required />
+            <Input type="file" name="policyCoverageFloaterFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           <Button type="submit">Create Account</Button>
          
@@ -435,7 +435,7 @@ const CreateAccount = () => {
               <CloseButton onClick={() => setModalVisible(false)}>Close</CloseButton>
               <h3>Account Created</h3>
               <p><strong>Account Name:</strong> {accountDetails.accountName}</p>
-              <p><strong>Network Hospital Link:</strong> {accountDetails.networkHospitalLink}</p>
+              <p><strong>Network Hospital Link :</strong> {accountDetails.networkHospitalLink}</p>
               <p><strong>cdStatementFile :</strong> {accountDetails.cdStatementFile}</p>
               <p><strong>claimSelfAnalysisFile :</strong> {accountDetails.claimSelfAnalysisFile}</p>
               <p><strong>claimFloaterAnalysisFile :</strong> {accountDetails.claimFloaterAnalysisFile}</p>
@@ -471,7 +471,7 @@ const CreateAccount = () => {
               id="hrName"
               value={hrName}
               onChange={(e) => setHrName(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -482,7 +482,7 @@ const CreateAccount = () => {
               id="hrMobile"
               value={hrMobile}
               onChange={(e) => setHrMobile(e.target.value)}
-              required
+              
             />
           </FormGroup>
 
@@ -493,7 +493,7 @@ const CreateAccount = () => {
               id="hrEmail"
               value={hrEmail}
               onChange={(e) => setHrEmail(e.target.value)}
-              required
+              
             />
           </FormGroup>
             </Form>

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import Header from '../../components/Header';
 import styled from 'styled-components';
+import Header from '../../../components/Header';
 import {
   Box,
   TextField,
@@ -19,8 +19,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DownloadIcon from '@mui/icons-material/Download';
 import UploadIcon from '@mui/icons-material/Upload';
 import AddIcon from '@mui/icons-material/Add';
-// import './Envrollment.css';
-import { textAlign } from '@mui/system';
+import './Floater.css';
 
 const DropdownWrapper = styled.div`
   background: #fff;
@@ -56,7 +55,7 @@ const Select = styled.select`
 
 const Option = styled.option``;
 
-const Addition = () => {
+const FloaterInactiveData = () => {
   const [data, setData] = useState([]);
   const [headers, setHeaders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -67,18 +66,40 @@ const Addition = () => {
   const [editData, setEditData] = useState({});
   const [openAddUserDialog, setOpenAddUserDialog] = useState(false);
   const [newUserData, setNewUserData] = useState({});
+  const [totalPremium , setTotalPremium] = useState(0);
+  const [activeLive , setactiveLive] = useState(0);
+  const [cdBalance , setCDBalance] = useState(0);
   const [file, setFile] = useState(null);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  
+  const [activeCount, setActiveCount] = useState(0);
+  const [inactiveCount, setInactiveCount] = useState(0);
+  const [error, setError] = useState('');
+
 
   useEffect(() => {
     const accountId = searchParams.get('accountId');
     if (accountId) {
       setSelectedAccount(accountId);
       fetchLiveDataFile(accountId);
+      fetchData(accountId);
     }
   }, [searchParams]);
+
+    const fetchData = async (accountId) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/getSpecificSelfFloaterFile`);
+      
+      setactiveLive(response.data.data[0]['Active live']);
+      setTotalPremium(response.data.data[0]['Total Preimium']);
+      setCDBalance(response.data.data[0]['CD Balance'])
+      setLoading(false);
+    } catch (err) {
+      console.log('Failed to fetch data');
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
     const fetchAccounts = async () => {
@@ -93,19 +114,28 @@ const Addition = () => {
     fetchAccounts();
   }, []);
 
-
-  
-
   const fetchLiveDataFile = async (accountId) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/Addition`);
+      const response = await axios.get(`http://localhost:5000/api/account/${accountId}/getInactiveData`);
       setHeaders(response.data.headers);
       setData(response.data.data);
     } catch (error) {
       console.error('Error fetching live data file:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  
+
+  const handleSelectChange = (e) => {
+    const accountId = e.target.value;
+    setSelectedAccount(accountId);
+    if (accountId) {
+      navigate(`/enrollment/FloaterLive?accountId=${accountId}`);
+      fetchLiveDataFile(accountId);
+      
     }
   };
 
@@ -130,7 +160,7 @@ const Addition = () => {
 
   const handleEditSave = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/account/${selectedAccount}/update-Addition`, {
+      await axios.put(`http://localhost:5000/api/account/${selectedAccount}/update-livefloater-parent-row`, {
         rowId: editRow.id,
         updatedData: editData,
       });
@@ -147,14 +177,15 @@ const Addition = () => {
       alert('Please select an account first.');
       return;
     }
+
     try {
-      const response = await axios.get(`http://localhost:5000/api/account/${selectedAccount}/download-Addition`, {
+      const response = await axios.get(`http://localhost:5000/api/account/${selectedAccount}/download-livefloater-parent-file`, {
         responseType: 'blob',
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'Addition.xlsx');
+      link.setAttribute('download', 'Live Data Floater with Parents.xlsx');
       document.body.appendChild(link);
       link.click();
     } catch (error) {
@@ -171,10 +202,12 @@ const Addition = () => {
       alert('Please select a file and an account first.');
       return;
     }
+
     const formData = new FormData();
     formData.append('file', file);
+
     try {
-      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/upload-Addition`, formData, {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/upload-livefloater-parent-file`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -187,6 +220,9 @@ const Addition = () => {
       console.log(formData.append('file', file))
     }
   };
+  const handleAddUserClick = () => {
+    setOpenAddUserDialog(true);
+  };
 
   const handleAddUserChange = (e) => {
     const { name, value } = e.target;
@@ -195,7 +231,7 @@ const Addition = () => {
 
   const handleAddUserSave = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/add-Addition`, {
+      await axios.post(`http://localhost:5000/api/account/${selectedAccount}/add-livefloater-parent-row`, {
         newRowData: newUserData,
       });
       fetchLiveDataFile(selectedAccount);
@@ -242,14 +278,12 @@ const Addition = () => {
     return rowData;
   });
 
-    const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-
-
+  const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
+  const role = localStorage.getItem('role');
   return (
 
     <Box mt="20px" style={{textAlign:'center'}}>
-      <Header title={` ${selectedAccountName}`}/>
-
+      <Header title={`${selectedAccountName}`}/>
 
 
     <Box
@@ -265,13 +299,39 @@ const Addition = () => {
     >
 
 
-     
+<div className="Detailsm">
 
-     
+<div className="totalPremium">
+  <p>Total Premium</p>
+  <p>Rs. {totalPremium}</p>
+</div>
 
+<div className="totalPremium">
+  <p>Total Life</p>
+  <p>{activeLive}</p>
+</div>
 
-
+<div className="totalPremium">
+  <p>CD Balance</p>
+  <p>{cdBalance}</p>
+</div>
       
+      {/* <DropdownWrapper style={{ width: '100%', display: 'flex', margin: '0px', alignItems: 'center', gap: '5px', padding: '5px' }}>
+        <Label htmlFor="account-select">Account</Label>
+        <Select
+          id="account-select"
+          value={selectedAccount}
+          onChange={handleSelectChange}
+        >
+          <Option value="">--Select an Account--</Option>
+          {accounts.map((account) => (
+            <Option key={account._id} value={account._id}>
+              {account.accountName}
+            </Option>
+          ))}
+        </Select>
+      </DropdownWrapper> */}
+      </div>
 
       <Box style={{ display: 'flex', justifyContent: 'center', margin: '20px' }}>
         <Button
@@ -289,6 +349,7 @@ const Addition = () => {
           style={{ display: 'none' }}
           id="file-input"
         />
+        {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -298,6 +359,9 @@ const Addition = () => {
         >
           Upload
         </Button>
+        )}
+
+      {role !== 'HR' && (
         <Button
           variant="contained"
           color="secondary"
@@ -307,8 +371,23 @@ const Addition = () => {
         >
           Submit File
         </Button>
-       
-        
+         )}
+        {/* <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAddUserClick}
+          startIcon={<AddIcon />}
+          style={{ marginLeft: '10px' , background:'rgb(57, 49, 132)' , height:'50%'}}
+        >
+          Add User
+        </Button> */}
+        <TextField
+          label="Search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          variant="outlined"
+          style={{ marginLeft: '10px'}}
+        />
       </Box>
 
       {loading ? (
@@ -406,9 +485,8 @@ const Addition = () => {
         </DialogActions>
       </Dialog>
     </Box>
-
     </Box>
   );
 };
 
-export default Addition;
+export default FloaterInactiveData;

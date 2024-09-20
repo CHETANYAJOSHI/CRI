@@ -4,7 +4,8 @@ const BulkRequestSchema = new mongoose.Schema({
     description : {type:String , required:true},
     account:{type:String , required:true},
     status:{type:String , enum:["Pending" , "Done"] , default:"Pending"},
-    createAt:{type:String , default:Date.now},
+    createAt:{type:String , default:new Date()},
+    isRead:{type:Boolean , default:false}
 })
 
 // BulkRequestSchema.virtual('formattedCreatedAt').get(function () {

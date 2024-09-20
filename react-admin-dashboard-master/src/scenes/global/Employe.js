@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { ProSidebar, Menu, MenuItem } from "react-pro-sidebar";
 import { Box, IconButton, Typography, useTheme } from "@mui/material";
+import SpaIcon from '@mui/icons-material/Spa';
 import "react-pro-sidebar/dist/css/styles.css";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
@@ -56,6 +57,10 @@ const Employe = () => {
   const handleProfileClick = () => {
     Navigate("/profile");
   };
+
+  const handleWellNess=()=>{
+    Navigate("/wellness");
+  }
 
   const Logout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");
@@ -164,6 +169,13 @@ const Employe = () => {
             >
               Policy Coverage
             </MenuItem>
+
+            {/* <MenuItem
+            icon={<SpaIcon />}
+            onClick={handleWellNess}
+            >
+              Wellness
+              </MenuItem> */}
           </Box>
         </Menu>
       </ProSidebar>

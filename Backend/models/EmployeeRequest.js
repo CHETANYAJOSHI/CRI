@@ -9,7 +9,8 @@ const EmployeeSchema = new mongoose.Schema({
 const EmployeeRequestSchema = new mongoose.Schema({
     account:{type:String , required:true},
     employees: [EmployeeSchema], // Store multiple employees as an array
-    createdAt: { type: Date, default: Date.now },
+    createAt:{type:String , default:new Date()},
+    isRead:{type:Boolean , default:false}
   });
   
   module.exports = mongoose.model("EmployeeRequest", EmployeeRequestSchema);

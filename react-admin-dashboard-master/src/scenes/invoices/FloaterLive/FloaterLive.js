@@ -86,7 +86,7 @@ const FloaterLive = () => {
     }
   }, [searchParams]);
 
-  const fetchData = async (accountId) => {
+    const fetchData = async (accountId) => {
     try {
       const response = await axios.get(`http://localhost:5000/api/account/${accountId}/getSpecificSelfFloaterFile`);
       

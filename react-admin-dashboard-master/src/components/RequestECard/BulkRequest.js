@@ -23,7 +23,6 @@ const BulkRequest = () => {
         body: JSON.stringify({
           requestDetails,
           selectedAccount,
-        
         }),
       });
 
@@ -37,6 +36,8 @@ const BulkRequest = () => {
       console.error("Error:", err);
     }
   };
+
+  
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -59,7 +60,7 @@ const BulkRequest = () => {
         gutterBottom
         style={{ fontWeight: "bold", marginBottom: "20px" }}
       >
-        Bulk Request to Admin
+        Bulk E-Card Request to Admin
       </Typography>
       <TextField
         label="Enter Request Details"

@@ -23,5 +23,17 @@ router.post("/employeeRequest", async (req, res) => {
   }
 });
 
+// GET /api/employeeRequests
+router.get("/employeeRequests", async (req, res) => {
+  try {
+    const employeeRequests = await EmployeeRequest.find(); // Retrieve all employee requests
+    res.status(200).json(employeeRequests);
+  } catch (error) {
+    console.error("Error fetching employee requests:", error);
+    res.status(500).json({ error: "Failed to fetch employee requests." });
+  }
+});
+
+
 
 module.exports = router;

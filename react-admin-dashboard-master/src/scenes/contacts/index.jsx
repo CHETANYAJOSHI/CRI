@@ -92,7 +92,7 @@ const Contacts = () => {
 
   useEffect(() => {
     const fetchAccountData = async () => {
-      const query = new URLSearchParams(location.search);
+        const query = new URLSearchParams(location.search);
       const accountId = query.get('accountId');
 
       if (accountId) {
@@ -118,11 +118,12 @@ const Contacts = () => {
   }, [location.search, selectedAccount]);
 
   const getRowDataByRelation = (relation) => {
-    const foundRow = rowData.find(item => item.benef_relation === relation);
+    const foundRow = rowData.find(item =>item.benef_relation === relation);
     return foundRow || {}; // Return an empty object if no match is found
   };
 
   const selfData = getRowDataByRelation('Self');
+
 
   // Automatically select and render available policy
   useEffect(() => {

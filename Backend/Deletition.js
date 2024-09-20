@@ -4,7 +4,7 @@ const multer = require('multer');
 const xlsx = require('xlsx');
 const readxlsxFile = require('read-excel-file/node');
 const Accounts = require('./models/createaccount'); // Adjust the path according to your project structure
-
+const fileNotificationSchema = require('./models/FileChangeNotification');
 // Function to fetch and read claims data file
 const getDeletionDataFile = async (req, res) => {
   try {
@@ -122,12 +122,28 @@ const uploadDeletionDataFile = async (req, res) => {
     account.deletionDataFile = newFilePath;
     await account.save();
 
+    const notification = new fileNotificationSchema({
+      type: 'file_upload',
+      message: `A new file has been uploaded for account: ${account.accountName}. File path: Deletion File.`
+    });
+    await notification.save();
+
     res.json({ message: 'File uploaded, old file removed, and account updated successfully' });
   } catch (error) {
     console.error('Error uploading file and updating database:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+// const getDelNotifications = async (req, res) => {
+//   try {
+//     const notifications = await fileNotificationSchema.find().sort({ createAt: -1 }); // Fetches notifications in descending order
+//     res.json(notifications);
+//   } catch (error) {
+//     console.error('Error fetching notifications:', error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// }; 
 
 // Function to update a row in the claims data file
 const updateDeletionDataRow = async (req, res) => {
@@ -243,6 +259,7 @@ module.exports = {
     downloadDeletionDataFile,
     uploadDeletionDataFile,
     updateDeletionDataRow,
+    // getDelNotifications,
     AddSelfDeletion,
     Deletionupload
 };

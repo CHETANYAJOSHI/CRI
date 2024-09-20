@@ -46,6 +46,8 @@ import EmployeeRequest from "./components/RequestECard/EmployeeRequest";
 import NotificationPage from "./components/Notification/NotificationPage";
 import DefaultAccount from "./components/CreateAccount/DefaultAccount";
 import Request from "./components/Notification/Request";
+import FloaterInactiveData from "./scenes/invoices/FloaterLive/FloaterInactiveData";
+import CalimIntimation from "./components/ClaimIntimation";
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
@@ -79,9 +81,9 @@ function App() {
                     <CreateAccount />
                   </PrivateRoute>
                 }/> */}
-               
-                <Route path="/CreateAccount" element={<PrivateRoute>
-                    <DefaultAccount />
+               <Route path="/claimIntimation" element={<CalimIntimation />} />
+              <Route path="/CreateAccount" element={<PrivateRoute>
+                  <DefaultAccount />
                   </PrivateRoute>} />
               <Route path="/notification" element={<Request />} />
               <Route path="/bulkRequest" element={<BulkRequest />} />
@@ -98,6 +100,7 @@ function App() {
               <Route path="/downloads" element={<Downloads/>} />
               <Route path="/enrollment/SelfLive" element={<EnrollmentLive />} />
               <Route path="/enrollment/FloaterLive" element={<FloaterLive />} />
+              <Route path="/enrollment/InactiveFloaterData" element={<FloaterInactiveData/>} />
               <Route path="/endorsement/rack-rates" element={<RackRates />} />
               <Route path="/enrollment/premium" element={<Premium />} />
               <Route path="/enrollment/endorsement" element={<Endorsement />} />

@@ -44,6 +44,60 @@ const getFloaterLive = async (req, res) => {
   }
 };
 
+
+
+const getInactiveFloaterLive = async (req, res) => {
+  try {
+    const accountId = req.params.id;
+    const account = await Accounts.findById(accountId);
+
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    const { accountName, liveDataFloaterFile } = account;
+    if (!accountName || !liveDataFloaterFile) {
+      return res.status(400).json({ error: 'Invalid account data' });
+    }
+
+    const floaterParentFilePath = path.join(__dirname, 'NewAccounts', liveDataFloaterFile);
+
+    // Read Excel file and send the data
+    readxlsxFile(floaterParentFilePath).then((rows) => {
+      const headers = rows[0];
+
+      // Find the index of the 'benef_status' column
+      const statusIndex = headers.indexOf('benef_status');
+      
+      if (statusIndex === -1) {
+        return res.status(400).json({ error: 'benef_status column not found' });
+      }
+
+      // Filter rows where 'benef_status' is 'Inactive'
+      const inactiveUsers = rows.slice(1).filter(row => row[statusIndex] === 'Inactive');
+
+      // Map the filtered rows to objects based on the headers
+      const data = inactiveUsers.map(row => {
+        let rowData = {};
+        row.forEach((cell, index) => {
+          rowData[headers[index]] = cell;
+        });
+        return rowData;
+      });
+
+      res.json({ headers, data });
+    }).catch(error => {
+      console.error('Error reading Excel file:', error);
+      res.status(500).json({ error: 'Failed to read Excel file' });
+    });
+  } catch (error) {
+    console.error('Error fetching account:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+
 const getSpecificSelfFloaterFile = async(req,res)=>{
   try {
     const accountId = req.params.id;
@@ -356,6 +410,7 @@ module.exports = {
     uploadFloaterLive,
     updateFloaterLive,
     AddFloaterLive,
+    getInactiveFloaterLive,
     getSpecificSelfFloaterFile,
     floaterUploadLive,
     countBenefStatus,

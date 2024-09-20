@@ -12,6 +12,7 @@ router.post("/bulkRequests", async (req, res) => {
       description: requestDetails,
       account: selectedAccount,
       status: "Pending", // Set initial status as "pending"
+      isRead:false,
     });
 
     await newRequest.save();
