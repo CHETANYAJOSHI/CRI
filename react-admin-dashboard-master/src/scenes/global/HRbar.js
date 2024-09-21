@@ -387,14 +387,10 @@ const Logout=()=>{
               />}
               
         
-              <Item
-                title="Query To Admin"
-                to="/reqestECard"
-                icon={<CreditCardIcon />}
-                selected={selected}
-                setSelected={setSelected}
-              />
+              
             </SubMenu>
+
+
 
             <SubMenu
                 title="Endorsement"
@@ -436,17 +432,23 @@ const Logout=()=>{
                 setSelected={setSelected}
               />
 
-              <Item
+              {/* <Item
                 title="Calculated Premium"
                 to="/enrollment/premium"
                 icon={<AttachMoneyIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />
+              /> */}
 
               </SubMenu>
 
-           
+              <SubMenu
+                title="Claim"
+                
+                icon={<BeenhereIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              > 
 
             
 
@@ -483,7 +485,23 @@ const Logout=()=>{
                 selected={selected}
                 setSelected={setSelected}
             />}
-            
+
+          <Item
+                title="Claim Intimation"
+                to={`/claimIntimation`}
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+            />
+        </SubMenu>    
+
+        <Item
+                title="Query To Admin"
+                to="/reqestECard"
+                icon={<CreditCardIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              />
           </Box>
         </Menu>
       </ProSidebar>

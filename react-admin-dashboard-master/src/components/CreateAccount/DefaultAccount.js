@@ -11,11 +11,11 @@ export default function DefaultAccount() {
   };
 
   return (
-    <Box sx={{ width: '100%', padding: '20px' }}>
-      <Typography variant="h4" align="center" gutterBottom>
+    <Box sx={{ width: '100%' }}>
+      {/* <Typography variant="h4" align="center" gutterBottom>
         Select Account Type
-      </Typography>
-      <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
+      </Typography> */}
+      {/* <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '40px' }}>
         <Button
           variant={activeSection === 'createAccount' ? 'contained' : 'outlined'}
           onClick={() => handleSwitchSection('createAccount')}
@@ -29,8 +29,8 @@ export default function DefaultAccount() {
         >
           Self with Parents
         </Button>
-      </Box>
-      <Divider sx={{ marginBottom: '20px' }} />
+      </Box> */}
+      <Divider sx={{ }} />
       {activeSection === 'createAccount' && <CreateAccount />}
       {activeSection === 'selfFloaterCreate' && <SelfFloaterCreate />}
     </Box>

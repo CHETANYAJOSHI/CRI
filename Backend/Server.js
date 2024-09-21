@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const xlsx = require('xlsx');
+const nodemailer = require('nodemailer');
 
 const bodyParser = require('body-parser');
 const userRoutes = require('./routes/userRoutes');
@@ -261,6 +262,50 @@ const formatExcelDate = (serialDate) => {
   // Return formatted date in dd-MM-YYYY
   return `${day}-${month}-${year}`;
 };
+
+//Send the intimation file to the email
+app.post('/api/send-email', async (req, res) => {
+  try {
+    // Create a new workbook and worksheet
+    const workbook = xlsx.utils.book_new();
+    const worksheet = xlsx.utils.aoa_to_sheet(req.body);
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Claim Data');
+
+    // Generate a buffer for the Excel file
+    const excelBuffer = xlsx.write(workbook, { bookType: 'xlsx', type: 'buffer' });
+
+    // Set up the email transport
+    const transporter = nodemailer.createTransport({
+      service: 'gmail', // Use your email service
+      auth: {
+        user: 'chetanyajoshi9654@gmail.com',
+        pass: 'uale nfrb oqjp joga', // Use environment variables for security
+      },
+    });
+
+    // Prepare email options
+    const mailOptions = {
+      from: 'chetanyajoshi9654@gmail.com',
+      to: 'anish@cri.co.in',
+      subject: 'Claim Intimation Data',
+      text: 'Please find the attached Excel file with the claim data.',
+      attachments: [
+        {
+          filename: 'claim_data.xlsx',
+          content: excelBuffer,
+          contentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        },
+      ],
+    };
+
+    // Send the email
+    await transporter.sendMail(mailOptions);
+    res.status(200).send('Email sent successfully!');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error sending email');
+  }
+});
 
 
 const searchFile = async (filePath, mobileNumber) => {

@@ -58,9 +58,13 @@ const Employe = () => {
     Navigate("/profile");
   };
 
-  const handleWellNess=()=>{
+  const handleClaimIntimation = () =>{
+    Navigate('/claimIntimation');
+  };
+
+  const handleWellNess = () => {
     Navigate("/wellness");
-  }
+  };
 
   const Logout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");
@@ -170,12 +174,23 @@ const Employe = () => {
               Policy Coverage
             </MenuItem>
 
+            <MenuItem
+              icon={<ContactsOutlinedIcon />}
+
+              onClick={handleClaimIntimation}
+              style={{
+                color: selected === "Claim Intimation" ? "#6870fa" : "white",
+              }}
+            >
+              Claim Intimation
+            </MenuItem>
+
             {/* <MenuItem
-            icon={<SpaIcon />}
-            onClick={handleWellNess}
+              icon={<SpaIcon />}
+              onClick={handleWellNess}
             >
               Wellness
-              </MenuItem> */}
+            </MenuItem> */}
           </Box>
         </Menu>
       </ProSidebar>

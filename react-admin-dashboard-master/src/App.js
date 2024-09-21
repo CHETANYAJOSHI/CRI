@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Topbar from "./scenes/global/Topbar";
@@ -48,14 +49,16 @@ import DefaultAccount from "./components/CreateAccount/DefaultAccount";
 import Request from "./components/Notification/Request";
 import FloaterInactiveData from "./scenes/invoices/FloaterLive/FloaterInactiveData";
 import CalimIntimation from "./components/ClaimIntimation";
+
 function App() {
   const [theme, colorMode] = useMode();
   const [isSidebar, setIsSidebar] = useState(true);
   const location = useLocation();
-
+  const URL = process.env.REACT_APP_URL;
   // List of paths where you want to hide the sidebar
   const noSidebarPaths = ["/"];
 
+  console.log(URL);
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>

@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import styled from 'styled-components';
 
+
+
 const Container = styled.div`
   display: flex;
   justify-content: center;
@@ -153,6 +155,7 @@ const CreateAccount = () => {
   const [accountDetails, setAccountDetails] = useState({});
   
 
+
   const onFileChange = (e) => {
     const { name, files } = e.target;
     if (files.length > 0) {
@@ -252,7 +255,7 @@ const CreateAccount = () => {
    
 
     try {
-      const response = await axios.post('http://localhost:5000/api/createaccount', formData, {
+      const response = await axios.post(`http://localhost:5000/api/createaccount`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -266,6 +269,8 @@ const CreateAccount = () => {
       setMessage('Error creating account. Please try again.');
     }
   };
+
+
 
   return (
     <Container style={{alignItems:'normal' , gap:'15px'}}>
@@ -356,7 +361,7 @@ const CreateAccount = () => {
             <Input type="file" name="claimSelfAnalysisFile" onChange={onFileChange}  accept=".pdf"  />
           </FormGroup> */}
           <FormGroup>
-            <Label>Floater with Parents Claim Analysis File</Label>
+            <Label>Claim Analysis File</Label>
             <Input type="file" name="claimFloaterAnalysisFile" onChange={onFileChange}  accept=".pdf"  />
           </FormGroup>
           {/* <FormGroup>
@@ -364,7 +369,7 @@ const CreateAccount = () => {
             <Input type="file" name="claimDumpSelfFile" onChange={onFileChange}  accept=".xlsx"  />
           </FormGroup> */}
           <FormGroup>
-            <Label>Floater with Parents Claim Dump File</Label>
+            <Label>Claim Dump File</Label>
             <Input type="file" name="claimDumpFloaterFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
@@ -372,7 +377,7 @@ const CreateAccount = () => {
             <Input type="file" name="liveDataSelfFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup> */}
           <FormGroup>
-            <Label>Floater with Parents Live Data File</Label>
+            <Label>Live Data File</Label>
             <Input type="file" name="liveDataFloaterFile" onChange={onFileChange} accept=".xlsx"  />
           </FormGroup>
           {/* <FormGroup>
@@ -420,7 +425,7 @@ const CreateAccount = () => {
             <Input type="file" name="policyCoverageSelfFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup> */}
           <FormGroup>
-            <Label>Floater with Parents Policy Coverage</Label>
+            <Label>Policy Coverage</Label>
             <Input type="file" name="policyCoverageFloaterFile" onChange={onFileChange} accept=".pdf"  />
           </FormGroup>
           <Button type="submit">Create Account</Button>
@@ -437,12 +442,12 @@ const CreateAccount = () => {
               <p><strong>Account Name:</strong> {accountDetails.accountName}</p>
               <p><strong>Network Hospital Link :</strong> {accountDetails.networkHospitalLink}</p>
               <p><strong>cdStatementFile :</strong> {accountDetails.cdStatementFile}</p>
-              <p><strong>claimSelfAnalysisFile :</strong> {accountDetails.claimSelfAnalysisFile}</p>
-              <p><strong>claimFloaterAnalysisFile :</strong> {accountDetails.claimFloaterAnalysisFile}</p>
-              <p><strong>claimDumpSelfFile :</strong> {accountDetails.claimDumpSelfFile}</p>
-              <p><strong>claimDumpFloaterFile :</strong> {accountDetails.claimDumpFloaterFile}</p>
-              <p><strong>liveDataSelfFile :</strong> {accountDetails.liveDataSelfFile}</p>
-              <p><strong>liveDataFloaterFile :</strong> {accountDetails.liveDataFloaterFile}</p>
+              <p><strong>claimAnalysisFile :</strong> {accountDetails.claimSelfAnalysisFile}</p>
+              <p><strong>claimAnalysisFile :</strong> {accountDetails.claimFloaterAnalysisFile}</p>
+              <p><strong>claimDumpFile :</strong> {accountDetails.claimDumpSelfFile}</p>
+              <p><strong>claimDumpFile :</strong> {accountDetails.claimDumpFloaterFile}</p>
+              <p><strong>liveDataFile :</strong> {accountDetails.liveDataSelfFile}</p>
+              <p><strong>liveDataFile :</strong> {accountDetails.liveDataFloaterFile}</p>
               {/* <p><strong>endrosementAdditionFile :</strong> {accountDetails.endrosementAdditionFile}</p>
               <p><strong>endrosementDeletionFile :</strong> {accountDetails.endrosementDeletionFile}</p> */}
               <p><strong>claimABFile :</strong> {accountDetails.claimABFile}</p>
@@ -453,8 +458,8 @@ const CreateAccount = () => {
               <p><strong>additionDataFile :</strong> {accountDetails.additionDataFile}</p>
               {/* <p><strong>additionDataSelfFile :</strong> {accountDetails.additionDataSelfFile}</p> */}
               <p><strong>deletionDataFile :</strong> {accountDetails.deletionDataFile}</p>
-              <p><strong>Self Policy Coverage :</strong> {accountDetails.policyCoverageSelfFile}</p>
-              <p><strong>Floater Policy Coverage:</strong> {accountDetails.policyCoverageFloaterFile}</p>
+              <p><strong>Policy Coverage :</strong> {accountDetails.policyCoverageSelfFile}</p>
+              <p><strong>Policy Coverage:</strong> {accountDetails.policyCoverageFloaterFile}</p>
               
             </ModalContent>
           </Modal>

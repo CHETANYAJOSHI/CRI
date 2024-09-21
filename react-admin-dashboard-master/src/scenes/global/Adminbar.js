@@ -505,13 +505,13 @@ const Logout=()=>{
               />
 
 
-              <Item
+              {/* <Item
                 title="Calculated Premium"
                 to="/enrollment/premium"
                 icon={<AttachMoneyIcon />}
                 selected={selected}
                 setSelected={setSelected}
-              />  
+              />   */}
 
 
               <Item
@@ -525,7 +525,13 @@ const Logout=()=>{
               </SubMenu>
 
            
-
+              <SubMenu
+                title="Claim"
+                
+                icon={<BeenhereIcon />}
+                selected={selected}
+                setSelected={setSelected}
+              >
             
 
 {!nullFields.includes('claimDumpSelfFile') && <Item
@@ -563,7 +569,7 @@ const Logout=()=>{
                 setSelected={setSelected}
             />}
           
-
+          </SubMenu>
             
 
             {/* <Item
