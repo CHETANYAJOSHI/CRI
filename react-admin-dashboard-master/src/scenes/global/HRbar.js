@@ -116,12 +116,12 @@ const HRbar = () => {
   // const { authData } = useContext(AuthContext);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
-  const [selectedAccount, setSelectedAccount] = useState(localStorage.getItem('hrId'))
+  const [selectedAccount, setSelectedAccount] = useState(sessionStorage.getItem('hrId'))
   const [accounts, setAccounts] = useState([]);
 
-  const [hrName,sethrName] = useState(localStorage.getItem('hrName'));
-  const [accountName,setaccountName] = useState(localStorage.getItem('accountName'));
-  const [hrId,sethrId] = useState(localStorage.getItem('hrId'));
+  const [hrName,sethrName] = useState(sessionStorage.getItem('hrName'));
+  const [accountName,setaccountName] = useState(sessionStorage.getItem('accountName'));
+  const [hrId,sethrId] = useState(sessionStorage.getItem('hrId'));
   const [hrDetails, setHrDetails] = useState([]);
   const [mobileNumber , setMobileNumber] = useState();
   const [selectedHr, setSelectedHr] = useState('');
@@ -169,8 +169,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  // Fetch HR details from localStorage or make an API call
-  const storedHrDetails = JSON.parse(localStorage.getItem('hrDetails'));
+  // Fetch HR details from sessionStorage or make an API call
+  const storedHrDetails = JSON.parse(sessionStorage.getItem('hrDetails'));
   if (storedHrDetails) {
     setHrDetails(storedHrDetails);
     if (storedHrDetails.length > 0) {
@@ -207,9 +207,9 @@ const handleSelectChange = (event) => {
 
 
 useEffect(() => {
-  // Store the selectedAccount in localStorage whenever it changes
-  localStorage.setItem('selectedAccount', selectedAccount);
-  localStorage.setItem('mobileNumber' , mobileNumber);
+  // Store the selectedAccount in sessionStorage whenever it changes
+  sessionStorage.setItem('selectedAccount', selectedAccount);
+  sessionStorage.setItem('mobileNumber' , mobileNumber);
 }, [selectedAccount]);
 // console.log(authData)
 
@@ -218,17 +218,17 @@ const Logout=()=>{
   const confirmed = window.confirm("Are you sure you want to logout?");
   if (confirmed) {
     // Clear the user's token or session data
-    localStorage.removeItem('role');
-    localStorage.removeItem('token'); // or your method of storing tokens
-    localStorage.removeItem('hrName'); 
-    localStorage.removeItem('accountName');
-    localStorage.removeItem('hrId'); 
-    localStorage.removeItem('authToken'); 
-    localStorage.removeItem('selectedAccount'); 
-    localStorage.removeItem('hrDetails');
-    localStorage.removeItem('mobileNumber');
-    localStorage.removeItem('employeeNumber');
-    localStorage.removeItem('employeeId');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('token'); // or your method of storing tokens
+    sessionStorage.removeItem('hrName'); 
+    sessionStorage.removeItem('accountName');
+    sessionStorage.removeItem('hrId'); 
+    sessionStorage.removeItem('authToken'); 
+    sessionStorage.removeItem('selectedAccount'); 
+    sessionStorage.removeItem('hrDetails');
+    sessionStorage.removeItem('mobileNumber');
+    sessionStorage.removeItem('employeeNumber');
+    sessionStorage.removeItem('employeeId');
     
     
     // Navigate to the login or home page after logout

@@ -25,14 +25,14 @@ function ClaimIntimation() {
   const [loading, setLoading] = useState(false); // New loading state
 
   useEffect(() => {
-    const cachedData = JSON.parse(localStorage.getItem('claimIntimationData'));
+    const cachedData = JSON.parse(sessionStorage.getItem('claimIntimationData'));
     if (cachedData) {
       setFormData(cachedData);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('claimIntimationData', JSON.stringify(formData));
+    sessionStorage.setItem('claimIntimationData', JSON.stringify(formData));
   }, [formData]);
 
   const handleChange = (e) => {
@@ -97,7 +97,7 @@ function ClaimIntimation() {
         contactNo: '',
         emailId: '',
       });
-      localStorage.removeItem('claimIntimationData');
+      sessionStorage.removeItem('claimIntimationData');
     } else {
       console.error("Error sending email");
     }

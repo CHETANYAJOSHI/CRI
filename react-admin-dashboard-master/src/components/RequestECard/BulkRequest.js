@@ -4,7 +4,7 @@ import SendIcon from "@mui/icons-material/Send";
 
 const BulkRequest = () => {
   const [requestDetails, setRequestDetails] = useState("");
-  const [selectedAccount, setSelectedAccount] = useState(localStorage.getItem("selectedAccount") || "");
+  const [selectedAccount, setSelectedAccount] = useState(sessionStorage.getItem("selectedAccount") || "");
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleInputChange = (event) => {

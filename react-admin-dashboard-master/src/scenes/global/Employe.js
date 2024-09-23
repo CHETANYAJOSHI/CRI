@@ -17,7 +17,7 @@ const Employe = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [selected, setSelected] = useState("Dashboard");
   const [selectedAccount, setSelectedAccount] = useState(() => {
-    return localStorage.getItem("selectedAccount") || "";
+    return sessionStorage.getItem("selectedAccount") || "";
   });
   const [accounts, setAccounts] = useState([]);
   const [navigateToPolicyCoverage, setNavigateToPolicyCoverage] = useState(false);
@@ -37,7 +37,7 @@ const Employe = () => {
 
   useEffect(() => {
     if (selectedAccount) {
-      localStorage.setItem("selectedAccount", selectedAccount);
+      sessionStorage.setItem("selectedAccount", selectedAccount);
       if (navigateToPolicyCoverage) {
         Navigate(`/policycoverage?accountId=${selectedAccount}`);
         setNavigateToPolicyCoverage(false); // Reset the flag
@@ -46,7 +46,7 @@ const Employe = () => {
   }, [selectedAccount, navigateToPolicyCoverage, Navigate]);
 
   const handlePolicyCoverageClick = () => {
-    const account = localStorage.getItem("selectedAccount");
+    const account = sessionStorage.getItem("selectedAccount");
     if (account) {
       Navigate(`/policycoverage?accountId=${account}`);
     } else {
@@ -69,7 +69,7 @@ const Employe = () => {
   const Logout = () => {
     const confirmed = window.confirm("Are you sure you want to logout?");
     if (confirmed) {
-      localStorage.clear();
+      sessionStorage.clear();
       sessionStorage.clear();
       Navigate("/");
     }

@@ -72,16 +72,16 @@ const Login = () => {
           setShowModal(true);
           // setAuthData(response.data);
           // console.log(setAuthData);
-          localStorage.setItem('hrDetails', JSON.stringify(response.data.hrDetails));
-          localStorage.setItem('role', response.data.role);
-          localStorage.setItem('accountName', response.data.accountName);
-          localStorage.setItem('hrId', response.data.hrId);
-          localStorage.setItem('hrName', response.data.hrName);
-          localStorage.setItem('authToken', response.data.token);
-          localStorage.setItem('mobileNumber' , response.data.mobileNumber);
-          localStorage.setItem('employeeNumber' , response.data.mobileNumber);
+          sessionStorage.setItem('hrDetails', JSON.stringify(response.data.hrDetails));
+          sessionStorage.setItem('role', response.data.role);
+          sessionStorage.setItem('accountName', response.data.accountName);
+          sessionStorage.setItem('hrId', response.data.hrId);
+          sessionStorage.setItem('hrName', response.data.hrName);
+          sessionStorage.setItem('authToken', response.data.token);
+          sessionStorage.setItem('mobileNumber' , response.data.mobileNumber);
+          sessionStorage.setItem('employeeNumber' , response.data.mobileNumber);
 
-          if (localStorage.getItem('role') === 'HR' || localStorage.getItem('role') == 'Employee') {
+          if (sessionStorage.getItem('role') === 'HR' || sessionStorage.getItem('role') == 'Employee') {
             navigate("/profile");
           }
           

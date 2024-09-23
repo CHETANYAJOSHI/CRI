@@ -23,7 +23,7 @@ const Contacts = () => {
   const [mobileNumber, setMobileNumber] = useState(null);
   const [rowData, setRowData] = useState([]);
   const [nullFields, setNullFields] = useState([]);
-  const [selectedAccount, setSelectedAccount] = useState(localStorage.getItem('selectedAccount'));
+  const [selectedAccount, setSelectedAccount] = useState(sessionStorage.getItem('selectedAccount'));
   const location = useLocation();
 
   const primaryColor = '#0a88ef';
@@ -56,8 +56,8 @@ const Contacts = () => {
  
 
   useEffect(() => {
-    const storedAccountId = localStorage.getItem('selectedAccount');
-    const storedMobileNumber = localStorage.getItem('mobileNumber');
+    const storedAccountId = sessionStorage.getItem('selectedAccount');
+    const storedMobileNumber = sessionStorage.getItem('mobileNumber');
 
     setAccountId(storedAccountId);
     setMobileNumber(storedMobileNumber);
@@ -99,7 +99,7 @@ const Contacts = () => {
         try {
           const res = await axios.get(`http://localhost:5000/api/accounts/${accountId}`);
           setAccountData(res.data);
-          localStorage.setItem('mobileNumber', res.data.hrNumber);
+          sessionStorage.setItem('mobileNumber', res.data.hrNumber);
           console.log(res.data);
         } catch (err) {
           setError('Failed to fetch account data');

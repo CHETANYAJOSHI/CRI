@@ -20,7 +20,7 @@ const EmployeeRequest = () => {
     { id: "", name: "", tpaName: "" },
     { id: "", name: "", tpaName: "" },
   ]);
-const [selectedAccount , setSelectedAccount] = useState(localStorage.getItem('selectedAccount'));
+const [selectedAccount , setSelectedAccount] = useState(sessionStorage.getItem('selectedAccount'));
   const [openDialog, setOpenDialog] = useState(false);
 
   const handleInputChange = (index, field, value) => {

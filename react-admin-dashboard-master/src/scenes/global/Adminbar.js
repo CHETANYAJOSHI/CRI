@@ -120,12 +120,12 @@ const Adminbar = () => {
 const [unreadCount, setUnreadCount] = useState(0);
 
   const [selectedAccount, setSelectedAccount] = useState(() => {
-    // Retrieve from localStorage if available
-    return localStorage.getItem('selectedAccount') || ''});
+    // Retrieve from sessionStorage if available
+    return sessionStorage.getItem('selectedAccount') || ''});
 
     const [hrNumber, sethrNumber] = useState(() => {
-      // Retrieve from localStorage if available
-      return localStorage.getItem('mobileNumber') || ''});
+      // Retrieve from sessionStorage if available
+      return sessionStorage.getItem('mobileNumber') || ''});
 
     const [accounts, setAccounts] = useState([]);
     const [nullFields, setNullFields] = useState([]);
@@ -207,8 +207,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  // Store the selectedAccount in localStorage whenever it changes
-  localStorage.setItem('selectedAccount', selectedAccount);
+  // Store the selectedAccount in sessionStorage whenever it changes
+  sessionStorage.setItem('selectedAccount', selectedAccount);
 }, [selectedAccount]);
 
 const handleSelectChange = (e) => {
@@ -220,10 +220,10 @@ const handleSelectChange = (e) => {
   if (selectedAcc && selectedAcc.hrNumber) {
     const hrNum = selectedAcc.hrNumber;
     sethrNumber(hrNum);
-    localStorage.setItem('mobileNumber', hrNum); // Persist HR number
+    sessionStorage.setItem('mobileNumber', hrNum); // Persist HR number
   } else {
     sethrNumber('');
-    localStorage.removeItem('mobileNumber'); // Remove if not found
+    sessionStorage.removeItem('mobileNumber'); // Remove if not found
   }
 
 
@@ -236,15 +236,15 @@ const Logout=()=>{
   const confirmed = window.confirm("Are you sure you want to logout?");
   if (confirmed) {
     // Clear the user's token or session data
-    localStorage.removeItem('role');
-    localStorage.removeItem('token'); // or your method of storing tokens
-    localStorage.removeItem('hrName'); 
-    localStorage.removeItem('accountName');
-    localStorage.removeItem('hrId'); 
-    localStorage.removeItem('authToken'); 
-    localStorage.removeItem('selectedAccount');  // or your method of storing tokens
-    localStorage.removeItem('mobileNumber');
-    localStorage.removeItem('employeeId');
+    sessionStorage.removeItem('role');
+    sessionStorage.removeItem('token'); // or your method of storing tokens
+    sessionStorage.removeItem('hrName'); 
+    sessionStorage.removeItem('accountName');
+    sessionStorage.removeItem('hrId'); 
+    sessionStorage.removeItem('authToken'); 
+    sessionStorage.removeItem('selectedAccount');  // or your method of storing tokens
+    sessionStorage.removeItem('mobileNumber');
+    sessionStorage.removeItem('employeeId');
     // Navigate to the login or home page after logout
     sessionStorage.clear();
     Navigate("/"); // or wherever you want to redirect after logout

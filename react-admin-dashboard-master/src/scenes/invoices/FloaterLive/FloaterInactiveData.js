@@ -279,7 +279,7 @@ const FloaterInactiveData = () => {
   });
 
   const selectedAccountName = accounts.find(account => account._id === selectedAccount)?.accountName || '';
-  const role = localStorage.getItem('role');
+  const role = sessionStorage.getItem('role');
   return (
 
     <Box mt="20px" style={{textAlign:'center'}}>

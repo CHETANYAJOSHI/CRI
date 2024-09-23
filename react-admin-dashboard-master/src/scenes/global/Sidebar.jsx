@@ -119,8 +119,8 @@ const Sidebar = () => {
   const [mobileNumber, setMobileNumber] = useState('');
   const [otp, setOtp] = useState('');
   const [selectedAccount, setSelectedAccount] = useState(() => {
-    // Retrieve from localStorage if available
-    return localStorage.getItem('selectedAccount') || ''});
+    // Retrieve from sessionStorage if available
+    return sessionStorage.getItem('selectedAccount') || ''});
     const [accounts, setAccounts] = useState([]);
 
 const Nav = ()=>{
@@ -130,7 +130,7 @@ const Nav = ()=>{
 
 
 
-const role = localStorage.getItem('role');
+const role = sessionStorage.getItem('role');
 
 
 useEffect(() => {
@@ -149,8 +149,8 @@ useEffect(() => {
 
 
 useEffect(() => {
-  // Store the selectedAccount in localStorage whenever it changes
-  localStorage.setItem('selectedAccount', selectedAccount);
+  // Store the selectedAccount in sessionStorage whenever it changes
+  sessionStorage.setItem('selectedAccount', selectedAccount);
 }, [selectedAccount]);
 
 const handleSelectChange = (e) => {

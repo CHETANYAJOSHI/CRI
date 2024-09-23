@@ -32,14 +32,14 @@ const Team = () => {
   //   }
   // }
 
-  // loginEmployee(localStorage.getItem('employeeNumber'))
+  // loginEmployee(sessionStorage.getItem('employeeNumber'))
 
 
 
   useEffect(() => {
-    // Retrieve accountId and mobileNumber from localStorage
-    const storedAccountId = localStorage.getItem('selectedAccount');
-    const storedMobileNumber = localStorage.getItem('mobileNumber');
+    // Retrieve accountId and mobileNumber from sessionStorage
+    const storedAccountId = sessionStorage.getItem('selectedAccount');
+    const storedMobileNumber = sessionStorage.getItem('mobileNumber');
 
     setAccountId(storedAccountId);
     setMobileNumber(storedMobileNumber);
@@ -79,10 +79,10 @@ const Team = () => {
   };
 
   const downloadECard = () => {
-    const employeeId = localStorage.getItem('employeeId'); // Assuming employeeId is stored in localStorage
+    const employeeId = sessionStorage.getItem('employeeId'); // Assuming employeeId is stored in sessionStorage
 
     if (!employeeId) {
-      console.error('Employee ID not found in localStorage');
+      console.error('Employee ID not found in sessionStorage');
       return;
     }
 
@@ -134,7 +134,7 @@ const Team = () => {
 
   useEffect(() => {
     if (selfData.pribenef_employee_code) {
-      localStorage.setItem('employeeId', selfData.pribenef_employee_code);
+      sessionStorage.setItem('employeeId', selfData.pribenef_employee_code);
     }
   }, [selfData.pribenef_employee_code]);
 

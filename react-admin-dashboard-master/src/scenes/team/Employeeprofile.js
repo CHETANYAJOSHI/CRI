@@ -47,8 +47,8 @@ const EmployeeProfile = () => {
         console.error(response.data.error); 
       } else {
         const { accountId } = response.data;
-        localStorage.setItem('selectedAccount', accountId);
-        localStorage.setItem('mobileNumber', mobileNumber);
+        sessionStorage.setItem('selectedAccount', accountId);
+        sessionStorage.setItem('mobileNumber', mobileNumber);
         fetchLiveData(accountId, mobileNumber);
       }
     } catch (error) {
@@ -60,8 +60,8 @@ const EmployeeProfile = () => {
   }, [fetchLiveData]);
 
   useEffect(() => {
-    const storedAccountId = localStorage.getItem('selectedAccount');
-    const storedMobileNumber = localStorage.getItem('employeeNumber');
+    const storedAccountId = sessionStorage.getItem('selectedAccount');
+    const storedMobileNumber = sessionStorage.getItem('employeeNumber');
     setAccountId(storedAccountId);
     setMobileNumber(storedMobileNumber);
     if (storedMobileNumber) {
@@ -92,15 +92,15 @@ const daughtersData = getRowDataByRelation('Daughter'); // Get all daughters
 
 useEffect(() => {
   if (selfData.pribenef_employee_code) {
-    localStorage.setItem('employeeId', selfData.pribenef_employee_code);
+    sessionStorage.setItem('employeeId', selfData.pribenef_employee_code);
   }
 }, [selfData.pribenef_employee_code]);
 
 const downloadECard = () => {
-  const employeeId = localStorage.getItem('employeeId'); // Assuming employeeId is stored in localStorage
+  const employeeId = sessionStorage.getItem('employeeId'); // Assuming employeeId is stored in sessionStorage
 
   if (!employeeId) {
-    console.error('Employee ID not found in localStorage');
+    console.error('Employee ID not found in sessionStorage');
     return;
   }
 
