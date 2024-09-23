@@ -1,33 +1,69 @@
 const OTP = require('../models/otpschema');
 const Accounts = require('../models/createaccount');
 const {generateOTP , generateExpireTime} = require('../utils/otpGenrator');
-const {sendOtpSMS} = require("../services/smsService");
+const axios = require('axios');
+
+// const {sendOtpSMS} = require("../services/smsService");
 require('dotenv').config();
 const {generateToken, verifyToken} = require('../utils/jwt');
 
-exports.sendOtp = async(req,res)=>{
-    const {mobileNumber} = req.body;
 
-    try{
-        const otp = generateOTP();
-        const otpExpireAt = generateExpireTime();
+const sendOtpSMS = async (mobileNumber, otp) => {
+    try {
+        const apiUrl = `https://msg.smsguruonline.com/fe/api/v1/send`;
+        const params = {
+            username: process.env.SMS_API_USERNAME,
+            password: process.env.SMS_API_PASSWORD,
+            unicode: 'false',
+            from: process.env.SMS_FROM,
+            to: mobileNumber, // Use the formatted mobile number
+            dltPrincipalEntityId: process.env.DLT_PRINCIPAL_ENTITY_ID,
+            dltContentId: process.env.DLT_CONTENT_ID,
+            text: `Dear ${'Family'}, Your One time password OTP is: ${otp},Thanks!! - Corporate Risks India Insurance Brokers Pvt. Ltd`
+        };
 
-        await OTP.findOneAndUpdate(
-            {mobileNumber},
-            {otp , otpExpireAt},
-            {upsert:true , new:true}
+        // Log for debugging
+        console.log(`Sending SMS to ${mobileNumber} with URL: ${apiUrl}?${new URLSearchParams(params)}`);
+
+        const response = await axios.get(apiUrl, { params });
+        console.log('SMS API Response:', response.data);
+    } catch (error) {
+        console.error('Error sending OTP:', error.response ? error.response.data : error.message);
+    }
+};
+
+
+
+
+
+
+
+exports.sendOtp = async (req, res) => {
+    const { mobileNumber } = req.body;
+    console.log('Received mobile number:', mobileNumber); // For debugging
+
+    try {
+        const otp = generateOTP(); // Generate OTP
+        const otpExpireAt = generateExpireTime(); // Expiration time
+
+        // Save OTP to the database...
+
+         // Save OTP and its expiration time in the database
+         await OTP.findOneAndUpdate(
+            { mobileNumber },
+            { otp, otpExpireAt },
+            { upsert: true, new: true }
         );
 
-        // await sendOtpSMS(mobileNumber , otp);
-        res.status(200).json({message:'OTP sent Successfully'});
-        
-    }
+        // Send OTP via SMS
+        // await sendOtpSMS(mobileNumber, otp);
 
-    catch(error){
-        console.error(error);
-        res.status(500).json({message:'Error Sending OTP'});
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).json({ message: 'Error sending OTP' });
     }
-}
+};
 
 
 exports.verfiyOtp = async (req, res) => {
